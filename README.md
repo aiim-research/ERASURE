@@ -16,8 +16,11 @@ ERASURE offers fully extensible built-in components, allowing users to define cu
 
 
 ## Team Information:
-* Prof. Giovanni Stilo [project leader/investigator]
-* Andrea D'Angelo [principal investigator]
+* Prof. Giovanni Stilo, PhD. [project leader/research advisor]
+* Flavio Giobergia, PhD. [project co-leader]
+* Andrea D'Angelo [co-principal investigator]
+* xxxx yyyy [co-principal investigator]
+* Gabriele Tagliente [pivotal contributor]
 
 ## First steps with ERASURE
 
