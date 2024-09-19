@@ -17,11 +17,11 @@ Additionally, it provides a flexible environment for defining and running unlear
 
 
 ## Team Information:
-* Prof. Giovanni Stilo, PhD. [project leader/research advisor]
+* Prof. Giovanni Stilo, PhD. [project co-leader/research advisor]
 * Flavio Giobergia, PhD. [project co-leader/research advisor]
 * Prof. Francesco Gullo [research advisor]
-* Andrea D'Angelo [co-principal investigator]
-* xxxx yyyy [co-principal investigator]
+* Andrea D'Angelo [investigator]
+* xxxx yyyy [investigator]
 * Gabriele Tagliente [pivotal contributor]
 
 ## First steps with ERASURE
