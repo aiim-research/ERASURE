@@ -4,7 +4,7 @@ from erasure.data.datasets.Dataset import Dataset
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 
-class unlearner(Configurable, metaclass=ABCMeta):
+class Unlearner(Configurable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx: Global, local_ctx):
         self.dataset = local_ctx.dataset

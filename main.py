@@ -39,14 +39,21 @@ if __name__ == "__main__":
     #Create unlearners 
     unlearners = []
     unlearners_cfg = global_ctx.config.unlearners
-    for identifier_cfg in unlearners_cfg:
-        current = Local(identifier_cfg)
+    for un in unlearners_cfg:
+        current = Local(un)
         current.dataset = data_manager
         current.model = predictor
         unlearners.append( global_ctx.factory.get_object(current) )
-        global_ctx.factory.get_object(current).unlearn()
 
     
-    
+    #Evaluator
+    current = Local(global_ctx.config.evaluator)
+    evaluator = global_ctx.factory.get_object(current)
+
+    # Evaluations
+    for unlearner in unlearners:
+        evaluator.evaluate(unlearner)
+
+ 
 
 
