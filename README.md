@@ -25,6 +25,12 @@ Additionally, it provides a flexible environment for defining and running unlear
 * Gabriele Tagliente [pivotal contributor]
 
 ## First steps with ERASURE
+```console
+foo@bar:~$ python main.py configs/example.jsonc
+foo
+```
+
+
 
 ## Resources Provided with the Framework
 
