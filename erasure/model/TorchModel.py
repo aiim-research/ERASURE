@@ -39,10 +39,11 @@ class TorchModel(Trainable):
             "cuda"
             if torch.cuda.is_available()
             else "mps"
-            if torch.backends.mps.is_available()
+                if torch.backends.mps.is_available()
             else "cpu"
         )
         self.model.to(self.device) 
+        self.model.device = self.device
         
         self.patience = 0     
         self.fit() 
