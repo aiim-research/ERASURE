@@ -27,7 +27,6 @@ Additionally, it provides a flexible environment for defining and running unlear
 ## First steps with ERASURE
 ```console
 foo@bar:~$ python main.py configs/example.jsonc
-foo
 ```
 
 
