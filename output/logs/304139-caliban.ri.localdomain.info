@@ -1,0 +1,8 @@
+2024-09-20 12:56:31,252938269 | INFO | 304139 - Creating Global Context for: configs/example.jsonc
+2024-09-20 12:56:31,252938300 | INFO | 304139 - {'class': 'erasure.data.data_sources.TVDataSource.TVDataSource', 'parameters': {'path': 'torchvision.datasets.FashionMNIST'}}
+2024-09-20 12:56:31,252938301 | INFO | 304139 - Instantiating: erasure.data.data_sources.TVDataSource.TVDataSource
+2024-09-20 12:57:04,252971301 | INFO | 304139 - <torch.utils.data.dataset.ConcatDataset object at 0x7f00c36900d0>
+2024-09-20 12:57:04,252971331 | INFO | 304139 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterPercentage
+2024-09-20 12:57:04,252971368 | INFO | 304139 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterPercentage
+2024-09-20 12:57:04,252971368 | INFO | 304139 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterClass
+2024-09-20 12:57:04,252971512 | INFO | 304139 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterNSamples

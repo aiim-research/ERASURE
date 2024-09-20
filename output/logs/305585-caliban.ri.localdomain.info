@@ -1,0 +1,57 @@
+2024-09-20 13:01:31,253238198 | INFO | 305585 - Creating Global Context for: configs/example.jsonc
+2024-09-20 13:01:31,253238222 | INFO | 305585 - {'class': 'erasure.data.data_sources.TVDataSource.TVDataSource', 'parameters': {'path': 'torchvision.datasets.FashionMNIST'}}
+2024-09-20 13:01:31,253238222 | INFO | 305585 - Instantiating: erasure.data.data_sources.TVDataSource.TVDataSource
+2024-09-20 13:01:33,253240250 | INFO | 305585 - <torch.utils.data.dataset.ConcatDataset object at 0x7fa33ccfb1c0>
+2024-09-20 13:01:33,253240250 | INFO | 305585 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterPercentage
+2024-09-20 13:01:33,253240257 | INFO | 305585 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterPercentage
+2024-09-20 13:01:33,253240257 | INFO | 305585 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterClass
+2024-09-20 13:01:33,253240374 | INFO | 305585 - Instantiating: erasure.data.datasets.DataSplitter.DataSplitterNSamples
+2024-09-20 13:01:33,253240375 | INFO | 305585 - ['all', 'all_reduced', '-', 'train', 'test', 'forget set', 'other_classes', 'example']
+2024-09-20 13:01:33,253240375 | INFO | 305585 - Created Configurable: erasure.data.datasets.DatasetManager.DatasetManager
+2024-09-20 13:01:35,253242684 | INFO | 305585 - Instantiating: erasure.model.cnns.standardCNN.FashionCNN
+2024-09-20 13:01:35,253242746 | INFO | 305585 - Instantiating: torch.optim.RMSprop
+2024-09-20 13:01:35,253242746 | INFO | 305585 - Instantiating: torch.nn.CrossEntropyLoss
+2024-09-20 13:01:36,253243171 | INFO | 305585 - epoch = 0 ---> loss = 8443.1523	 accuracy = 0.1057
+2024-09-20 13:01:36,253243487 | INFO | 305585 - epoch = 1 ---> loss = 2444.2800	 accuracy = 0.2214
+2024-09-20 13:01:36,253243810 | INFO | 305585 - epoch = 2 ---> loss = 92.7552	 accuracy = 0.5371
+2024-09-20 13:01:37,253244194 | INFO | 305585 - epoch = 3 ---> loss = 56.1094	 accuracy = 0.5886
+2024-09-20 13:01:37,253244558 | INFO | 305585 - epoch = 4 ---> loss = 37.8452	 accuracy = 0.6300
+2024-09-20 13:01:37,253244930 | INFO | 305585 - epoch = 5 ---> loss = 29.9114	 accuracy = 0.6371
+2024-09-20 13:01:38,253245411 | INFO | 305585 - epoch = 6 ---> loss = 21.8085	 accuracy = 0.6629
+2024-09-20 13:01:38,253245831 | INFO | 305585 - epoch = 7 ---> loss = 17.5040	 accuracy = 0.6829
+2024-09-20 13:01:39,253246309 | INFO | 305585 - epoch = 8 ---> loss = 17.7515	 accuracy = 0.6714
+2024-09-20 13:01:39,253246674 | INFO | 305585 - epoch = 9 ---> loss = 24.0381	 accuracy = 0.6629
+2024-09-20 13:01:40,253247039 | INFO | 305585 - epoch = 10 ---> loss = 12.5051	 accuracy = 0.7343
+2024-09-20 13:01:40,253247499 | INFO | 305585 - epoch = 11 ---> loss = 11.7945	 accuracy = 0.7429
+2024-09-20 13:01:40,253247848 | INFO | 305585 - epoch = 12 ---> loss = 9.0031	 accuracy = 0.7386
+2024-09-20 13:01:41,253248189 | INFO | 305585 - epoch = 13 ---> loss = 8.0436	 accuracy = 0.7500
+2024-09-20 13:01:41,253248646 | INFO | 305585 - epoch = 14 ---> loss = 10.3595	 accuracy = 0.7357
+2024-09-20 13:01:42,253249014 | INFO | 305585 - epoch = 15 ---> loss = 7.3136	 accuracy = 0.7671
+2024-09-20 13:01:42,253249441 | INFO | 305585 - epoch = 16 ---> loss = 7.3917	 accuracy = 0.7600
+2024-09-20 13:01:42,253249905 | INFO | 305585 - epoch = 17 ---> loss = 7.7738	 accuracy = 0.7786
+2024-09-20 13:01:43,253250256 | INFO | 305585 - epoch = 18 ---> loss = 5.8276	 accuracy = 0.7657
+2024-09-20 13:01:43,253250613 | INFO | 305585 - epoch = 19 ---> loss = 5.6598	 accuracy = 0.7914
+2024-09-20 13:01:44,253251037 | INFO | 305585 - epoch = 20 ---> loss = 4.3026	 accuracy = 0.8257
+2024-09-20 13:01:44,253251434 | INFO | 305585 - epoch = 21 ---> loss = 4.4240	 accuracy = 0.8000
+2024-09-20 13:01:44,253251796 | INFO | 305585 - epoch = 22 ---> loss = 4.1535	 accuracy = 0.8057
+2024-09-20 13:01:45,253252203 | INFO | 305585 - epoch = 23 ---> loss = 4.4353	 accuracy = 0.8086
+2024-09-20 13:01:45,253252563 | INFO | 305585 - epoch = 24 ---> loss = 3.7429	 accuracy = 0.8157
+2024-09-20 13:01:45,253252922 | INFO | 305585 - epoch = 25 ---> loss = 2.8436	 accuracy = 0.8300
+2024-09-20 13:01:46,253253387 | INFO | 305585 - epoch = 26 ---> loss = 4.9024	 accuracy = 0.8257
+2024-09-20 13:01:46,253253725 | INFO | 305585 - epoch = 27 ---> loss = 2.7493	 accuracy = 0.8471
+2024-09-20 13:01:47,253254151 | INFO | 305585 - epoch = 28 ---> loss = 3.5178	 accuracy = 0.8171
+2024-09-20 13:01:47,253254563 | INFO | 305585 - epoch = 29 ---> loss = 3.3583	 accuracy = 0.8229
+2024-09-20 13:01:47,253254941 | INFO | 305585 - epoch = 30 ---> loss = 2.5998	 accuracy = 0.8500
+2024-09-20 13:01:48,253255382 | INFO | 305585 - epoch = 31 ---> loss = 1.8843	 accuracy = 0.8471
+2024-09-20 13:01:48,253255865 | INFO | 305585 - epoch = 32 ---> loss = 2.2981	 accuracy = 0.8543
+2024-09-20 13:01:49,253256315 | INFO | 305585 - epoch = 33 ---> loss = 1.6362	 accuracy = 0.8786
+2024-09-20 13:01:49,253256745 | INFO | 305585 - epoch = 34 ---> loss = 1.8176	 accuracy = 0.8686
+2024-09-20 13:01:50,253257166 | INFO | 305585 - epoch = 35 ---> loss = 1.7116	 accuracy = 0.8614
+2024-09-20 13:01:50,253257620 | INFO | 305585 - epoch = 36 ---> loss = 1.5965	 accuracy = 0.8800
+2024-09-20 13:01:50,253258001 | INFO | 305585 - epoch = 37 ---> loss = 1.5467	 accuracy = 0.8757
+2024-09-20 13:01:51,253258358 | INFO | 305585 - epoch = 38 ---> loss = 1.5925	 accuracy = 0.8686
+2024-09-20 13:01:51,253258797 | INFO | 305585 - epoch = 39 ---> loss = 1.5127	 accuracy = 0.8914
+2024-09-20 13:01:51,253258797 | INFO | 305585 - TorchModel trained on cpu in: 16.043449640274048 secs
+2024-09-20 13:01:51,253258816 | INFO | 305585 - Created Configurable: erasure.model.TorchModel.TorchModel
+2024-09-20 13:01:52,253259098 | INFO | 305585 - Created Configurable: erasure.unlearners.GoldModel.GoldModel
+2024-09-20 13:01:52,253259098 | INFO | 305585 - Created Configurable: erasure.unlearners.GoldModel.GoldModel

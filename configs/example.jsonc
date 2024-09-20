@@ -1,0 +1,51 @@
+{
+    "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
+                "parameters": {
+                    "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSource", 
+                                    "parameters": {"path": "torchvision.datasets.FashionMNIST"}
+                                }, 
+                    "splits":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"splits_names":["all_reduced","-"], "percentage":0.0125}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"splits_names":["train","test"], "percentage":0.8, "ref_data":"all_reduced"}},
+                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterClass", "parameters": {"splits_names":["forget set","other_classes"], "label":1, "ref_data": "train"} },
+                                 { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"splits_names":["example","-"], "n_samples":100, "ref_data":"forget set"}}
+                                ],
+                    "batch_size":128,
+                    "split_seed":16}
+                },
+    "predictor": {
+        "class": "erasure.model.TorchModel.TorchModel",
+        "parameters": {
+          "epochs": 40,
+          "optimizer": {
+            "class": "torch.optim.RMSprop",
+            "parameters": {
+              "lr": 0.01
+            }
+          },
+          "loss_fn": {
+            "class": "torch.nn.CrossEntropyLoss",
+            "parameters": {
+              "reduction": "mean"
+            }
+          },
+          "model": {
+            "class": "erasure.model.cnns.standardCNN.FashionCNN",
+            "parameters": { }
+          }
+        }
+      },
+
+    "unlearners":[{
+        "class": "erasure.unlearners.GoldModel.GoldModel",
+        "parameters": {}
+    }],
+
+
+    "evaluator":{
+      "class": "erasure.evaluations.manager.Evaluator",
+      "parameters": {
+        "measures":[ 
+      ]
+      }
+    }
+  }
