@@ -21,7 +21,7 @@ Additionally, it provides a flexible environment for defining and running unlear
 * Flavio Giobergia, PhD. [project co-leader/research advisor]
 * Prof. Francesco Gullo [research advisor]
 * Andrea D'Angelo [investigator]
-* xxxx yyyy [investigator]
+* Claudio Savelli [investigator]
 * Gabriele Tagliente [pivotal contributor]
 
 ## First steps with ERASURE
