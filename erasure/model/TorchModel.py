@@ -8,7 +8,7 @@ from erasure.core.factory_base import get_instance_kvargs, get_instance
 from sklearn.metrics import accuracy_score
 import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.data import Subset
-from torch_geometric.loader import DataLoader
+#from torch_geometric.loader import DataLoader
 import torch.nn as nn
 
 from fractions import Fraction

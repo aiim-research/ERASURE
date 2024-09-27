@@ -1,6 +1,6 @@
 import os
 import torch.nn as nn
-from torch_geometric.nn.aggr import MeanAggregation,SoftmaxAggregation
+#from torch_geometric.nn.aggr import MeanAggregation,SoftmaxAggregation
 
 
 class FMNIST_CNN(nn.Module):
