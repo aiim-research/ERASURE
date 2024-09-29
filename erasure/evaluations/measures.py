@@ -1,3 +1,4 @@
+from erasure.core.measure import Measure
 from erasure.evaluations.manager import Evaluation
 import time
 import torch
@@ -10,6 +11,7 @@ from sklearn.metrics import accuracy_score
 from collections import defaultdict
 import os
 
+
 class RunTime():    
     def process(self, e: Evaluation):
         if not e.unlearned_model:
@@ -21,7 +23,8 @@ class RunTime():
         e.add_value('RunTime', metric_value)
 
         return e
-    
+
+
 class Accuracy():
     def process(self, e: Evaluation): 
         
@@ -39,7 +42,6 @@ class Accuracy():
         e.add_value('Accuracies', {'Original_accuracy:':og_accuracy, 'New_accuracy:':new_accuracy})
 
         return e
-
 
     def compute_accuracy(self, test_loader, model):
         
@@ -59,7 +61,8 @@ class Accuracy():
     def accuracy(self, testy, probs):
         acc = accuracy_score(testy, np.argmax(probs, axis=1))
         return acc
-    
+
+
 class ForgetSetInfo():
     def process(self, e:Evaluation):
         e.add_value('Size of identified forget set', len(e.forget_set))
@@ -79,7 +82,6 @@ class ForgetSetInfo():
         return e
 
 
-    
 class SaveValues():
     def __init__(self, path):
         self.path = path
@@ -90,6 +92,40 @@ class SaveValues():
             json.dump(e.data_info, json_file, indent=4)
             json_file.write(',')
 
+        return e
 
 
+class AUS(Measure):
+    """ Abstract Unlearning Score """
 
+    def process(self, e: Evaluation):
+        or_model = e.unlearner.model
+        ul_model = e.unlearned_model
+
+        test_loader, _ = e.unlearner.dataset.get_loader_for('test')
+        forget_loader, _ = e.unlearner.dataset.get_loader_for('forget set')
+
+        or_test_accuracy = self.compute_accuracy(test_loader, or_model.model)
+        ul_forget_accuracy = self.compute_accuracy(forget_loader, ul_model.model)
+
+        print("OR test:", or_test_accuracy)
+        print("UL forget:", ul_forget_accuracy)
+
+        return e
+
+    def compute_accuracy(self, test_loader, model):
+        var_labels, var_preds = [], [],
+        with torch.no_grad():
+            for batch, (X, labels) in enumerate(test_loader):
+                _, pred = model(X.to(model.device))
+
+                var_labels += list(labels.squeeze().to('cpu').numpy())
+                var_preds += list(pred.squeeze().to('cpu').numpy())
+
+            accuracy = self.accuracy(var_labels, var_preds)
+
+        return accuracy
+
+    def accuracy(self, testy, probs):
+        acc = accuracy_score(testy, np.argmax(probs, axis=1))
+        return acc
