@@ -92,11 +92,9 @@ class SaveValues():
             json.dump(e.data_info, json_file, indent=4)
             json_file.write(',')
 
-        return e
-
 
 class AUS(Measure):
-    """ Abstract Unlearning Score """
+    """ Adaptive Unlearning Score """
 
     def process(self, e: Evaluation):
         or_model = e.unlearner.model
@@ -106,10 +104,17 @@ class AUS(Measure):
         forget_loader, _ = e.unlearner.dataset.get_loader_for('forget set')
 
         or_test_accuracy = self.compute_accuracy(test_loader, or_model.model)
+        ul_test_accuracy = self.compute_accuracy(test_loader, ul_model.model)
         ul_forget_accuracy = self.compute_accuracy(forget_loader, ul_model.model)
 
-        print("OR test:", or_test_accuracy)
-        print("UL forget:", ul_forget_accuracy)
+        aus = (1 - (or_test_accuracy - ul_test_accuracy)) / (1 + abs(ul_test_accuracy - ul_forget_accuracy))
+
+        print("Accuracy original test", or_test_accuracy)
+        print("Accuracy unlearned test", ul_test_accuracy)
+        print("Accuracy unlearned forget", ul_forget_accuracy)
+
+        print("Adaptive Unlearning Score:", aus)
+        e.add_value("AUS", aus)
 
         return e
 
