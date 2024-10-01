@@ -277,4 +277,21 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "Finetuning",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "finetune_epochs": 5,
+        "freeze_layers": false,
+        "n_layers_unfreezed": 1
+    },
+    "RunTime": 0.5350501537322998,
+    "Accuracies": {
+        "Original_accuracy:": 0.7142857142857143,
+        "New_accuracy:": 0.7028571428571428
+    },
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },
