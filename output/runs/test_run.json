@@ -294,4 +294,64 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "Finetuning",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "finetune_epochs": 5,
+        "freeze_layers": false,
+        "n_layers_unfreezed": 1
+    },
+    "RunTime": 0.5410046577453613,
+    "Accuracies": {
+        "Original_accuracy:": 0.7142857142857143,
+        "New_accuracy:": 0.7028571428571428
+    },
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "GoldModel",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 3.01568865776062,
+    "Accuracies": {
+        "Original_accuracy:": 0.7314285714285714,
+        "New_accuracy:": 0.5885714285714285
+    },
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "GoldModel",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 3.0346436500549316,
+    "Accuracies": {
+        "Original_accuracy:": 0.7314285714285714,
+        "New_accuracy:": 0.5885714285714285
+    },
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Finetuning",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "finetune_epochs": 5,
+        "freeze_layers": false,
+        "n_layers_unfreezed": 1
+    },
+    "RunTime": 0.5363807678222656,
+    "Accuracies": {
+        "Original_accuracy:": 0.7142857142857143,
+        "New_accuracy:": 0.7028571428571428
+    },
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },

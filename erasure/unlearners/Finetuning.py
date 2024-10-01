@@ -20,48 +20,43 @@ class Finetuning(Unlearner):
         # TODO: The following code will be changes as train_set = self.dataset.partitions['retain set']
         forget_set = self.dataset.partitions['forget set']
         cfg_dataset = self.dataset.local_config 
-        cfg_model = self.model.local_config
         data_manager = self.global_ctx.factory.get_object( Local( cfg_dataset))
         data_manager.revise_split('train', forget_set)
 
         train_loader, val_loader = self.dataset.get_loader_for('train', Fraction('0'))
 
         print(len(train_loader))
-        print(type(self.model.model))
+        print(type(self.predictor.model))
 
         print("Starting fine-tuning...")
         
         for epoch in range(self.finetune_epochs):
             losses, preds, labels_list = [], [], []
-            self.model.model.train()
-
-            num_images = 0
+            self.predictor.model.train()
 
             for batch, (X, labels) in enumerate(train_loader):
 
                 X, labels = X.to(self.device), labels.to(self.device)
-                self.model.optimizer.zero_grad()
+                self.predictor.optimizer.zero_grad()
 
 
-                _,pred = self.model.model(X)
+                _,pred = self.predictor.model(X)
 
-                loss = self.model.loss_fn(pred, labels)
+                loss = self.predictor.loss_fn(pred, labels)
                 
                 losses.append(loss.to('cpu').detach().numpy())
                 loss.backward()
                 
                 labels_list += list(labels.squeeze().long().detach().to('cpu').numpy())
                 preds += list(pred.squeeze().detach().to('cpu').numpy())
-                self.model.optimizer.step()
-                num_images += X.size(0)
+                self.predictor.optimizer.step()
             
             epoch_loss = sum(losses) / len(losses)
             self.global_ctx.logger.info(f'Finetuning - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
-            print(num_images)
 
-            self.model.lr_scheduler.step()
+            self.predictor.lr_scheduler.step()
         
-        return self.model
+        return self.predictor
 
 
 

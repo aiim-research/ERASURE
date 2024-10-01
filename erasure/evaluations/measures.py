@@ -25,11 +25,8 @@ class RunTime():
 class Accuracy():
     def process(self, e: Evaluation): 
         
-        model1 = e.unlearner.model
+        model1 = e.unlearner.predictor
         model2 = e.unlearned_model
-
-        print(type(model1))
-        print(type(model2))
 
         test_loader, _ = e.unlearner.dataset.get_loader_for('test')
 
