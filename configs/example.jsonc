@@ -30,7 +30,7 @@
           },
           "model": {
             "class": "erasure.model.cnns.standardCNN.FashionCNN",
-            "parameters": { }
+            "parameters": {}
           }
         }
       },

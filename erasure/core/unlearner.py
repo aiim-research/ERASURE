@@ -9,6 +9,8 @@ class Unlearner(Configurable, metaclass=ABCMeta):
     def __init__(self, global_ctx: Global, local_ctx):
         self.dataset = local_ctx.dataset
         self.model = local_ctx.model
+        self.device = self.model.device
+
         super().__init__(global_ctx, local_ctx)
 
 

@@ -28,6 +28,9 @@ class Accuracy():
         model1 = e.unlearner.model
         model2 = e.unlearned_model
 
+        print(type(model1))
+        print(type(model2))
+
         test_loader, _ = e.unlearner.dataset.get_loader_for('test')
 
         og_accuracy = self.compute_accuracy(test_loader, model1.model)
