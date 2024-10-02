@@ -12,4 +12,5 @@ class GoldModel(Unlearner):
     
     def unlearn(self):
 
-        return self.get_retrained(self.dataset.partitions['forget set'])
+        predictor = self.get_retrained(self.dataset.partitions['forget set'])
+        return predictor

@@ -8,14 +8,17 @@ class Unlearner(Configurable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx: Global, local_ctx):
         self.dataset = local_ctx.dataset
-        self.model = local_ctx.model
+        self.predictor = local_ctx.predictor
+        self.device = self.predictor.device
+
         super().__init__(global_ctx, local_ctx)
 
 
     def get_retrained(self, forget_set):
-        if not hasattr(self, 'predictor'):
+        if not hasattr(self, 'new_predictor'):
+            print("No predictor found.")
             cfg_dataset = self.dataset.local_config 
-            cfg_model = self.model.local_config
+            cfg_model = self.predictor.local_config
     
             #Create Dataset
             data_manager = self.global_ctx.factory.get_object( Local( cfg_dataset))
@@ -24,8 +27,8 @@ class Unlearner(Configurable, metaclass=ABCMeta):
             #Create Predictor
             current = Local(cfg_model)
             current.dataset = data_manager
-            predictor = self.global_ctx.factory.get_object(current)
+            self.new_predictor = self.global_ctx.factory.get_object(current)
             
 
-        return predictor
+        return self.new_predictor
         
