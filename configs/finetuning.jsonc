@@ -75,6 +75,10 @@
               "freeze_layers": false,
               "n_layers_unfreezed": 1
           }
+      },
+      {
+        "class": "erasure.unlearners.GoldModel.GoldModel",
+        "parameters": {}
       }
   ],
   "evaluator": {
