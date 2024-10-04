@@ -1,17 +1,18 @@
 from erasure.core.unlearner import Unlearner
+from erasure.unlearners.torchunlearner import TorchUnlearner
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 from fractions import Fraction
 
 
-class Finetuning(Unlearner):
+class Finetuning(TorchUnlearner):
     def __init__(self, global_ctx: Global, local_ctx):
         super().__init__(global_ctx, local_ctx)
         self.finetune_epochs = local_ctx.config.get("finetune_epochs", 5)  # Default 5 epochs
         # self.freeze_layers = local_ctx.config.get("freeze_layers", True)   # Default to freezing layers
         # self.n_layers = local_ctx.config.get("n_layers_unfreezed", 2)      # Default to freezing everything except the last 2 layers
 
-    def unlearn(self):
+    def __unlearn__(self):
         """
         Fine-tunes the model to forget specific data points in the forget_set.
         """

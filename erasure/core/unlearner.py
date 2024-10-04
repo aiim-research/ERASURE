@@ -31,4 +31,22 @@ class Unlearner(Configurable, metaclass=ABCMeta):
             
 
         return self.new_predictor
+    
+
+    def unlearn(self):
+        self.__preprocess__()
+        new_model = self.__unlearn__()
+        self.__postprocess__()
+        return new_model
+
+
+    def __preprocess__(self):
+        pass
+
+    @abstractmethod
+    def __unlearn__(self):
+        pass
+
+    def __postprocess__(self):
+        pass
         
