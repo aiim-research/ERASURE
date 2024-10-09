@@ -42,7 +42,7 @@ if __name__ == "__main__":
     for un in unlearners_cfg:
         current = Local(un)
         current.dataset = data_manager
-        current.model = predictor
+        current.predictor = predictor
         unlearners.append( global_ctx.factory.get_object(current) )
 
     

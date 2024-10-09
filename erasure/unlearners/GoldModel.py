@@ -10,6 +10,7 @@ class GoldModel(Unlearner):
     def __init__(self, global_ctx: Global, local_ctx):
         super().__init__(global_ctx, local_ctx)
     
-    def unlearn(self):
+    def __unlearn__(self):
 
-        return self.get_retrained(self.dataset.partitions['forget set'])
+        predictor = self.get_retrained(self.dataset.partitions['forget set'])
+        return predictor
