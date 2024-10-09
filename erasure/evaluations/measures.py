@@ -29,7 +29,7 @@ class AUS(Measure):
     """ Adaptive Unlearning Score """
 
     def process(self, e: Evaluation):
-        or_model = e.unlearner.model
+        or_model = e.unlearner.predictor
         ul_model = e.unlearned_model
 
         test_loader, _ = e.unlearner.dataset.get_loader_for('test')
