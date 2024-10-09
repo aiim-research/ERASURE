@@ -45,7 +45,7 @@
       "class": "erasure.evaluations.manager.Evaluator",
       "parameters": {
         "measures":[
-          { "class":"erasure.evaluations.measures.RunTime", "parameters":{}},
+          { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
           {"class": "erasure.evaluations.measures.Accuracy", "parameters":{}},
           {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
           {"class": "erasure.evaluations.measures.ForgetSetInfo", "parameters":{}},
