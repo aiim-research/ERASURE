@@ -69,9 +69,9 @@
   },
   "unlearners": [
       {
-          "class": "erasure.unlearners.Finetuning.Finetuning",
+          "class": "erasure.unlearners.NegGrad.NegGrad",
           "parameters": {
-              "epochs": 5
+              "epochs": 1
           }
       }
   ],
