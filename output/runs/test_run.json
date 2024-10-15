@@ -513,4 +513,34 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "AdvancedNegGrad",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1
+    },
+    "RunTime": 0.06732964515686035,
+    "Accuracies": {
+        "Original_accuracy:": 0.2342857142857143,
+        "New_accuracy:": 0.21714285714285714
+    },
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "AdvancedNegGrad",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1
+    },
+    "RunTime": 0.265028715133667,
+    "Accuracies": {
+        "Original_accuracy:": 0.38285714285714284,
+        "New_accuracy:": 0.3657142857142857
+    },
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },

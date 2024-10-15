@@ -84,7 +84,21 @@ class DatasetManager(Configurable):
         else:
             self.partitions[split_id] = list(set(self.partitions[split_id] + ids_list))
         
-        
+    def get_dataset_from_partition(self, split_id):
+        """
+        Returns the dataset corresponding to the given partition ID.
+
+        Args:
+            partition_id (str): The ID of the partition.
+
+        Returns:
+            Dataset: The dataset corresponding to the partition ID.
+        """
+        if split_id in self.partitions:
+            return self.partitions['all'].data if split_id == 'all' else Dataset(Subset(self.partitions['all'].data, self.partitions[split_id])).data
+        else:
+            raise ValueError(f"Partition ID '{split_id}' not found in partitions.")
+   
 
 def skip_nones_collate(batch):
     batch = [item for item in batch if item is not None]

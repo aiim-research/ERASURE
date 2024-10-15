@@ -30,13 +30,13 @@ class Finetuning(TorchUnlearner):
         data_manager = self.global_ctx.factory.get_object(Local(cfg_dataset))
         data_manager.revise_split('train', forget_set)
 
-        train_loader, val_loader = self.dataset.get_loader_for('train', Fraction('0'))
+        retain_loader, _ = self.dataset.get_loader_for('train', Fraction('0'))
         
         for epoch in range(self.epochs):
-            losses, preds, labels_list = [], [], []
+            losses = []
             self.predictor.model.train()
 
-            for batch, (X, labels) in enumerate(train_loader):
+            for batch, (X, labels) in enumerate(retain_loader):
                 X, labels = X.to(self.device), labels.to(self.device)
                 self.predictor.optimizer.zero_grad() 
 
@@ -46,9 +46,6 @@ class Finetuning(TorchUnlearner):
                 losses.append(loss.to('cpu').detach().numpy())
 
                 loss.backward()
-
-                labels_list += list(labels.squeeze().long().detach().to('cpu').numpy())
-                preds += list(pred.squeeze().detach().to('cpu').numpy())
 
                 self.predictor.optimizer.step()
             
