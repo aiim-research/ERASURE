@@ -53,33 +53,41 @@ if __name__ == "__main__":
     attack_samples = []
     attack_labels = []
 
+    with torch.no_grad():
+        for batch, (X, labels) in enumerate(train_loader):
+            _, predictions = shadow_model.model(X)    # shadow model prediction
 
-    for batch, (X, labels) in enumerate(train_loader):
-        result = shadow_model.model(X)    # shadow model prediction
+            original_labels = labels.view(len(X), -1)
+            #predictions = result[1]
 
-        original_labels = labels.view(len(X), -1)
-        predictions = result[1]
-
-        attack_samples.append(
-            torch.cat([labels.view(len(labels), -1), predictions], dim=1)
-        )
-        attack_labels.append(
-            torch.zeros(len(X))
-        )
+            attack_samples.append(
+                torch.cat([labels.view(len(labels), -1), predictions], dim=1)
+            )
+            attack_labels.append(
+                torch.zeros(len(X), dtype=torch.long)
+            )
 
 
-    attack_dataset = torch.utils.data.TensorDataset(torch.cat(attack_samples), torch.cat(attack_labels)) 
+    attack_dataset = torch.utils.data.TensorDataset(torch.cat(attack_samples), torch.cat(attack_labels))
 
+
+
+
+
+    local_config = global_ctx.config.evaluator['parameters']['measures'][0]
+
+    # build a datamanager for the attack dataset
+    torch.save(attack_dataset, "tmp/mia.pt")
+    attack_datamanager = global_ctx.factory.get_object( Local( local_config["parameters"]["data"] ))
+
+    current = Local(local_config['parameters']['predictor'])
+    current.dataset = attack_datamanager
+    attack_model = global_ctx.factory.get_object(current)
 
 
     # test molto vari
     attack_loader = torch.utils.data.DataLoader(attack_dataset, batch_size=128)
     X, label = next(iter(attack_loader))
-
-
-
-
-
 
 
 
