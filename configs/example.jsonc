@@ -37,7 +37,9 @@
 
     "unlearners":[{
         "class": "erasure.unlearners.GoldModel.GoldModel",
-        "parameters": {}
+        "parameters": {
+          "ref_data": "train set"
+        }
     }],
 
 

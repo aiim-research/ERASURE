@@ -21,7 +21,9 @@ class AdvancedNegGrad(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config.get("epochs", 1)  # Default 5 epochs
+        self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
 
     def __unlearn__(self):
         """
@@ -31,15 +33,9 @@ class AdvancedNegGrad(TorchUnlearner):
 
         self.global_ctx.logger.info(f'Starting AdvancedNegGrad with {self.epochs} epochs')
 
-        # TODO: The following code will be changed as train_set = self.dataset.partitions['retain set']
-        forget_set = self.dataset.partitions['forget set']
-        cfg_dataset = self.dataset.local_config 
-        data_manager = self.global_ctx.factory.get_object(Local(cfg_dataset))
-        data_manager.revise_split('train', forget_set)
+        retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
-        retain_loader, _ = self.dataset.get_loader_for('train', Fraction('0'))
-
-        forget_loader, _ = self.dataset.get_loader_for('forget set', Fraction('0'))
+        forget_loader, _ = self.dataset.get_loader_for(self.ref_data_forget, Fraction('0'))
 
         dataloader_iterator = iter(forget_loader)
 

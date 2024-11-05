@@ -18,7 +18,9 @@ class NegGrad(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config.get("epochs", 1)  # Default 5 epochs
+        self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.ref_data = local_ctx.config['parameters'].get("ref_data", 'forget set')  # Default reference data is forget
+
 
     def __unlearn__(self):
         """
@@ -27,7 +29,7 @@ class NegGrad(TorchUnlearner):
 
         self.global_ctx.logger.info(f'Starting NegGrad with {self.epochs} epochs')
 
-        forget_loader, _ = self.dataset.get_loader_for('forget set', Fraction('0'))
+        forget_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
 
         for epoch in range(self.epochs):
             losses, preds, labels_list = [], [], []

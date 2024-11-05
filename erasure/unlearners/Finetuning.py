@@ -15,7 +15,9 @@ class Finetuning(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config.get("epochs", 5)  # Default 5 epochs
+
+        self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.ref_data = local_ctx.config['parameters'].get("ref_data", 'retain set')  # Default reference data is retain
 
     def __unlearn__(self):
         """
@@ -24,13 +26,7 @@ class Finetuning(TorchUnlearner):
 
         self.global_ctx.logger.info(f'Starting Finetuning with {self.epochs} epochs')
 
-        # TODO: The following code will be changed as train_set = self.dataset.partitions['retain set']
-        forget_set = self.dataset.partitions['forget set']
-        cfg_dataset = self.dataset.local_config 
-        data_manager = self.global_ctx.factory.get_object(Local(cfg_dataset))
-        data_manager.revise_split('train', forget_set)
-
-        retain_loader, _ = self.dataset.get_loader_for('train', Fraction('0'))
+        retain_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
         
         for epoch in range(self.epochs):
             losses = []
