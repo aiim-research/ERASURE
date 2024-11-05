@@ -1,28 +1,12 @@
-from erasure.evaluations.manager import Evaluation
-import time
-import torch
-from sklearn.metrics import confusion_matrix
-import numpy as np
 import json
-import matplotlib.pyplot as plt
-from sklearn.svm import SVC
-from sklearn.metrics import accuracy_score
 from collections import defaultdict
-import os
 
-class RunTime():    
-    def process(self, e: Evaluation):
-        if not e.unlearned_model:
-            start_time = time.time()
+from erasure.core.measure import Measure
+from erasure.evaluations.evaluation import Evaluation
+from erasure.evaluations.utils import compute_accuracy
 
-            e.unlearned_model = e.unlearner.unlearn()
-            metric_value = time.time() - start_time
 
-        e.add_value('RunTime', metric_value)
-
-        return e
-    
-class Accuracy():
+class Accuracy(Measure):
     def process(self, e: Evaluation): 
         
         model1 = e.unlearner.predictor
@@ -30,8 +14,8 @@ class Accuracy():
 
         test_loader, _ = e.unlearner.dataset.get_loader_for('test')
 
-        og_accuracy = self.compute_accuracy(test_loader, model1.model)
-        new_accuracy = self.compute_accuracy(test_loader,model2.model)
+        og_accuracy = compute_accuracy(test_loader, model1.model)
+        new_accuracy = compute_accuracy(test_loader,model2.model)
 
         print("ORIGINAL ACCURACY WAS ", og_accuracy)
         print("NEW ACCURACY IS ", new_accuracy)
@@ -41,26 +25,29 @@ class Accuracy():
         return e
 
 
-    def compute_accuracy(self, test_loader, model):
-        
-        var_labels, var_preds = [], [],
-        with torch.no_grad():
-            for batch, (X, labels) in enumerate(test_loader):
+class AUS(Measure):
+    """ Adaptive Unlearning Score """
 
-                _,pred = model(X.to(model.device))
+    def process(self, e: Evaluation):
+        or_model = e.unlearner.predictor
+        ul_model = e.unlearned_model
 
-                var_labels += list(labels.squeeze().to('cpu').numpy())
-                var_preds += list(pred.squeeze().to('cpu').numpy())
+        test_loader, _ = e.unlearner.dataset.get_loader_for('test')
+        forget_loader, _ = e.unlearner.dataset.get_loader_for('forget set')
 
-            accuracy = self.accuracy(var_labels, var_preds)
+        or_test_accuracy = compute_accuracy(test_loader, or_model.model)
+        ul_test_accuracy = compute_accuracy(test_loader, ul_model.model)
+        ul_forget_accuracy = compute_accuracy(forget_loader, ul_model.model)
 
-        return accuracy
+        aus = (1 - (or_test_accuracy - ul_test_accuracy)) / (1 + abs(ul_test_accuracy - ul_forget_accuracy))
 
-    def accuracy(self, testy, probs):
-        acc = accuracy_score(testy, np.argmax(probs, axis=1))
-        return acc
-    
-class ForgetSetInfo():
+        print("Adaptive Unlearning Score:", aus)
+        e.add_value("AUS", aus)
+
+        return e
+
+
+class ForgetSetInfo(Accuracy):
     def process(self, e:Evaluation):
         e.add_value('Size of identified forget set', len(e.forget_set))
         
@@ -79,10 +66,10 @@ class ForgetSetInfo():
         return e
 
 
-    
-class SaveValues():
-    def __init__(self, path):
-        self.path = path
+class SaveValues(Accuracy):
+    def __init__(self, global_ctx, local_ctx):
+        super().__init__(global_ctx, local_ctx)
+        self.path = self.params['path']
 
     def process(self, e:Evaluation):
 
@@ -90,6 +77,5 @@ class SaveValues():
             json.dump(e.data_info, json_file, indent=4)
             json_file.write(',')
 
-
-
+        return e
 
