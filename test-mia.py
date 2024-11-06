@@ -47,30 +47,39 @@ if __name__ == "__main__":
     current.dataset = original_dataset
     shadow_model = global_ctx.factory.get_object(current)   # create and train the shadow model
 
-    train_loader, val_loader = shadow_model.dataset.get_loader_for('train')
+    train_loader, _ = shadow_model.dataset.get_loader_for('train')
+    test_loader, _ = shadow_model.dataset.get_loader_for('test')
 
-    # attack_dataset = torch.utils.data.TensorDataset(torch.empty(1, 11), torch.empty(1))
     attack_samples = []
     attack_labels = []
 
     with torch.no_grad():
+        # TRAINING set
         for batch, (X, labels) in enumerate(train_loader):
-            _, predictions = shadow_model.model(X)    # shadow model prediction
-
             original_labels = labels.view(len(X), -1)
-            #predictions = result[1]
+            _, predictions = shadow_model.model(X)    # shadow model prediction
 
             attack_samples.append(
                 torch.cat([labels.view(len(labels), -1), predictions], dim=1)
             )
             attack_labels.append(
-                torch.zeros(len(X), dtype=torch.long)
+                torch.ones((len(X), 1), dtype=torch.float)   # 1: training samples
+                #torch.ones(len(X), dtype=torch.long)   # 1: training samples
+            )
+        # TESTING set
+        for batch, (X, labels) in enumerate(test_loader):
+            original_labels = labels.view(len(X), -1)
+            _, predictions = shadow_model.model(X)  # shadow model prediction
+
+            attack_samples.append(
+                torch.cat([labels.view(len(labels), -1), predictions], dim=1)
+            )
+            attack_labels.append(
+                torch.zeros((len(X), 1), dtype=torch.float)   # 0: testing samples
+                #torch.zeros(len(X), dtype=torch.long)   # 0: testing samples
             )
 
-
     attack_dataset = torch.utils.data.TensorDataset(torch.cat(attack_samples), torch.cat(attack_labels))
-
-
 
 
 
@@ -87,10 +96,18 @@ if __name__ == "__main__":
 
     # test molto vari
     attack_loader = torch.utils.data.DataLoader(attack_dataset, batch_size=128)
-    X, label = next(iter(attack_loader))
+    # X, label = next(iter(attack_loader))
 
 
+    with torch.no_grad():
+        for batch, (X, labels) in enumerate(attack_loader):
+            original_labels = labels.view(len(X), -1)
+            _, predictions = attack_model.model(X)    # attack model prediction
 
+            a = torch.cat([labels.view(len(labels), -1), predictions], dim=1)
+            print(a)
+
+    
 
 
 

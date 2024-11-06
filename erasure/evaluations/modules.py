@@ -9,13 +9,13 @@ from torchvision.datasets import FashionMNIST
 
 class MIAAttack(nn.Module):
 
-    def __init__(self, n_classes):     # ToDo capire chi gli manda il numero di classi come parametro
+    def __init__(self, n_classes):     # ToDo: non capisco chi gli manda il numero di classi come parametro
         super().__init__()
         self.fc1 = nn.Linear(11, 100)
-        self.fc2 = nn.Linear(100, 200)
-        self.fc3 = nn.Linear(200, 2)
+        self.fc2 = nn.Linear(100, 50)
+        self.fc3 = nn.Linear(50, 1)
         self.relu = nn.ReLU()
-        self.flatten = nn.Flatten()
+        self.sigmoid = nn.Sigmoid()
         self.last_layer = self.fc3
 
     def forward(self, x):
@@ -23,6 +23,7 @@ class MIAAttack(nn.Module):
         x = self.relu(self.fc2(x))
         intermediate_output = x
         x = self.fc3(x)
+        x = self.sigmoid(x)
         return intermediate_output, x
 
 

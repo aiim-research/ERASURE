@@ -91,8 +91,9 @@
                   }
                 },
                 "loss_fn": {
-                  "class": "torch.nn.CrossEntropyLoss",
-                  "class1": "torch.nn.BCEWithLogitsLoss",
+                  "class0": "torch.nn.CrossEntropyLoss",
+                  "class": "torch.nn.BCELoss",
+                  "class2": "torch.nn.BCEWithLogitsLoss",
                   "parameters": {
                     "reduction": "mean"
                   }
