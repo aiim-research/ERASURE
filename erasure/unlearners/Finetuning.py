@@ -1,7 +1,5 @@
-from erasure.core.unlearner import Unlearner
 from erasure.unlearners.torchunlearner import TorchUnlearner
 from erasure.utils.config.global_ctx import Global
-from erasure.utils.config.local_ctx import Local
 from fractions import Fraction
 
 

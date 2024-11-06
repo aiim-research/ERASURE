@@ -1,15 +1,6 @@
-from erasure.core.unlearner import Unlearner
 from erasure.unlearners.torchunlearner import TorchUnlearner
 from erasure.utils.config.global_ctx import Global
-from erasure.utils.config.local_ctx import Local
-from erasure.utils.dataset_utils import create_combined_dataloader
 from fractions import Fraction
-
-import torch
-from torch.utils.data import DataLoader
-from torch.utils.data import Subset
-from erasure.data.datasets.Dataset import Dataset
-
 
 class AdvancedNegGrad(TorchUnlearner):
     def __init__(self, global_ctx: Global, local_ctx):
@@ -45,6 +36,7 @@ class AdvancedNegGrad(TorchUnlearner):
 
             for X_retain, labels_retain in retain_loader:
                 X_retain, labels_retain = X_retain.to(self.device), labels_retain.to(self.device)
+                
                 self.predictor.optimizer.zero_grad() 
 
                 try: 

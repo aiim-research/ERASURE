@@ -6,8 +6,6 @@ import torch
 import torch.nn.functional as F
 from torch import nn
 
-import numpy as np
-
 class Noise(nn.Module):
     """
     Noise class to add noise to the model weights. 
@@ -34,6 +32,7 @@ class UNSIR(TorchUnlearner):
         self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
         self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
         self.noise_lr = local_ctx.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
+        
     def __unlearn__(self):
         """
         UNSIR unlearning algorithm for task agnostic setting proposed by https://arxiv.org/pdf/2311.02240, since the original method is thought for class-unlearning setting. 
@@ -93,6 +92,9 @@ class UNSIR(TorchUnlearner):
                 running_loss += joint_loss.item() * x_retain.size(0)
 
             average_train_loss = running_loss / (len(retain_loader) * x_retain.size(0))
+            
+            self.global_ctx.logger.info(f'UNSIR-1 - epoch = {epoch} ---> var_loss = {average_train_loss:.4f}')
+
 
             for epoch in range(self.epochs_2):
                 running_loss = 0
@@ -109,5 +111,9 @@ class UNSIR(TorchUnlearner):
                     self.predictor.optimizer.step()
 
                     running_loss += classification_loss.item() * x_retain.size(0)
+                
                 average_epoch_loss = running_loss / (len(retain_loader) * x_retain.size(0))
+                
+                self.global_ctx.logger.info(f'UNSIR-2 - epoch = {epoch} ---> var_loss = {average_epoch_loss:.4f}')
+        
         return self.predictor
