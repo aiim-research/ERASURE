@@ -69,10 +69,12 @@
   },
   "unlearners": [
       {
-          "class": "erasure.unlearners.Finetuning.Finetuning",
+          "class": "erasure.unlearners.scrub.scrub",
           "parameters": {
-              "epochs": 5, 
-              "ref_data":"train"
+              "epochs": 1, 
+              "ref_data_retain": "train", 
+              "ref_data_forget": "forget set",
+              "T": 4.0
           }
       }
   ],
