@@ -1,10 +1,8 @@
-import os
 import argparse
 import torch
-import numpy as np
-import random
-from erasure.utils.config.global_ctx import set_seed
 from torch.utils.data import DataLoader, TensorDataset
+
+from erasure.utils.config.global_ctx import set_seed
 
 set_seed(1)
 
@@ -56,37 +54,45 @@ if __name__ == "__main__":
     with torch.no_grad():
         # TRAINING set
         for batch, (X, labels) in enumerate(train_loader):
-            original_labels = labels.view(len(X), -1)
+            original_labels = labels.view(len(labels), -1)
             _, predictions = shadow_model.model(X)    # shadow model prediction
 
             attack_samples.append(
-                torch.cat([labels.view(len(labels), -1), predictions], dim=1)
+                torch.cat([original_labels, predictions], dim=1)
             )
             attack_labels.append(
-                torch.ones((len(X), 1), dtype=torch.float)   # 1: training samples
-                #torch.ones(len(X), dtype=torch.long)   # 1: training samples
+                # torch.ones((len(X), 1), dtype=torch.float)   # 1: training samples
+                torch.ones(len(X), dtype=torch.long)   # 1: training samples
             )
         # TESTING set
         for batch, (X, labels) in enumerate(test_loader):
-            original_labels = labels.view(len(X), -1)
+            original_labels = labels.view(len(labels), -1)
             _, predictions = shadow_model.model(X)  # shadow model prediction
 
             attack_samples.append(
-                torch.cat([labels.view(len(labels), -1), predictions], dim=1)
+                torch.cat([original_labels, predictions], dim=1)
             )
             attack_labels.append(
-                torch.zeros((len(X), 1), dtype=torch.float)   # 0: testing samples
-                #torch.zeros(len(X), dtype=torch.long)   # 0: testing samples
+                # torch.zeros((len(X), 1), dtype=torch.float)   # 0: testing samples
+                torch.zeros(len(X), dtype=torch.long)   # 0: testing samples
             )
 
-    attack_dataset = torch.utils.data.TensorDataset(torch.cat(attack_samples), torch.cat(attack_labels))
+    # concat all batches in single array -- all samples are in the first dimesion
+    attack_samples = torch.cat(attack_samples)
+    attack_labels = torch.cat(attack_labels)
+    # shuffle samples
+    perm_idxs = torch.randperm(len(attack_samples))
+    attack_samples = attack_samples[perm_idxs]
+    attack_labels = attack_labels[perm_idxs]
 
-
+    # create the Dataset
+    attack_dataset = torch.utils.data.TensorDataset(attack_samples, attack_labels)
 
     local_config = global_ctx.config.evaluator['parameters']['measures'][0]
 
     # build a datamanager for the attack dataset
-    torch.save(attack_dataset, "tmp/mia.pt")
+    data_path = local_config['parameters']['data']['parameters']['DataSource']['parameters']['path']
+    torch.save(attack_dataset, data_path)
     attack_datamanager = global_ctx.factory.get_object( Local( local_config["parameters"]["data"] ))
 
     current = Local(local_config['parameters']['predictor'])

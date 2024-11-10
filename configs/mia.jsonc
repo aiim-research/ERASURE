@@ -66,12 +66,11 @@
               "parameters": {
                 "DataSource": {
                   "class": "erasure.evaluations.modules.MIADataSource",
-                  "parameters": {}
+                  "parameters": {
+                    "path": "tmp/mia.pt"
+                  }
                 },
                 "splits": [
-                  { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"splits_names": ["all_reduced", "-"], "percentage": 0.0125}
-                  },
                   { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                     "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
                   }
@@ -91,9 +90,7 @@
                   }
                 },
                 "loss_fn": {
-                  "class0": "torch.nn.CrossEntropyLoss",
-                  "class": "torch.nn.BCELoss",
-                  "class2": "torch.nn.BCEWithLogitsLoss",
+                  "class": "torch.nn.CrossEntropyLoss",
                   "parameters": {
                     "reduction": "mean"
                   }
@@ -104,7 +101,52 @@
                 }
               }
             },
-            "measures": "Accuracy"
+            "shadow": {
+              "data": {
+                "class": "erasure.data.datasets.DatasetManager.DatasetManager",
+                "parameters": {
+                  "DataSource": {
+                    "class": "erasure.evaluations.modules.MIADataSource",
+                    "parameters": {
+                      "path": "tmp/shadow.pt"
+                    }
+                  },
+                  "splits": [
+                    { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
+                      "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
+                    }
+                  ],
+                  "batch_size": 128,
+                  "split_seed": 16
+                }
+              },
+              "predictor": {
+                "class": "erasure.model.TorchModel.TorchModel",
+                "parameters": {
+                  "epochs": 4,
+                  "optimizer": {
+                    "class": "torch.optim.RMSprop",
+                    "parameters": {
+                      "lr": 0.01
+                    }
+                  },
+                  "loss_fn": {
+                    "class": "torch.nn.CrossEntropyLoss",
+                    "parameters": {
+                      "reduction": "mean"
+                    }
+                  },
+                  "model": {
+                    "class": "erasure.model.cnns.standardCNN.FashionCNN",
+                    "parameters": {}
+                  }
+                }
+              },
+              "n_models": 3,
+              "n_samples": 10,
+              "ref_data": "all_reduced"
+            },
+            "measure": "accuracy"
           }
         }
       ]

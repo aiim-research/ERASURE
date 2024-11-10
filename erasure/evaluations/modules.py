@@ -1,19 +1,22 @@
 import torch
 import torch.nn as nn
 
+from torchvision.datasets import FashionMNIST
+
+from erasure.core.factory_base import *
 from erasure.data.data_sources.datasource import DataSource
 from erasure.data.datasets.Dataset import Dataset
-
-from torchvision.datasets import FashionMNIST
+from erasure.data.datasets.DatasetManager import DatasetManager
 
 
 class MIAAttack(nn.Module):
 
-    def __init__(self, n_classes):     # ToDo: non capisco chi gli manda il numero di classi come parametro
+    def __init__(self, n_classes):
         super().__init__()
         self.fc1 = nn.Linear(11, 100)
         self.fc2 = nn.Linear(100, 50)
-        self.fc3 = nn.Linear(50, 1)
+        # self.fc3 = nn.Linear(50, 1)
+        self.fc3 = nn.Linear(50, 2)
         self.relu = nn.ReLU()
         self.sigmoid = nn.Sigmoid()
         self.last_layer = self.fc3
@@ -23,23 +26,25 @@ class MIAAttack(nn.Module):
         x = self.relu(self.fc2(x))
         intermediate_output = x
         x = self.fc3(x)
-        x = self.sigmoid(x)
+        # x = self.sigmoid(x)
         return intermediate_output, x
 
 
 class MIADataSource(DataSource):
 
-    def __init__(self):
-        pass
+    def __init__(self, path):
+        self.path = path
 
     def get_name(self):
         return "MIAAttackDataset"
 
     def create_data(self) -> Dataset:
-        torch_dataset = torch.load("tmp/mia.pt")
-        return BinaryDataset(torch_dataset)
+        torch_dataset = torch.load(self.path)
+        # return MIADataset(torch_dataset)
+        return MIADataset(torch_dataset)
 
 
-class BinaryDataset(Dataset):
+class MIADataset(Dataset):
     def get_n_classes(self):
-        return 2
+        return self.data.n_classes
+
