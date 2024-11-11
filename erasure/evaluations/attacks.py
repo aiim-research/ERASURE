@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import torch
 from torch.utils.data import DataLoader
 
@@ -10,48 +12,29 @@ class MembershipInference(Measure):
     """ Membership Inference Attack (MIA) """
 
     def process(self, e: Evaluation):
-
+        self.info("Membership Inference Attack")
         # Target Model (unlearned model)
         target_model = e.unlearned_model
 
         # original dataset
         original_dataset = target_model.dataset
 
-        # Shadow Model creation
+        # Shadow Models
         shadow_models = []
         for k in range(self.params["shadow"]["n_models"]):
+            self.info(f"Creating shadow model {k}")
             shadow_models.append(self.__create_shadow_model(original_dataset))
 
-        attack_samples = []
-        attack_labels = []
+        # Attack Datasets and DataManagers
+        attack_datasets = self.__create_attack_datasets(shadow_models)
 
-        # Attack Dataset creation
-        for shadow_model in shadow_models:
-            samples, labels = self.__get_attack_samples(shadow_model)
-            attack_samples.append(samples)
-            attack_labels.append(labels)
+        attack_models = {}
+        for c, dataset in attack_datasets.items():
+            self.info(f"Creating attack model {c}")
+            current = Local(self.local_config['parameters']['predictor'])
+            current.dataset = dataset
+            attack_models[c] = self.global_ctx.factory.get_object(current)
 
-
-        # concat all batches in single array -- all samples are in the first dimesion
-        attack_samples = torch.cat(attack_samples)
-        attack_labels = torch.cat(attack_labels)
-        # shuffle samples
-        perm_idxs = torch.randperm(len(attack_samples))
-        attack_samples = attack_samples[perm_idxs]
-        attack_labels = attack_labels[perm_idxs]
-
-        # create the Dataset
-        attack_dataset = torch.utils.data.TensorDataset(attack_samples, attack_labels)
-        attack_dataset.n_classes = original_dataset.partitions['all'].get_n_classes()
-
-        # build a datamanager for the attack dataset
-        data_path = self.params['data']['parameters']['DataSource']['parameters']['path']
-        torch.save(attack_dataset, data_path)
-        attack_datamanager = self.global_ctx.factory.get_object(Local(self.local_config["parameters"]["data"]))
-
-        current = Local(self.local_config['parameters']['predictor'])
-        current.dataset = attack_datamanager
-        attack_model = self.global_ctx.factory.get_object(current)
 
         return e
 
@@ -75,6 +58,42 @@ class MembershipInference(Measure):
         shadow_model = self.global_ctx.factory.get_object(current)
 
         return shadow_model
+
+    def __create_attack_datasets(self, shadow_models):
+        """ Create n_classes attack datasets from the given shadow models """
+        attack_samples = []
+        attack_labels = []
+
+        # Attack Dataset creation
+        for shadow_model in shadow_models:
+            samples, labels = self.__get_attack_samples(shadow_model)
+            attack_samples.append(samples)
+            attack_labels.append(labels)
+
+        # concat all batches in single array -- all samples are in the first dimension
+        attack_samples = torch.cat(attack_samples)
+        attack_labels = torch.cat(attack_labels)
+        # shuffle samples
+        perm_idxs = torch.randperm(len(attack_samples))
+        attack_samples = attack_samples[perm_idxs]
+        attack_labels = attack_labels[perm_idxs]
+
+        # create Datasets based on true original label
+        attack_datasets = {}
+        n_classes = shadow_models[0].dataset.n_classes
+        for c in range(n_classes):
+            c_idxs = (attack_samples[:,0] == c).nonzero(as_tuple=True)[0]
+            attack_datasets[c] = torch.utils.data.TensorDataset(attack_samples[c_idxs,1:], attack_labels[c_idxs])
+            attack_datasets[c].n_classes = n_classes
+
+        # create DataManagers for the Attack model
+        attack_datamanagers = {}
+        data_path = self.params['data']['parameters']['DataSource']['parameters']['path']
+        for c in range(n_classes):
+            torch.save(attack_datasets[c], data_path)
+            attack_datamanagers[c] = self.global_ctx.factory.get_object(Local(self.local_config["parameters"]["data"]))
+
+        return attack_datamanagers
 
     def __get_attack_samples(self, shadow_model):
         """ From the shadow model, generate the attack samples """
@@ -100,7 +119,7 @@ class MembershipInference(Measure):
         attack_labels = []
 
         with torch.no_grad():
-            for batch, (X, labels) in enumerate(loader):
+            for X, labels in loader:
                 original_labels = labels.view(len(labels), -1)
                 _, predictions = model.model(X)  # shadow model prediction
 
@@ -108,8 +127,6 @@ class MembershipInference(Measure):
                     torch.cat([original_labels, predictions], dim=1)
                 )
                 attack_labels.append(
-                    # torch.ones((len(X), 1), dtype=torch.float)  # 1: training samples
-                    # torch.ones(len(X), dtype=torch.long)   # 1: training samples
                     torch.full([len(X)], label_value, dtype=torch.long)   # 1: training samples, 0: testing samples
                 )
 

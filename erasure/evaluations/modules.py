@@ -13,7 +13,7 @@ class MIAAttack(nn.Module):
 
     def __init__(self, n_classes):
         super().__init__()
-        self.fc1 = nn.Linear(11, 100)
+        self.fc1 = nn.Linear(n_classes, 100)
         self.fc2 = nn.Linear(100, 50)
         # self.fc3 = nn.Linear(50, 1)
         self.fc3 = nn.Linear(50, 2)

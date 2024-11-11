@@ -142,8 +142,8 @@
                   }
                 }
               },
-              "n_models": 3,
-              "n_samples": 10,
+              "n_models": 5,
+              "n_samples": 50,
               "ref_data": "all_reduced"
             },
             "measure": "accuracy"
