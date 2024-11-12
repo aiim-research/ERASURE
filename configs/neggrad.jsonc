@@ -50,7 +50,7 @@
       "parameters": {
           "epochs": 20,
           "optimizer": {
-              "class": "torch.optim.RMSprop",
+              "class": "torch.optim.Adam",
               "parameters": {
                   "lr": 0.01
               }
