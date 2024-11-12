@@ -12,6 +12,7 @@ class Finetuning(TorchUnlearner):
             global_ctx (Global): The global context containing configurations and shared resources.
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
+
         super().__init__(global_ctx, local_ctx)
 
         self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
@@ -19,7 +20,7 @@ class Finetuning(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Fine-tunes the model to forget specific data points in the forget_set.
+        Fine-tunes the model to forget specific data points in the forget_set by training the model on the retain_set solely.
         """
 
         self.global_ctx.logger.info(f'Starting Finetuning with {self.epochs} epochs')

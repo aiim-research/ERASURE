@@ -11,6 +11,7 @@ class AdvancedNegGrad(TorchUnlearner):
             global_ctx (Global): The global context containing configurations and shared resources.
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
+
         super().__init__(global_ctx, local_ctx)
         self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
@@ -18,8 +19,9 @@ class AdvancedNegGrad(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Advanced NegGrad unlearning algorithm. The algorithm is based on the NegGrad algorithm, but it also includes the 
-        loss of the retained data points in the loss function.
+        Advanced NegGrad unlearning algorithm proposed by https://arxiv.org/pdf/2311.02240. 
+        
+        The algorithm is based on the NegGrad algorithm, but it also includes the loss of the retained data points in the loss function.
         """
 
         self.global_ctx.logger.info(f'Starting AdvancedNegGrad with {self.epochs} epochs')
