@@ -28,6 +28,7 @@ class MembershipInference(Measure):
         # Attack Datasets and DataManagers
         attack_datasets = self.__create_attack_datasets(shadow_models)
 
+        # Attack Models
         attack_models = {}
         for c, dataset in attack_datasets.items():
             self.info(f"Creating attack model {c}")
@@ -35,8 +36,21 @@ class MembershipInference(Measure):
             current.dataset = dataset
             attack_models[c] = self.global_ctx.factory.get_object(current)
 
-        # Test original dataset
-        self.__test_dataset(attack_models, target_model)
+        # Test data
+        train_loader, _ = target_model.dataset.get_loader_for("train")
+        print(self.__test_dataset(attack_models, target_model, "train"))
+        print(self.__test_dataset(attack_models, target_model, "test"))
+
+        print("Original Forget:", self.__test_dataset(attack_models, e.unlearner.predictor, "forget set"))
+        print("Target Forget:", self.__test_dataset(attack_models, target_model, "forget set"))
+
+        print("Original Retain:", self.__test_dataset(attack_models, e.unlearner.predictor, "other_classes"))
+        print("Target Retain:", self.__test_dataset(attack_models, target_model, "other_classes"))
+
+        print(self.__test_dataset(attack_models, shadow_models[0], "train"))
+        print(self.__test_dataset(attack_models, shadow_models[0], "test"))
+        print(self.__test_dataset(attack_models, shadow_models[1], "train"))
+        print(self.__test_dataset(attack_models, shadow_models[1], "test"))
 
 
         return e
@@ -137,19 +151,20 @@ class MembershipInference(Measure):
 
         return torch.cat(attack_samples), torch.cat(attack_labels)
 
-    def __test_dataset(self, attack_models, target_model):
+    def __test_dataset(self, attack_models, target_model, split_name):
         """ tests samples from the original dataset """
 
-        train_loader, _ = target_model.dataset.get_loader_for("train")
+        loader, _ = target_model.dataset.get_loader_for(split_name)
+        attack_predictions = []
         with torch.no_grad():
-            for X, labels in train_loader:
+            for X, labels in loader:
                 _, target_predictions = target_model.model(X.to(target_model.device))
-                attack_predictions = []
                 for i in range(len(target_predictions)):
-                    _, attack_prediction = attack_models[labels[i].item()].model(target_predictions[i])
-                    attack_predictions.append(attack_prediction)
+                    _, prediction = attack_models[labels[i].item()].model(target_predictions[i])
+                    attack_predictions.append(prediction)
 
-                attack_predictions = torch.stack(attack_predictions)    # convert into a Tensor
-                #print(attack_predictions)
+        attack_predictions = torch.stack(attack_predictions)    # convert into a Tensor
+        predicted_labels = torch.argmax(attack_predictions, dim=1)    # get the predicted label
 
+        return torch.bincount(predicted_labels)
 

@@ -18,7 +18,7 @@ class MIAAttack(nn.Module):
         # self.fc3 = nn.Linear(50, 1)
         self.fc3 = nn.Linear(50, 2)
         self.relu = nn.ReLU()
-        self.sigmoid = nn.Sigmoid()
+        self.softmax = nn.Softmax(dim=0)
         self.last_layer = self.fc3
 
     def forward(self, x):
@@ -26,7 +26,7 @@ class MIAAttack(nn.Module):
         x = self.relu(self.fc2(x))
         intermediate_output = x
         x = self.fc3(x)
-        # x = self.sigmoid(x)
+        x = self.softmax(x)
         return intermediate_output, x
 
 
