@@ -35,6 +35,9 @@ class MembershipInference(Measure):
             current.dataset = dataset
             attack_models[c] = self.global_ctx.factory.get_object(current)
 
+        # Test original dataset
+        self.__test_dataset(attack_models, target_model)
+
 
         return e
 
@@ -121,7 +124,9 @@ class MembershipInference(Measure):
         with torch.no_grad():
             for X, labels in loader:
                 original_labels = labels.view(len(labels), -1)
+                X = X.to(model.device)
                 _, predictions = model.model(X)  # shadow model prediction
+                predictions = predictions.to('cpu')
 
                 attack_samples.append(
                     torch.cat([original_labels, predictions], dim=1)
@@ -131,3 +136,20 @@ class MembershipInference(Measure):
                 )
 
         return torch.cat(attack_samples), torch.cat(attack_labels)
+
+    def __test_dataset(self, attack_models, target_model):
+        """ tests samples from the original dataset """
+
+        train_loader, _ = target_model.dataset.get_loader_for("train")
+        with torch.no_grad():
+            for X, labels in train_loader:
+                _, target_predictions = target_model.model(X.to(target_model.device))
+                attack_predictions = []
+                for i in range(len(target_predictions)):
+                    _, attack_prediction = attack_models[labels[i].item()].model(target_predictions[i])
+                    attack_predictions.append(attack_prediction)
+
+                attack_predictions = torch.stack(attack_predictions)    # convert into a Tensor
+                #print(attack_predictions)
+
+
