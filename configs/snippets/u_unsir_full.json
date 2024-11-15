@@ -1,0 +1,9 @@
+{
+    "class": "erasure.unlearners.composite.Cascade",
+    "parameters": {
+        "sub_unlearner": [
+            {"compose_impair" : "configs/snippets/u_unsir_imp.json"}, 
+            {"compose_repair" : "configs/snippets/u_fine.json"}
+        ]
+    }
+}

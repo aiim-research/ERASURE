@@ -1,0 +1,4 @@
+{
+    "class": "erasure.unlearners.composite.Identity",
+    "parameters": {}
+}
