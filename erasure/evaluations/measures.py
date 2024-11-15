@@ -9,7 +9,7 @@ from erasure.evaluations.utils import compute_accuracy
 class Accuracy(Measure):
     def process(self, e: Evaluation): 
         
-        model1 = e.unlearner.predictor
+        model1 = e.predictor
         model2 = e.unlearned_model
 
         test_loader, _ = e.unlearner.dataset.get_loader_for('test')
@@ -17,8 +17,8 @@ class Accuracy(Measure):
         og_accuracy = compute_accuracy(test_loader, model1.model)
         new_accuracy = compute_accuracy(test_loader,model2.model)
 
-        print("ORIGINAL ACCURACY WAS ", og_accuracy)
-        print("NEW ACCURACY IS ", new_accuracy)
+        print("ORIGINAL ACCURACY WAS ", og_accuracy, model1)
+        print("NEW ACCURACY IS ", new_accuracy, model2)
 
         e.add_value('Accuracies', {'Original_accuracy:':og_accuracy, 'New_accuracy:':new_accuracy})
 
@@ -29,7 +29,7 @@ class AUS(Measure):
     """ Adaptive Unlearning Score """
 
     def process(self, e: Evaluation):
-        or_model = e.unlearner.predictor
+        or_model = e.predictor
         ul_model = e.unlearned_model
 
         test_loader, _ = e.unlearner.dataset.get_loader_for('test')

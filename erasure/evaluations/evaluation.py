@@ -1,11 +1,13 @@
+import copy
 from erasure.core.unlearner import Unlearner
 
 
 class Evaluation():
-    def __init__(self,unlearner: Unlearner):
+    def __init__(self,unlearner: Unlearner, predictor):
         self.data_info = {}
         self.unlearned_model = None
         self.unlearner = unlearner
+        self.predictor = predictor
         self.forget_set = unlearner.dataset.partitions['forget set']
         self.data_info['unlearner'] = unlearner.__class__.__name__
         self.data_info['dataset'] = unlearner.dataset.name

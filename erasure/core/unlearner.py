@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+import copy
 from erasure.core.base import Configurable
 from erasure.data.datasets.Dataset import Dataset
 from erasure.utils.config.global_ctx import Global
@@ -35,6 +36,7 @@ class Unlearner(Configurable, metaclass=ABCMeta):
 
     def unlearn(self):
         self.__preprocess__()
+        self.info('Unlearning on predictor: '+str(self.predictor))
         new_model = self.__unlearn__()
         self.__postprocess__()
         return new_model

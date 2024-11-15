@@ -42,7 +42,7 @@ class UNSIR(TorchUnlearner):
         Since the second phase of the model is a simple finetuning, we can use the Finetuning unlearner to implement the second phase and here only the first phase is implemented.
         """
 
-        self.global_ctx.logger.info(f'Starting UNSIR with {self.epochs} epochs for the impair phase')
+        self.info(f'Starting UNSIR with {self.epochs} epochs for the impair phase')
 
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
@@ -94,6 +94,6 @@ class UNSIR(TorchUnlearner):
             
             average_train_loss = running_loss / (len(retain_loader) * x_retain.size(0))
             
-            self.global_ctx.logger.info(f'UNSIR-1 - epoch = {epoch} ---> var_loss = {average_train_loss:.4f}')
+            self.info(f'UNSIR-1 - epoch = {epoch} ---> var_loss = {average_train_loss:.4f}')
 
         return self.predictor
