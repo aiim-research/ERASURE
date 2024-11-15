@@ -13,7 +13,7 @@
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
                       "splits_names": ["all_reduced", "-"],
-                      "percentage": 0.125
+                      "percentage": 0.525
                   }
               },
               {
@@ -41,14 +41,14 @@
                   }
               }
           ],
-          "batch_size": 128,
+          "batch_size": 256,
           "split_seed": 16
       }
   },
   "predictor": {
       "class": "erasure.model.TorchModel.TorchModel",
       "parameters": {
-          "epochs": 20,
+          "epochs": 15,
           "optimizer": {
               "class": "torch.optim.Adam",
               "parameters": {
@@ -69,66 +69,20 @@
   },
   "unlearners": [
     {
-        "class": "erasure.unlearners.composite.Cascade",
-        "parameters": {
-            "sub_unlearner": [
-                {
-                    "class": "erasure.unlearners.UNSIR.UNSIR",
-                    "parameters": {
-                        "epochs": 1,
-                        "ref_data_retain": "train", 
-                        "ref_data_forget": "forget set", 
-                        "noise_lr": 0.1
-                    }
-                }, 
-                {
-                  "class": "erasure.unlearners.Finetuning.Finetuning",
-                  "parameters": {
-                      "epochs": 10, 
-                      "ref_data":"train"
-                  }
-              }
-            ]
-        }
+        "class": "erasure.unlearners.composite.Identity",
+        "parameters": {}
     },
     {
-        "class": "erasure.unlearners.composite.Cascade",
-        "parameters": {
-            "sub_unlearner": [
-                {
-                    "class": "erasure.unlearners.UNSIR.UNSIR",
-                    "parameters": {
-                        "epochs": 1,
-                        "ref_data_retain": "train", 
-                        "ref_data_forget": "forget set", 
-                        "noise_lr": 0.1
-                    }
-                }, 
-                {
-                  "class": "erasure.unlearners.Finetuning.Finetuning",
-                  "parameters": {
-                      "epochs": 10, 
-                      "ref_data":"train"
-                  }
-              }
-            ]
-        }
+        "class": "erasure.unlearners.composite.Identity",
+        "parameters": {}
     },
     {
-        "class": "erasure.unlearners.UNSIR.UNSIR",
-        "parameters": {
-            "epochs": 1,
-            "ref_data_retain": "train", 
-            "ref_data_forget": "forget set", 
-            "noise_lr": 0.05
-        }
-    }, 
+        "class": "erasure.unlearners.composite.Identity",
+        "parameters": {}
+    },
     {
-      "class": "erasure.unlearners.Finetuning.Finetuning",
-      "parameters": {
-          "epochs": 10, 
-          "ref_data":"train"
-      }
+        "class": "erasure.unlearners.composite.Identity",
+        "parameters": {}
     }
   ],
   "evaluator":{
