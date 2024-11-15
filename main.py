@@ -1,3 +1,4 @@
+import copy
 import os
 import argparse
 import torch
@@ -25,7 +26,7 @@ if __name__ == "__main__":
     global_ctx = Global(config_file)
     global_ctx.factory = ConfigurableFactory(global_ctx)
 
-    print(f"Current PyTorch seed: {torch.initial_seed()}")
+    global_ctx.logger.info(f"Current PyTorch seed: {torch.initial_seed()}")
 
     #Create Dataset
     data_manager = global_ctx.factory.get_object( Local( global_ctx.config.data ))
@@ -34,7 +35,7 @@ if __name__ == "__main__":
     current = Local(global_ctx.config.predictor)
     current.dataset = data_manager
     predictor = global_ctx.factory.get_object(current)
-
+    global_ctx.logger.info('Global Predictor: ' + str(predictor))
 
     #Create unlearners 
     unlearners = []
@@ -42,17 +43,19 @@ if __name__ == "__main__":
     for un in unlearners_cfg:
         current = Local(un)
         current.dataset = data_manager
-        current.predictor = predictor
+        current.predictor = copy.deepcopy(predictor)
         unlearners.append( global_ctx.factory.get_object(current) )
 
     
     #Evaluator
     current = Local(global_ctx.config.evaluator)
+    current.unlearners = unlearners
     evaluator = global_ctx.factory.get_object(current)
 
     # Evaluations
     for unlearner in unlearners:
-        evaluator.evaluate(unlearner)
+        global_ctx.logger.info('####\t\t Evaluating: '+unlearner.__class__.__name__ +'\t\t####')
+        evaluator.evaluate(unlearner,predictor)
 
  
 

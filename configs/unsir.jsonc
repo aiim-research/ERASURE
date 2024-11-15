@@ -78,13 +78,13 @@
                         "epochs": 1,
                         "ref_data_retain": "train", 
                         "ref_data_forget": "forget set", 
-                        "noise_lr": 0.1
+                        "noise_lr": 1e-30
                     }
                 }, 
                 {
                   "class": "erasure.unlearners.Finetuning.Finetuning",
                   "parameters": {
-                      "epochs": 10, 
+                      "epochs": 200, 
                       "ref_data":"train"
                   }
               }
@@ -101,13 +101,13 @@
                         "epochs": 1,
                         "ref_data_retain": "train", 
                         "ref_data_forget": "forget set", 
-                        "noise_lr": 0.1
+                        "noise_lr": 1e-30
                     }
                 }, 
                 {
                   "class": "erasure.unlearners.Finetuning.Finetuning",
                   "parameters": {
-                      "epochs": 10, 
+                      "epochs": 200, 
                       "ref_data":"train"
                   }
               }
@@ -120,13 +120,13 @@
             "epochs": 1,
             "ref_data_retain": "train", 
             "ref_data_forget": "forget set", 
-            "noise_lr": 0.05
+            "noise_lr": 1e-30
         }
     }, 
     {
       "class": "erasure.unlearners.Finetuning.Finetuning",
       "parameters": {
-          "epochs": 10, 
+          "epochs": 20, 
           "ref_data":"train"
       }
     }
