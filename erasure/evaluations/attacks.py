@@ -1,7 +1,9 @@
 from collections import defaultdict
+from copy import deepcopy
 
 import torch
 from torch.utils.data import DataLoader
+import torch.nn as nn
 
 from erasure.core.measure import Measure
 from erasure.evaluations.evaluation import Evaluation
@@ -23,7 +25,7 @@ class MembershipInference(Measure):
         shadow_models = []
         for k in range(self.params["shadow"]["n_models"]):
             self.info(f"Creating shadow model {k}")
-            shadow_models.append(self.__create_shadow_model(original_dataset))
+            shadow_models.append(self.__create_shadow_model(original_dataset, k))
 
         # Attack Datasets and DataManagers
         attack_datasets = self.__create_attack_datasets(shadow_models)
@@ -38,14 +40,20 @@ class MembershipInference(Measure):
 
         # Test data
         train_loader, _ = target_model.dataset.get_loader_for("train")
+
         print(self.__test_dataset(attack_models, target_model, "train"))
         print(self.__test_dataset(attack_models, target_model, "test"))
+        print("Original Train:", self.__test_dataset(attack_models, e.unlearner.predictor, "train"))    # e.predictor
+        print("Original Test:", self.__test_dataset(attack_models, e.unlearner.predictor, "test"))
 
         print("Original Forget:", self.__test_dataset(attack_models, e.unlearner.predictor, "forget set"))
         print("Target Forget:", self.__test_dataset(attack_models, target_model, "forget set"))
 
         print("Original Retain:", self.__test_dataset(attack_models, e.unlearner.predictor, "other_classes"))
         print("Target Retain:", self.__test_dataset(attack_models, target_model, "other_classes"))
+
+        print("Original Train:", self.__test_dataset(attack_models, e.unlearner.predictor, "train"))
+        print("Original Test:", self.__test_dataset(attack_models, e.unlearner.predictor, "test"))
 
         print(self.__test_dataset(attack_models, shadow_models[0], "train"))
         print(self.__test_dataset(attack_models, shadow_models[0], "test"))
@@ -55,7 +63,7 @@ class MembershipInference(Measure):
 
         return e
 
-    def __create_shadow_model(self, original_dataset):
+    def __create_shadow_model(self, original_dataset, k):
         """ create generic Shadow Model """
 
         # create DataSet from random samples
@@ -66,8 +74,10 @@ class MembershipInference(Measure):
 
         # Create DatasetManager for shadow dataset
         data_path = self.params["shadow"]["data"]["parameters"]["DataSource"]["parameters"]["path"]
-        torch.save(shadow_dataset, data_path)
-        shadow_datamanager = self.global_ctx.factory.get_object(Local(self.params["shadow"]["data"]))
+        shadow_data = deepcopy(self.params["shadow"]["data"])
+        shadow_data["parameters"]["DataSource"]["parameters"]["path"] = data_path+str(k)
+        torch.save(shadow_dataset, data_path+str(k))
+        shadow_datamanager = self.global_ctx.factory.get_object(Local(shadow_data))
 
         # create Model
         current = Local(self.params["shadow"]["predictor"])
@@ -107,8 +117,10 @@ class MembershipInference(Measure):
         attack_datamanagers = {}
         data_path = self.params['data']['parameters']['DataSource']['parameters']['path']
         for c in range(n_classes):
-            torch.save(attack_datasets[c], data_path)
-            attack_datamanagers[c] = self.global_ctx.factory.get_object(Local(self.local_config["parameters"]["data"]))
+            torch.save(attack_datasets[c], data_path+str(c))
+            attack_data = deepcopy(self.local_config["parameters"]["data"])
+            attack_data["parameters"]["DataSource"]["parameters"]["path"] = data_path + str(c)
+            attack_datamanagers[c] = self.global_ctx.factory.get_object(Local(attack_data))
 
         return attack_datamanagers
 
@@ -161,6 +173,8 @@ class MembershipInference(Measure):
                 _, target_predictions = target_model.model(X.to(target_model.device))
                 for i in range(len(target_predictions)):
                     _, prediction = attack_models[labels[i].item()].model(target_predictions[i])
+                    softmax = nn.Softmax(dim=0)
+                    prediction = softmax(prediction)
                     attack_predictions.append(prediction)
 
         attack_predictions = torch.stack(attack_predictions)    # convert into a Tensor

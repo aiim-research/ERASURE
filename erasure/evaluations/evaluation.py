@@ -6,6 +6,7 @@ class Evaluation():
         self.data_info = {}
         self.unlearned_model = None
         self.unlearner = unlearner
+        self.predictor = unlearner.predictor
         self.forget_set = unlearner.dataset.partitions['forget set']
         self.data_info['unlearner'] = unlearner.__class__.__name__
         self.data_info['dataset'] = unlearner.dataset.name

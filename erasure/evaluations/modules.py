@@ -13,10 +13,10 @@ class MIAAttack(nn.Module):
 
     def __init__(self, n_classes):
         super().__init__()
-        self.fc1 = nn.Linear(n_classes, 100)
-        self.fc2 = nn.Linear(100, 50)
+        self.fc1 = nn.Linear(n_classes, 3*n_classes)
+        self.fc2 = nn.Linear(3*n_classes, int(1.5*n_classes))
         # self.fc3 = nn.Linear(50, 1)
-        self.fc3 = nn.Linear(50, 2)
+        self.fc3 = nn.Linear(int(1.5*n_classes), 2)
         self.relu = nn.ReLU()
         self.softmax = nn.Softmax(dim=0)
         self.last_layer = self.fc3
@@ -26,7 +26,7 @@ class MIAAttack(nn.Module):
         x = self.relu(self.fc2(x))
         intermediate_output = x
         x = self.fc3(x)
-        x = self.softmax(x)
+        #x = self.softmax(x)
         return intermediate_output, x
 
 

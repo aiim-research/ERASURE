@@ -29,7 +29,7 @@
   "predictor": {
     "class": "erasure.model.TorchModel.TorchModel",
     "parameters": {
-      "epochs": 4,
+      "epochs": 40,
       "optimizer": {
         "class": "torch.optim.RMSprop",
         "parameters": {
@@ -72,7 +72,10 @@
                 },
                 "splits": [
                   { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
+                    "parameters": {"splits_names": ["tt", "attack"], "percentage": 0.7, "ref_data": "all"}
+                  },
+                  { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
+                    "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "tt"}
                   }
                 ],
                 "batch_size": 128,
@@ -82,7 +85,7 @@
             "predictor": {
               "class": "erasure.model.TorchModel.TorchModel",
               "parameters": {
-                "epochs": 4,
+                "epochs": 200,
                 "optimizer": {
                   "class": "torch.optim.RMSprop",
                   "parameters": {
@@ -123,7 +126,7 @@
               "predictor": {
                 "class": "erasure.model.TorchModel.TorchModel",
                 "parameters": {
-                  "epochs": 4,
+                  "epochs": 40,
                   "optimizer": {
                     "class": "torch.optim.RMSprop",
                     "parameters": {
@@ -142,9 +145,9 @@
                   }
                 }
               },
-              "n_models": 5,
-              "n_samples": 200,
-              "ref_data": "all_reduced"
+              "n_models": 20,
+              "n_samples": 300,
+              "ref_data": "train"
             },
             "measure": "accuracy"
           }
