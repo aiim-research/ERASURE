@@ -19,7 +19,7 @@ class DistillKL(nn.Module):
         loss = F.kl_div(p_s, p_t, size_average=False) * (self.T**2) / y_s.shape[0]
         return loss
 
-class scrub(TorchUnlearner):
+class Scrub(TorchUnlearner):
 
     def __init__(self, global_ctx: Global, local_ctx):
         """
