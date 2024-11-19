@@ -1,5 +1,6 @@
 from erasure.core.unlearner import Unlearner
 from erasure.utils.config.global_ctx import Global
+from erasure.utils.config.local_ctx import Local
 
 class GoldModel(Unlearner):
     def __init__(self, global_ctx: Global, local_ctx):
@@ -12,10 +13,24 @@ class GoldModel(Unlearner):
         """
 
         super().__init__(global_ctx, local_ctx)
+        self.train_data = local_ctx.config['parameters'].get("train_data", 'train')  # Default train data is train
         self.ref_data = local_ctx.config['parameters'].get("ref_data", 'forget set')  # Default reference data is forget
+
+        self.forget_set = self.dataset.partitions[self.ref_data]
     
     def __unlearn__(self):
         # retrain the model by removing the reference data (forget set by default)
 
-        predictor = self.get_retrained(self.ref_data)
+        cfg_dataset = self.dataset.local_config 
+        cfg_model = self.predictor.local_config
+
+        #Create Dataset
+        data_manager = self.global_ctx.factory.get_object(Local(cfg_dataset))
+        data_manager.revise_split(self.train_data, self.forget_set)
+    
+        #Create Predictor
+        current = Local(cfg_model)
+        current.dataset = data_manager
+        predictor = self.global_ctx.factory.get_object(current)
+            
         return predictor
