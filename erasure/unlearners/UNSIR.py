@@ -17,6 +17,8 @@ class Noise(nn.Module):
     def forward(self):
         return self.noise
 
+#TODO: check
+
 class UNSIR(TorchUnlearner):
     def __init__(self, global_ctx: Global, local_ctx):
         """
@@ -27,11 +29,7 @@ class UNSIR(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config['parameters'].get("epochs", 1)  # Default 1 epoch
-        self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
-        self.noise_lr = local_ctx.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
-        
+    
     def __unlearn__(self):
         """
         UNSIR unlearning algorithm for task agnostic setting proposed by https://arxiv.org/pdf/2111.08947, since the original method is thought for class-unlearning setting, we propose here the modified version proposed by https://arxiv.org/pdf/2311.02240. 
@@ -97,3 +95,11 @@ class UNSIR(TorchUnlearner):
             self.info(f'UNSIR-1 - epoch = {epoch} ---> var_loss = {average_train_loss:.4f}')
 
         return self.predictor
+
+    def check_configuration(self):
+        super().check_configuration()
+
+        self.epochs = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
+        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
+        self.noise_lr = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01

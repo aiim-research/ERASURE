@@ -980,4 +980,207 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "Identity",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 3.123283386230469e-05,
+    "Accuracies": {
+        "Original_accuracy:": 0.8835374149659864,
+        "New_accuracy:": 0.8835374149659864
+    },
+    "AUS": 0.9451066538318046,
+    "Size of identified forget set": 2962,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Cascade",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "sub_unlearner": [
+            {
+                "class": "erasure.unlearners.UNSIR.UNSIR",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data_retain": "train",
+                    "ref_data_forget": "forget set",
+                    "noise_lr": 1e-30
+                }
+            },
+            {
+                "class": "erasure.unlearners.Finetuning.Finetuning",
+                "parameters": {
+                    "epochs": 20,
+                    "ref_data": "train"
+                }
+            }
+        ]
+    },
+    "RunTime": 37.82046341896057,
+    "Accuracies": {
+        "Original_accuracy:": 0.8835374149659864,
+        "New_accuracy:": 0.10108843537414966
+    },
+    "AUS": 0.19757815396021258,
+    "Size of identified forget set": 2962,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "UNSIR",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget set",
+        "noise_lr": 1e-30
+    },
+    "RunTime": 0.5949990749359131,
+    "Accuracies": {
+        "Original_accuracy:": 0.8835374149659864,
+        "New_accuracy:": 0.10108843537414966
+    },
+    "AUS": 0.19757815396021258,
+    "Size of identified forget set": 2962,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Finetuning",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 20,
+        "ref_data": "train"
+    },
+    "RunTime": 36.897420167922974,
+    "Accuracies": {
+        "Original_accuracy:": 0.8835374149659864,
+        "New_accuracy:": 0.878095238095238
+    },
+    "AUS": 0.9680581608727135,
+    "Size of identified forget set": 2962,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Cascade",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "sub_unlearner": [
+            {
+                "class": "erasure.unlearners.UNSIR.UNSIR",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data_retain": "train",
+                    "ref_data_forget": "forget set",
+                    "noise_lr": 1e-30
+                }
+            },
+            {
+                "class": "erasure.unlearners.Finetuning.Finetuning",
+                "parameters": {
+                    "epochs": 200,
+                    "ref_data": "train"
+                }
+            }
+        ]
+    },
+    "RunTime": 120.16780090332031,
+    "Accuracies": {
+        "Original_accuracy:": 0.8742857142857143,
+        "New_accuracy:": 0.74
+    },
+    "AUS": 0.7751990064944317,
+    "Size of identified forget set": 754,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Cascade",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "sub_unlearner": [
+            {
+                "class": "erasure.unlearners.UNSIR.UNSIR",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data_retain": "train",
+                    "ref_data_forget": "forget set",
+                    "noise_lr": 1e-30
+                }
+            }
+        ]
+    },
+    "RunTime": 0.2812981605529785,
+    "Accuracies": {
+        "Original_accuracy:": 0.8742857142857143,
+        "New_accuracy:": 0.104
+    },
+    "AUS": 0.2080745341614906,
+    "Size of identified forget set": 754,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "AdvancedNegGrad",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget set"
+    },
+    "RunTime": 0.13169550895690918,
+    "Accuracies": {
+        "Original_accuracy:": 0.7828571428571428,
+        "New_accuracy:": 0.2342857142857143
+    },
+    "AUS": 0.3657407407407408,
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Finetuning",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 5,
+        "ref_data": "train"
+    },
+    "RunTime": 0.32852649688720703,
+    "Accuracies": {
+        "Original_accuracy:": 0.7828571428571428,
+        "New_accuracy:": 0.7771428571428571
+    },
+    "AUS": 0.8643006263048016,
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Cascade",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "sub_unlearner": [
+            {
+                "class": "erasure.unlearners.UNSIR.UNSIR",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data_retain": "train",
+                    "ref_data_forget": "forget set",
+                    "noise_lr": 1e-30
+                }
+            }
+        ]
+    },
+    "RunTime": 0.231170654296875,
+    "Accuracies": {
+        "Original_accuracy:": 0.8742857142857143,
+        "New_accuracy:": 0.104
+    },
+    "AUS": 0.2080745341614906,
+    "Size of identified forget set": 754,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },

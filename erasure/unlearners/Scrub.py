@@ -30,11 +30,7 @@ class Scrub(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config['parameters'].get("epochs", 1)  # Default 1 epoch
-        self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
-        self.T = local_ctx.config['parameters'].get("T", 4.0)  # Default temperature is 4.0
-
+        
         self.criterion_div = DistillKL(self.T)
 
     def __unlearn__(self):
@@ -122,3 +118,11 @@ class Scrub(TorchUnlearner):
 
                 
         return self.predictor
+    
+    def check_configuration(self):
+        super().check_configuration()
+
+        self.epochs = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
+        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
+        self.T = self.local.config['parameters'].get("T", 4.0)  # Default temperature is 4.0

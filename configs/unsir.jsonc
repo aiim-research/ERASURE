@@ -84,7 +84,7 @@
                 {
                   "class": "erasure.unlearners.Finetuning.Finetuning",
                   "parameters": {
-                      "epochs": 200, 
+                      "epochs": 1, 
                       "ref_data":"train"
                   }
               }

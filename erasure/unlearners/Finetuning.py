@@ -15,9 +15,6 @@ class Finetuning(TorchUnlearner):
 
         super().__init__(global_ctx, local_ctx)
 
-        self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
-        self.ref_data = local_ctx.config['parameters'].get("ref_data", 'retain set')  # Default reference data is retain
-
     def __unlearn__(self):
         """
         Fine-tunes the model to forget specific data points in the forget_set by training the model on the retain_set solely.
@@ -50,3 +47,9 @@ class Finetuning(TorchUnlearner):
             self.predictor.lr_scheduler.step()
         
         return self.predictor
+    
+    def check_configuration(self):
+        super().check_configuration()
+
+        self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.ref_data = self.local.config['parameters'].get("ref_data", 'retain set')  # Default reference data is retain

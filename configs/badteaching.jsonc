@@ -83,6 +83,7 @@
               "batch_size": 64,
               "KL_temperature": 1.0
           }
+          // aggancia quello di default se non c'è un predictor
       }
   ],
   "evaluator":{

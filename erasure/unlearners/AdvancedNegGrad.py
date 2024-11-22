@@ -13,9 +13,6 @@ class AdvancedNegGrad(TorchUnlearner):
         """
 
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
-        self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
 
     def __unlearn__(self):
         """
@@ -70,3 +67,10 @@ class AdvancedNegGrad(TorchUnlearner):
             self.predictor.lr_scheduler.step()
         
         return self.predictor
+
+    def check_configuration(self):
+        super().check_configuration()
+
+        self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget

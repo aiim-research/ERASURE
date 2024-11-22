@@ -13,8 +13,6 @@ class GoldModel(Unlearner):
         """
 
         super().__init__(global_ctx, local_ctx)
-        self.train_data = local_ctx.config['parameters'].get("train_data", 'train')  # Default train data is train
-        self.ref_data = local_ctx.config['parameters'].get("ref_data", 'forget set')  # Default reference data is forget
 
         self.forget_set = self.dataset.partitions[self.ref_data]
     
@@ -34,3 +32,9 @@ class GoldModel(Unlearner):
         predictor = self.global_ctx.factory.get_object(current)
             
         return predictor
+    
+    def check_configuration(self):
+        super().check_configuration()
+
+        self.train_data = self.local.config['parameters'].get("train_data", 'train')  # Default train data is train
+        self.ref_data = self.local.config['parameters'].get("ref_data", 'forget set')  # Default reference data is forget

@@ -22,27 +22,6 @@ class BadTeaching(TorchUnlearner):
         """
 
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config['parameters'].get("epochs", 5)  # Default 5 epoch
-        self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
-
-        self.transform = local_ctx.config['parameters'].get("transform", None)
-        self.batch_size = local_ctx.config['parameters'].get("batch_size", 64)
-        self.KL_temperature = local_ctx.config['parameters'].get("KL_temperature", 1.0)
-
-        optimizer = local_ctx.config['parameters'].get("optimizer", "adam")
-        if optimizer == "adam":
-            optimizer = {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.001
-                }
-            }
-        module_name, class_name = optimizer["class"].rsplit(".", 1)
-        module = __import__(module_name, fromlist=[class_name])
-        optimizer_class = getattr(module, class_name)
-        self.optimizer = optimizer_class(self.predictor.model.parameters(), **optimizer["parameters"])
-
 
     def UnlearnerLoss(self, output, labels, full_teacher_logits, unlearn_teacher_logits, KL_temperature):
         labels = torch.unsqueeze(labels, dim = 1)
@@ -129,3 +108,27 @@ class UnLearningData(Dataset):
             x = self.transform(self.retain_data[index - self.forget_len]) if self.transform else self.retain_data[index - self.forget_len]
             y = 0
             return x,y
+
+def check_configuration(self):
+        super().check_configuration()
+
+        self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
+
+        self.transform = self.local.config['parameters'].get("transform", None)
+        self.batch_size = self.local.config['parameters'].get("batch_size", 64)
+        self.KL_temperature = self.local.config['parameters'].get("KL_temperature", 1.0)
+
+        optimizer = self.local.config['parameters'].get("optimizer", "adam")
+        if optimizer == "adam":
+            optimizer = {
+                "class": "torch.optim.Adam",
+                "parameters": {
+                    "lr": 0.001
+                }
+            }
+        module_name, class_name = optimizer["class"].rsplit(".", 1)
+        module = __import__(module_name, fromlist=[class_name])
+        optimizer_class = getattr(module, class_name)
+        self.optimizer = optimizer_class(self.predictor.model.parameters(), **optimizer["parameters"])
