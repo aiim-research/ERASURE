@@ -48,7 +48,6 @@ class UNSIR(TorchUnlearner):
 
         for epoch in range(self.epochs):
             running_loss = 0
-            self.predictor.optimizer.zero_grad()
 
             for batch_idx, ((x_retain, y_retain), (x_forget, y_forget)) in enumerate(zip(retain_loader, forget_loader)):
                 y_retain = y_retain.to(self.device)
@@ -86,6 +85,7 @@ class UNSIR(TorchUnlearner):
 
                 joint_loss = loss_1 + loss_2
 
+                self.predictor.optimizer.zero_grad()
                 joint_loss.backward()
                 self.predictor.optimizer.step()
                 running_loss += joint_loss.item() * x_retain.size(0)

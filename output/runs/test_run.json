@@ -1183,4 +1183,70 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "Cascade",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "sub_unlearner": [
+            {
+                "class": "erasure.unlearners.UNSIR.UNSIR",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data_retain": "train",
+                    "ref_data_forget": "forget set",
+                    "noise_lr": 1e-30
+                }
+            },
+            {
+                "class": "erasure.unlearners.Finetuning.Finetuning",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data": "train"
+                }
+            }
+        ]
+    },
+    "RunTime": 0.8400123119354248,
+    "Accuracies": {
+        "Original_accuracy:": 0.8742857142857143,
+        "New_accuracy:": 0.8411428571428572
+    },
+    "AUS": 0.9409276165273458,
+    "Size of identified forget set": 754,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "Cascade",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "sub_unlearner": [
+            {
+                "class": "erasure.unlearners.UNSIR.UNSIR",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data_retain": "train",
+                    "ref_data_forget": "forget set",
+                    "noise_lr": 0.01
+                }
+            },
+            {
+                "class": "erasure.unlearners.Finetuning.Finetuning",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data": "train"
+                }
+            }
+        ]
+    },
+    "RunTime": 0.9071521759033203,
+    "Accuracies": {
+        "Original_accuracy:": 0.8742857142857143,
+        "New_accuracy:": 0.852
+    },
+    "AUS": 0.9656652424765937,
+    "Size of identified forget set": 754,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },
