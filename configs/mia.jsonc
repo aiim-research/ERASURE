@@ -10,7 +10,7 @@
       },
       "splits": [
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"splits_names": ["all_reduced", "-"], "percentage": 0.0125}
+          "parameters": {"splits_names": ["all_reduced", "-"], "percentage": 0.125}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
           "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
@@ -29,7 +29,7 @@
   "predictor": {
     "class": "erasure.model.TorchModel.TorchModel",
     "parameters": {
-      "epochs": 40,
+      "epochs": 400,
       "optimizer": {
         "class": "torch.optim.RMSprop",
         "parameters": {
@@ -126,7 +126,7 @@
               "predictor": {
                 "class": "erasure.model.TorchModel.TorchModel",
                 "parameters": {
-                  "epochs": 40,
+                  "epochs": 400,
                   "optimizer": {
                     "class": "torch.optim.RMSprop",
                     "parameters": {
@@ -145,8 +145,8 @@
                   }
                 }
               },
-              "n_models": 20,
-              "n_samples": 300,
+              "n_models": 50,
+              "n_samples": 3000,
               "ref_data": "train"
             },
             "measure": "accuracy"

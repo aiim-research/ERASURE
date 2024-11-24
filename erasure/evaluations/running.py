@@ -14,6 +14,7 @@ class UnlearnRunner(Measure):
 
 
 class RunTime(UnlearnRunner):
+    """ Wallclock running time to execute the unlearn """
     def process(self, e: Evaluation):
         if not e.unlearned_model:
             start_time = time.time()

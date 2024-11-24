@@ -8,4 +8,4 @@ class Measure(Configurable, metaclass=ABCMeta):
 
     @abstractmethod
     def process(self, e:Evaluation):
-        pass
+        return e

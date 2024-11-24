@@ -3,7 +3,8 @@ from collections import defaultdict
 
 from erasure.core.measure import Measure
 from erasure.evaluations.evaluation import Evaluation
-from erasure.evaluations.utils import compute_accuracy
+from erasure.evaluations.utils import compute_accuracy, compute_relearn_time
+from erasure.utils.config.local_ctx import Local
 
 
 class Accuracy(Measure):
@@ -21,6 +22,36 @@ class Accuracy(Measure):
         print("NEW ACCURACY IS ", new_accuracy)
 
         e.add_value('Accuracies', {'Original_accuracy:':og_accuracy, 'New_accuracy:':new_accuracy})
+
+        return e
+
+
+class Accuracies(Measure):
+    def process(self, e: Evaluation):
+        original = e.unlearner.predictor
+        unlearned = e.unlearned_model
+
+
+        # Test set
+        test_loader, _ = e.unlearner.dataset.get_loader_for('test')
+        or_test_accuracy = compute_accuracy(test_loader, original.model)
+        un_test_accuracy = compute_accuracy(test_loader, unlearned.model)
+        self.info(f"original test accuracy: {or_test_accuracy}")
+        self.info(f"original test accuracy: {un_test_accuracy}")
+
+        # Forget set
+        forget_loader, _ = e.unlearner.dataset.get_loader_for('forget set')
+        or_forget_accuracy = compute_accuracy(forget_loader, original.model)
+        un_forget_accuracy = compute_accuracy(forget_loader, unlearned.model)
+        self.info(f"original forget accuracy: {or_forget_accuracy}")
+        self.info(f"original forget accuracy: {un_forget_accuracy}")
+
+        # Retain set
+        retain_loader, _ = e.unlearner.dataset.get_loader_for('other_classes')
+        or_retain_accuracy = compute_accuracy(retain_loader, original.model)
+        un_retain_accuracy = compute_accuracy(retain_loader, unlearned.model)
+        self.info(f"original retain accuracy: {or_retain_accuracy}")
+        self.info(f"original retain accuracy: {un_retain_accuracy}")
 
         return e
 
@@ -79,3 +110,56 @@ class SaveValues(Accuracy):
 
         return e
 
+
+class RelearnTime(Measure):
+
+    def process(self, e: Evaluation):
+
+        relearn_time = compute_relearn_time(e.unlearned_model, "forget set", max_accuracy=self.params['req_acc'])
+
+        self.info(f'Relearning Time: {relearn_time} epochs')
+        e.add_value('Relearning Time (epochs):', relearn_time)
+
+        return e
+
+
+class AIN(Measure):
+    """ Anamnesis Index (AIN) """
+
+    def __init__(self, global_ctx, local_ctx):
+        super().__init__(global_ctx, local_ctx)
+
+        pass
+
+    def process(self, e: Evaluation):
+
+        # Gold Model creation
+        current = Local(self.params["gold_model"])
+        current.dataset = e.predictor.dataset
+        current.predictor = e.predictor
+        gold_model_unlearner = self.global_ctx.factory.get_object(current)
+        self.gold_model = gold_model_unlearner.unlearn()
+
+        # orginal accuracy on Forget Set
+        forget_loader, _ = e.unlearner.dataset.get_loader_for('forget set')
+        original_forget_accuracy = compute_accuracy(forget_loader, e.predictor.model)
+
+        max_accuracy = (1-self.params["alpha"]) * original_forget_accuracy
+
+        # relearn time of Unleaned model on Forget set
+        rt_unlearned = compute_relearn_time(e.unlearned_model, "forget set", max_accuracy=max_accuracy)
+
+        # relearn time of Gold model on Forget set
+        rt_gold = compute_relearn_time(e.unlearned_model, "forget set", max_accuracy=max_accuracy)
+
+        ain = rt_unlearned / rt_gold
+        self.info(f'AIN: {ain}')
+        e.add_value('AIN:', ain)
+
+        return e
+
+
+
+class MisuraGold(Measure):
+    def process(self, e:Evaluation):
+        return e
