@@ -114,11 +114,9 @@ class BadTeaching(TorchUnlearner):
         self.optimizer = optimizer_class(self.predictor.model.parameters(), **optimizer["parameters"])
 
         self.cfg_bad_teacher = self.local.config['parameters'].get("bad_teacher", None)
-        
-        retain_set = self.dataset.get_dataset_from_partition(self.ref_data_retain)
 
         current = Local(self.cfg_bad_teacher)
-        current.dataset = retain_set
+        current.dataset = self.dataset
         self.bad_teacher = self.global_ctx.factory.get_object(current)
 
 

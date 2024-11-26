@@ -33,7 +33,8 @@ class TorchModel(Trainable):
         self.early_stopping_threshold = self.local_config['parameters']['early_stopping_threshold']
         
         self.lr_scheduler =  lr_scheduler.LinearLR(self.optimizer, start_factor=1.0, end_factor=0.5, total_iters=self.epochs)
-        
+
+        self.training_set = self.local.config['parameters'].get("training_set", "train")
 
         self.device = (
             "cuda"
@@ -51,7 +52,7 @@ class TorchModel(Trainable):
     
     def real_fit(self):
 
-        train_loader, val_loader = self.dataset.get_loader_for('train', Fraction('1/10'))
+        train_loader, val_loader = self.dataset.get_loader_for(self.training_set, Fraction('1/10'))
         
         best_loss = [0,0]
         
