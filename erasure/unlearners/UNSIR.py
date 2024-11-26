@@ -17,6 +17,8 @@ class Noise(nn.Module):
     def forward(self):
         return self.noise
 
+#TODO: check
+
 class UNSIR(TorchUnlearner):
     def __init__(self, global_ctx: Global, local_ctx):
         """
@@ -27,29 +29,25 @@ class UNSIR(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
-        self.epochs_1 = local_ctx.config['parameters'].get("epochs_1", 1)  # Default 1 epoch
-        self.epochs_2 = local_ctx.config['parameters'].get("epochs_2", 1) # Default 1 epoch
-        self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
-        self.noise_lr = local_ctx.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
-        
+    
     def __unlearn__(self):
         """
-        UNSIR unlearning algorithm for task agnostic setting proposed by https://arxiv.org/pdf/2311.02240, since the original method is thought for class-unlearning setting. 
+        UNSIR unlearning algorithm for task agnostic setting proposed by https://arxiv.org/pdf/2111.08947, since the original method is thought for class-unlearning setting, we propose here the modified version proposed by https://arxiv.org/pdf/2311.02240. 
         The method is divided in two phases:
         1. In the first phase (Impair), noise is added to perturb the weights of the model.
         2. In the second phase (Repair), the model is trained with the retain data to restore its performance.
+
+        Since the second phase of the model is a simple finetuning, we can use the Finetuning unlearner to implement the second phase and here only the first phase is implemented.
         """
 
-        self.global_ctx.logger.info(f'Starting UNSIR with {self.epochs_1} epochs for the impair phase and {self.epochs_2} epochs for the repair phase')
+        self.info(f'Starting UNSIR with {self.epochs} epochs for the impair phase')
 
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data_forget, Fraction('0'))
 
-        for epoch in range(self.epochs_1):
+        for epoch in range(self.epochs):
             running_loss = 0
-            self.predictor.optimizer.zero_grad()
 
             for batch_idx, ((x_retain, y_retain), (x_forget, y_forget)) in enumerate(zip(retain_loader, forget_loader)):
                 y_retain = y_retain.to(self.device)
@@ -82,38 +80,26 @@ class UNSIR(TorchUnlearner):
                 _, outputs = self.predictor.model(noise_tensor.to(self.device))
                 loss_1 = self.predictor.loss_fn(outputs, y_retain)
 
-                outputs = self.predictor.model(x_retain.to(self.device))
+                _, outputs = self.predictor.model(x_retain.to(self.device))
                 loss_2 = self.predictor.loss_fn(outputs, y_retain)
 
                 joint_loss = loss_1 + loss_2
 
+                self.predictor.optimizer.zero_grad()
                 joint_loss.backward()
                 self.predictor.optimizer.step()
                 running_loss += joint_loss.item() * x_retain.size(0)
-
+            
             average_train_loss = running_loss / (len(retain_loader) * x_retain.size(0))
             
-            self.global_ctx.logger.info(f'UNSIR-1 - epoch = {epoch} ---> var_loss = {average_train_loss:.4f}')
+            self.info(f'UNSIR-1 - epoch = {epoch} ---> var_loss = {average_train_loss:.4f}')
 
-
-            for epoch in range(self.epochs_2):
-                running_loss = 0
-                self.predictor.optimizer.zero_grad()
-
-                for batch_idx, (x_retain, y_retain) in enumerate(retain_loader):
-                    y_retain = y_retain.to(self.device)
-
-                    # Classification Loss
-                    _, outputs_retain = self.predictor.model(x_retain.to(self.device))
-                    classification_loss = self.predictor.loss_fn(outputs_retain, y_retain)
-
-                    classification_loss.backward()
-                    self.predictor.optimizer.step()
-
-                    running_loss += classification_loss.item() * x_retain.size(0)
-                
-                average_epoch_loss = running_loss / (len(retain_loader) * x_retain.size(0))
-                
-                self.global_ctx.logger.info(f'UNSIR-2 - epoch = {epoch} ---> var_loss = {average_epoch_loss:.4f}')
-        
         return self.predictor
+
+    def check_configuration(self):
+        super().check_configuration()
+
+        self.epochs = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
+        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
+        self.noise_lr = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01

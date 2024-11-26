@@ -13,11 +13,10 @@ class Evaluator(Configurable):
 
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
-
         self.__init_measures__()
         
-    def evaluate(self, unlearner: Unlearner):
-        e = Evaluation(unlearner)
+    def evaluate(self, unlearner: Unlearner, predictor):
+        e = Evaluation(unlearner,predictor)
         for measure in self.measures:
             e = measure.process(e)
 

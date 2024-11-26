@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+import copy
 from erasure.core.base import Configurable
 from erasure.data.datasets.Dataset import Dataset
 from erasure.utils.config.global_ctx import Global
@@ -11,30 +12,11 @@ class Unlearner(Configurable, metaclass=ABCMeta):
         self.predictor = local_ctx.predictor
         self.device = self.predictor.device
 
-        super().__init__(global_ctx, local_ctx)
-
-
-    def get_retrained(self, forget_set):
-        if not hasattr(self, 'new_predictor'):
-            print("No predictor found.")
-            cfg_dataset = self.dataset.local_config 
-            cfg_model = self.predictor.local_config
-    
-            #Create Dataset
-            data_manager = self.global_ctx.factory.get_object( Local( cfg_dataset))
-            data_manager.revise_split('train', forget_set)
-        
-            #Create Predictor
-            current = Local(cfg_model)
-            current.dataset = data_manager
-            self.new_predictor = self.global_ctx.factory.get_object(current)
-            
-
-        return self.new_predictor
-    
+        super().__init__(global_ctx, local_ctx)   
 
     def unlearn(self):
         self.__preprocess__()
+        self.info('Unlearning on predictor: '+str(self.predictor))
         new_model = self.__unlearn__()
         self.__postprocess__()
         return new_model

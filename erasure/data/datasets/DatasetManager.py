@@ -3,6 +3,7 @@ from erasure.core.factory_base import *
 from fractions import Fraction
 import numpy as np
 from .Dataset import Dataset
+import torch
 from torch.utils.data import DataLoader, Subset
 from torch.utils.data.dataloader import default_collate
 
@@ -38,7 +39,7 @@ class DatasetManager(Configurable):
 
         dataset = self.partitions['all']
 
-        main_loader = DataLoader(Subset(dataset.data, list_ids), batch_size=self.batch_size, collate_fn = skip_nones_collate)
+        main_loader = DataLoader(Subset(dataset.data, list_ids), batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
 
         return main_loader
            
@@ -52,7 +53,7 @@ class DatasetManager(Configurable):
         num_samples = len(dataset)
 
         if split_id == 'train':
-            print(f"TRAINING WITH {num_samples} samples")
+            self.info(f"TRAINING WITH {num_samples} samples")
 
         if fold_fraction is not None:
             number_of_folds = fold_fraction.denominator
@@ -69,17 +70,21 @@ class DatasetManager(Configurable):
 
             main_indices = np.concatenate([folds[i] for i in range(number_of_folds) if i != fold_id])
     
-            main_loader = DataLoader(Subset(dataset, main_indices), batch_size=self.batch_size, collate_fn = skip_nones_collate)
-            fold_loader = DataLoader(Subset(dataset, fold_indices), batch_size=self.batch_size, collate_fn = skip_nones_collate)
+            main_loader = DataLoader(Subset(dataset, main_indices), batch_size=self.batch_size, collate_fn = skip_nones_collate,shuffle=False, worker_init_fn = torch.initial_seed())
+            fold_loader = DataLoader(Subset(dataset, fold_indices), batch_size=self.batch_size, collate_fn = skip_nones_collate,shuffle=False, worker_init_fn = torch.initial_seed())
 
         else:
-            main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate)
+            main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
             fold_loader = None
 
         return main_loader, fold_loader
 
     def revise_split(self, split_id, ids_list, additive=False):
+        print(f"REVISING SPLIT {split_id} with {len(ids_list)} samples")
+        print(f"ids_list: {ids_list}")
         if not additive:
+            print(self.partitions[split_id])
+            print(ids_list)
             self.partitions[split_id] = [sample for sample in self.partitions[split_id] if sample not in ids_list]
         else:
             self.partitions[split_id] = list(set(self.partitions[split_id] + ids_list))

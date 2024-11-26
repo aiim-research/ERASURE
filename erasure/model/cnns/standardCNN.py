@@ -62,7 +62,7 @@ class FashionCNN(nn.Module):
         out = self.layer2(out)
         out = out.view(out.size(0), -1)
         out = self.fc1(out)
-        out = self.drop(out)
+        #out = self.drop(out)
         out = self.fc2(out)
         intermediate_output = out
         out = self.fc3(out)       

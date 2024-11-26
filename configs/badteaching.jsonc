@@ -13,7 +13,7 @@
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
                       "splits_names": ["all_reduced", "-"],
-                      "percentage": 0.125
+                      "percentage": 0.0125
                   }
               },
               {
@@ -68,29 +68,23 @@
       }
   },
   "unlearners": [
-    {
-        "class": "erasure.unlearners.composite.Cascade",
-        "parameters": {
-            "sub_unlearner": [
-                {
-                    "class": "erasure.unlearners.UNSIR.UNSIR",
-                    "parameters": {
-                        "epochs": 1,
-                        "ref_data_retain": "train", 
-                        "ref_data_forget": "forget set", 
-                        "noise_lr": 0.01
-                    }
-                }, 
-                {
-                  "class": "erasure.unlearners.Finetuning.Finetuning",
+      {
+          "class": "erasure.unlearners.BadTeaching.BadTeaching",
+          "parameters": {
+              "epochs": 1, 
+              "ref_data_retain": "train", 
+              "ref_data_forget": "forget set",
+              "optimizer": {
+                  "class": "torch.optim.Adam",
                   "parameters": {
-                      "epochs": 1, 
-                      "ref_data":"train"
+                      "lr": 0.01
                   }
-              }
-            ]
-        }
-    }
+              },
+              "batch_size": 64,
+              "KL_temperature": 1.0
+          }
+          // aggancia quello di default se non c'è un predictor
+      }
   ],
   "evaluator":{
       "class": "erasure.evaluations.manager.Evaluator",

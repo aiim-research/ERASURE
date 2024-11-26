@@ -1,3 +1,4 @@
+from copy import deepcopy
 import os
 
 from erasure.utils.config.file_parser import Config
@@ -17,14 +18,29 @@ class Global:
         
         self.config = Config.from_json(config_file)
         
-        
-    
 
     def __setitem__(self, key, value):
         self._data[key] = value
 
     def __getitem__(self, key):
         return self._data[key]
+    
+    def __copy__(self):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        result.__dict__.update(self.__dict__)
+        return result
+
+    def __deepcopy__(self, memo):
+        cls = self.__class__
+        result = cls.__new__(cls)
+        memo[id(self)] = result
+        for k, v in self.__dict__.items():
+            if k != 'logger':
+                setattr(result, k, deepcopy(v, memo))
+            else:
+                setattr(result, k, self.logger)
+        return result
     
 def clean_cfg(cfg):
     if isinstance(cfg,dict):
@@ -52,6 +68,8 @@ def set_seed(seed=0):
     if torch.cuda.is_available():
         torch.cuda.manual_seed(seed)
         torch.cuda.manual_seed_all(seed)
+    if torch.backends.mps.is_available():
+        torch.mps.manual_seed(seed)
     # For more deterministic behavior, you can set the following
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = False

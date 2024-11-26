@@ -19,7 +19,7 @@ class DistillKL(nn.Module):
         loss = F.kl_div(p_s, p_t, size_average=False) * (self.T**2) / y_s.shape[0]
         return loss
 
-class scrub(TorchUnlearner):
+class Scrub(TorchUnlearner):
 
     def __init__(self, global_ctx: Global, local_ctx):
         """
@@ -30,17 +30,19 @@ class scrub(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
-        self.epochs = local_ctx.config['parameters'].get("epochs", 1)  # Default 1 epoch
-        self.ref_data_retain = local_ctx.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = local_ctx.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
-        self.T = local_ctx.config['parameters'].get("T", 4.0)  # Default temperature is 4.0
-
+        
         self.criterion_div = DistillKL(self.T)
 
     def __unlearn__(self):
         """
-        scrub unlearning algorithm
+        SCRUB unlearning algorithm for selectively removing specific data from a model as proposed by https://arxiv.org/pdf/2302.09880. The method operates in two main stages:
+        
+        1. Training on Retain Data: The model (student) is trained using the data to be retained, guided by a frozen version of the model (teacher) to minimize divergence and finetune on retain data.
+        2. Divergence on Forget Data: The model then maximizes divergence between its outputs and the teacher's outputs on the data to be forgotten, aiming to remove learned information specific to these samples.
+
+        During each epoch, loss is calculated for both retain and forget data.
         """
+
 
         self.global_ctx.logger.info(f'Starting scrub with {self.epochs} epochs')
 
@@ -116,3 +118,11 @@ class scrub(TorchUnlearner):
 
                 
         return self.predictor
+    
+    def check_configuration(self):
+        super().check_configuration()
+
+        self.epochs = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
+        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
+        self.T = self.local.config['parameters'].get("T", 4.0)  # Default temperature is 4.0

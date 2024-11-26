@@ -13,7 +13,7 @@
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
                       "splits_names": ["all_reduced", "-"],
-                      "percentage": 0.125
+                      "percentage": 0.525
                   }
               },
               {
@@ -41,14 +41,14 @@
                   }
               }
           ],
-          "batch_size": 128,
+          "batch_size": 256,
           "split_seed": 16
       }
   },
   "predictor": {
       "class": "erasure.model.TorchModel.TorchModel",
       "parameters": {
-          "epochs": 20,
+          "epochs": 15,
           "optimizer": {
               "class": "torch.optim.Adam",
               "parameters": {
@@ -67,36 +67,18 @@
           }
       }
   },
+  // THIS IS A TEST COMMENT
   "unlearners": [
-    {
-        "class": "erasure.unlearners.composite.Cascade",
-        "parameters": {
-            "sub_unlearner": [
-                {
-                    "class": "erasure.unlearners.UNSIR.UNSIR",
-                    "parameters": {
-                        "epochs": 1,
-                        "ref_data_retain": "train", 
-                        "ref_data_forget": "forget set", 
-                        "noise_lr": 0.01
-                    }
-                }, 
-                {
-                  "class": "erasure.unlearners.Finetuning.Finetuning",
-                  "parameters": {
-                      "epochs": 1, 
-                      "ref_data":"train"
-                  }
-              }
-            ]
-        }
-    }
+    {"compose_idt" : "configs/snippets/u_id.json"},
+    {"compose_unsir" : "configs/snippets/u_unsir_full.json"},
+    {"compose_impair" : "configs/snippets/u_unsir_imp.json"}, 
+    {"compose_fine" : "configs/snippets/u_fine.json"}
   ],
   "evaluator":{
       "class": "erasure.evaluations.manager.Evaluator",
       "parameters": {
         "measures":[
-          { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
+          {"class":"erasure.evaluations.running.RunTime", "parameters":{}},
           {"class": "erasure.evaluations.measures.Accuracy", "parameters":{}},
           {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
           {"class": "erasure.evaluations.measures.ForgetSetInfo", "parameters":{}},
