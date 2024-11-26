@@ -81,7 +81,29 @@
                   }
               },
               "batch_size": 64,
-              "KL_temperature": 1.0
+              "KL_temperature": 1.0,
+              "bad_teacher": {
+                    "class": "erasure.model.TorchModel.TorchModel",
+                    "parameters": {
+                        "epochs": 20,
+                        "optimizer": {
+                            "class": "torch.optim.Adam",
+                            "parameters": {
+                                "lr": 0.01
+                            }
+                        },
+                        "loss_fn": {
+                            "class": "torch.nn.CrossEntropyLoss",
+                            "parameters": {
+                                "reduction": "mean"
+                            }
+                        },
+                        "model": {
+                            "class": "erasure.model.cnns.standardCNN.FashionCNN",
+                            "parameters": {}
+                        }
+                    }
+                }
           }
           // aggancia quello di default se non c'è un predictor
       }

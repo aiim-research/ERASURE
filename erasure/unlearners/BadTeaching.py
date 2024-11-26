@@ -11,6 +11,8 @@ import copy
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
+from erasure.utils.config.local_ctx import Local
+
 class BadTeaching(TorchUnlearner):
     def __init__(self, global_ctx: Global, local_ctx):
         """
@@ -87,29 +89,7 @@ class BadTeaching(TorchUnlearner):
             
         return self.predictor
 
-class UnLearningData(Dataset):
-    def __init__(self, forget_data, retain_data, transform):
-        super().__init__()
-        self.forget_data = forget_data
-        self.retain_data = retain_data
-        self.transform = transform
-        self.forget_len = len(forget_data)
-        self.retain_len = len(retain_data)
-
-    def __len__(self):
-        return self.retain_len + self.forget_len
-    
-    def __getitem__(self, index):
-        if(index < self.forget_len):
-            x = self.transform(self.forget_data[index]) if self.transform else self.forget_data[index]
-            y = 1
-            return x,y
-        else:
-            x = self.transform(self.retain_data[index - self.forget_len]) if self.transform else self.retain_data[index - self.forget_len]
-            y = 0
-            return x,y
-
-def check_configuration(self):
+    def check_configuration(self):
         super().check_configuration()
 
         self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
@@ -132,3 +112,34 @@ def check_configuration(self):
         module = __import__(module_name, fromlist=[class_name])
         optimizer_class = getattr(module, class_name)
         self.optimizer = optimizer_class(self.predictor.model.parameters(), **optimizer["parameters"])
+
+        self.cfg_bad_teacher = self.local.config['parameters'].get("bad_teacher", None)
+        
+        retain_set = self.dataset.get_dataset_from_partition(self.ref_data_retain)
+
+        current = Local(self.cfg_bad_teacher)
+        current.dataset = retain_set
+        self.bad_teacher = self.global_ctx.factory.get_object(current)
+
+
+class UnLearningData(Dataset):
+    def __init__(self, forget_data, retain_data, transform):
+        super().__init__()
+        self.forget_data = forget_data
+        self.retain_data = retain_data
+        self.transform = transform
+        self.forget_len = len(forget_data)
+        self.retain_len = len(retain_data)
+
+    def __len__(self):
+        return self.retain_len + self.forget_len
+    
+    def __getitem__(self, index):
+        if(index < self.forget_len):
+            x = self.transform(self.forget_data[index]) if self.transform else self.forget_data[index]
+            y = 1
+            return x,y
+        else:
+            x = self.transform(self.retain_data[index - self.forget_len]) if self.transform else self.retain_data[index - self.forget_len]
+            y = 0
+            return x,y
