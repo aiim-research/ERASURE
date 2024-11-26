@@ -1249,4 +1249,38 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "GoldModel",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data": "forget set",
+        "train_data": "train"
+    },
+    "RunTime": 14.515040636062622,
+    "Accuracies": {
+        "Original_accuracy:": 0.8342857142857143,
+        "New_accuracy:": 0.6571428571428571
+    },
+    "AUS": 0.4965517241379311,
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
+},{
+    "unlearner": "GoldModel",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data": "forget set",
+        "train_data": "train"
+    },
+    "RunTime": 14.053215503692627,
+    "Accuracies": {
+        "Original_accuracy:": 0.8342857142857143,
+        "New_accuracy:": 0.6571428571428571
+    },
+    "AUS": 0.4965517241379311,
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },
