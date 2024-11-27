@@ -49,21 +49,7 @@
         "measures":[
           { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
           {"class": "erasure.evaluations.measures.Accuracy", "parameters":{}},
-          {"class": "erasure.evaluations.measures.Accuracies", "parameters":{}},
           {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
-          {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{
-            "req_acc": 0.7
-          }},
-          {"class": "erasure.evaluations.measures.AIN", "parameters":{
-            "alpha": 0.05,
-            "gold_model": {
-                "class": "erasure.unlearners.GoldModel.GoldModel",
-                "parameters": {
-                  "ref_data": "forget set",
-                  "train_data": "train"
-                }
-            }
-          }},
           {"class": "erasure.evaluations.measures.ForgetSetInfo", "parameters":{}},
           {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/test_run.json"}}
         ]
