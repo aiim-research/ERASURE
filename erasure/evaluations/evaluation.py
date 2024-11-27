@@ -1,4 +1,3 @@
-import copy
 from erasure.core.unlearner import Unlearner
 
 

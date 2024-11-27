@@ -5,3 +5,5 @@ torch
 torchvision
 torch_geometric
 picologging
+jsonc_parser
+jsonpickle

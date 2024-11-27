@@ -11,12 +11,15 @@ from erasure.utils.config.local_ctx import Local
 
 
 class MembershipInference(Measure):
-    """ Membership Inference Attack (MIA) """
+    """ Membership Inference Attack (MIA)
+        as presented in https://doi.org/10.1109/SP.2017.41
+    """
 
     def process(self, e: Evaluation):
         self.info("Membership Inference Attack")
         # Target Model (unlearned model)
         target_model = e.unlearned_model
+        original_model = e.predictor
 
         # original dataset
         original_dataset = target_model.dataset
@@ -41,25 +44,15 @@ class MembershipInference(Measure):
         # Test data
         train_loader, _ = target_model.dataset.get_loader_for("train")
 
-        print(self.__test_dataset(attack_models, target_model, "train"))
-        print(self.__test_dataset(attack_models, target_model, "test"))
-        print("Original Train:", self.__test_dataset(attack_models, e.unlearner.predictor, "train"))    # e.predictor
-        print("Original Test:", self.__test_dataset(attack_models, e.unlearner.predictor, "test"))
+        original_foget = self.__test_dataset(attack_models, original_model, "forget set")
+        target_forget = self.__test_dataset(attack_models, target_model, "forget set")
+        self.info(f"Original Forget: {original_foget/original_foget.sum()}")
+        self.info(f"Target Forget: {target_forget/target_forget.sum()}")
 
-        print("Original Forget:", self.__test_dataset(attack_models, e.unlearner.predictor, "forget set"))
-        print("Target Forget:", self.__test_dataset(attack_models, target_model, "forget set"))
-
-        print("Original Retain:", self.__test_dataset(attack_models, e.unlearner.predictor, "other_classes"))
-        print("Target Retain:", self.__test_dataset(attack_models, target_model, "other_classes"))
-
-        print("Original Train:", self.__test_dataset(attack_models, e.unlearner.predictor, "train"))
-        print("Original Test:", self.__test_dataset(attack_models, e.unlearner.predictor, "test"))
-
-        print(self.__test_dataset(attack_models, shadow_models[0], "train"))
-        print(self.__test_dataset(attack_models, shadow_models[0], "test"))
-        print(self.__test_dataset(attack_models, shadow_models[1], "train"))
-        print(self.__test_dataset(attack_models, shadow_models[1], "test"))
-
+        # Forgetting Rate
+        fr = (target_forget[0] - original_foget[0]) / original_foget[1]
+        self.info(f"Forgetting Rate: {fr}")
+        e.add_value("Forgetting Rate", fr)
 
         return e
 
