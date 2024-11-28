@@ -35,7 +35,7 @@ class Scrub(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        SCRUB unlearning algorithm for selectively removing specific data from a model as proposed by https://arxiv.org/pdf/2302.09880. The method operates in two main stages:
+        SCRUB unlearning algorithm as proposed by https://arxiv.org/pdf/2302.09880. The method operates in two main stages:
         
         1. Training on Retain Data: The model (student) is trained using the data to be retained, guided by a frozen version of the model (teacher) to minimize divergence and finetune on retain data.
         2. Divergence on Forget Data: The model then maximizes divergence between its outputs and the teacher's outputs on the data to be forgotten, aiming to remove learned information specific to these samples.

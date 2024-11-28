@@ -86,7 +86,7 @@
                     "class": "erasure.model.TorchModel.TorchModel",
                     "parameters": {
                         "epochs": 20,
-                        "training_set": "forget set",
+                        "training_set": "train", //should be retain set
                         "optimizer": {
                             "class": "torch.optim.Adam",
                             "parameters": {

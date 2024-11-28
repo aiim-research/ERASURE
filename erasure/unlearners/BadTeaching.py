@@ -59,7 +59,10 @@ class BadTeaching(TorchUnlearner):
 
     def __unlearn__(self):
         """
+        Bad Teaching unlearning algorithm as proposed by https://arxiv.org/abs/2205.08096. The method uses a distillation method between two teachers and a student model:
         
+        1. The student model and the good teacher are both initialized with the same weights, the ones of the model before unlearning. The bad teacher is initialized with random weights or could be finetuned for few epochs on the retain set. 
+        2. The KL-divergence of the logits between the good teacher and the student are minimized on the retain set, while the KL-divergence of the logits between the bad teacher and the student is minimized on the forget set.
         """
 
         self.global_ctx.logger.info(f'Starting BadTeaching with {self.epochs} epochs')
@@ -76,14 +79,13 @@ class BadTeaching(TorchUnlearner):
         print("Number of steps per epoch: ", len(unlearning_loader))
 
         good_teacher = copy.deepcopy(self.predictor.model)
-        full_trained_teacher = None #TODO 
 
         good_teacher.eval()
-        full_trained_teacher.eval()        
+        self.bad_teacher.model.eval()        
 
         for epoch in range(self.epochs):
             loss = self.unlearning_step(model = self.predictor.model, unlearning_teacher= good_teacher, 
-                            full_trained_teacher=full_trained_teacher, unlearn_data_loader=unlearning_loader, 
+                            full_trained_teacher=self.bad_teacher.model, unlearn_data_loader=unlearning_loader, 
                             optimizer=self.optimizer, device=self.device, KL_temperature=self.KL_temperature)
             print("Epoch {} Unlearning Loss {}".format(epoch, loss))
             

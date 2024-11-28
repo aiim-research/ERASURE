@@ -1283,4 +1283,70 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "BadTeaching",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget set",
+        "optimizer": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+                "lr": 0.01
+            }
+        },
+        "batch_size": 64,
+        "KL_temperature": 1.0,
+        "bad_teacher": {
+            "class": "erasure.model.TorchModel.TorchModel",
+            "parameters": {
+                "epochs": 20,
+                "training_set": "train",
+                "optimizer": {
+                    "class": "torch.optim.Adam",
+                    "parameters": {
+                        "lr": 0.01,
+                        "betas": [
+                            0.9,
+                            0.999
+                        ],
+                        "eps": 1e-08,
+                        "weight_decay": 0,
+                        "amsgrad": false,
+                        "maximize": false,
+                        "capturable": false,
+                        "differentiable": false
+                    }
+                },
+                "loss_fn": {
+                    "class": "torch.nn.CrossEntropyLoss",
+                    "parameters": {
+                        "ignore_index": -100,
+                        "reduction": "mean",
+                        "label_smoothing": 0.0
+                    }
+                },
+                "model": {
+                    "class": "erasure.model.cnns.standardCNN.FashionCNN",
+                    "parameters": {
+                        "n_classes": 10
+                    }
+                },
+                "fold_id": -1,
+                "batch_size": 4,
+                "early_stopping_threshold": null
+            }
+        }
+    },
+    "RunTime": 0.14629769325256348,
+    "Accuracies": {
+        "Original_accuracy:": 0.7828571428571428,
+        "New_accuracy:": 0.5771428571428572
+    },
+    "AUS": 0.5819428432740733,
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },
