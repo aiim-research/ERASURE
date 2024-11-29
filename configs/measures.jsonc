@@ -50,8 +50,6 @@
         "measures":[
           // All available measures
           { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
-          {"class": "erasure.evaluations.measures.Accuracy", "parameters":{}},
-          {"class": "erasure.evaluations.measures.Accuracies", "parameters":{}},
           {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
           {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{
             "req_acc": 0.7
@@ -66,7 +64,13 @@
                 }
             }
           }},
-          {"class": "erasure.evaluations.measures.ForgetSetInfo", "parameters":{}},
+          {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"unlearned"}},
+          {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"original"}},
+          {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"unlearned"}},
+          {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
+          {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
+          {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
+          {"class": "erasure.evaluations.measures.PartitionInfo", "parameters":{}},
           {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/test_run.json"}}
         ]
       }

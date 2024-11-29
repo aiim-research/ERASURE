@@ -270,4 +270,28 @@
             "1": 1.0
         }
     }
+},{
+    "unlearner": "GoldModel",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data": "forget",
+        "train_data": "train"
+    },
+    "RunTime": 0.36266207695007324,
+    "AUS": 0.6212121212121213,
+    "Relearning Time (epochs):": 3,
+    "AIN:": 1.0,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5085714285714286,
+    "sklearn.metrics.accuracy_score.test.original": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.028985507246376812,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.5625990491283677,
+    "sklearn.metrics.accuracy_score.retain.original": 0.6354992076069731,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
 },
