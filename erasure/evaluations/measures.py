@@ -71,7 +71,6 @@ class PartitionInfo(Measure):
         
 
     def process(self, e:Evaluation):
-
         info={}
         info['name']=self.partition_name
 
@@ -112,25 +111,6 @@ class AUS(Measure):
 
         print("Adaptive Unlearning Score:", aus)
         e.add_value("AUS", aus)
-
-        return e
-
-
-class ForgetSetInfo(Measure):
-    def process(self, e:Evaluation):
-        e.add_value('Size of identified forget', len(e.forget_set))
-        
-        forget_set_loader = e.unlearner.dataset.get_loader_for_ids(e.forget_set)
-
-        distributions = defaultdict(int)
-
-        for _,labels in forget_set_loader:
-            for l in labels:
-                distributions[l.item()] += 1
-
-        distributions = {key:(value/len(e.forget_set)) for key,value in distributions.items()}
-
-        e.add_value('Distribution of classes in the forget', distributions)
 
         return e
 
