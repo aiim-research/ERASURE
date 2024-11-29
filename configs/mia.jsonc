@@ -69,7 +69,7 @@
                 "DataSource": {
                   "class": "erasure.evaluations.modules.MIADataSource",
                   "parameters": {
-                    "path": "tmp/mia.pt"
+                    "path": "resources/data/mia/mia.pt"
                   }
                 },
                 "partitions": [
@@ -115,7 +115,7 @@
                   "DataSource": {
                     "class": "erasure.evaluations.modules.MIADataSource",
                     "parameters": {
-                      "path": "tmp/shadow.pt"
+                      "path": "resources/data/mia/shadow.pt"
                     }
                   },
                   "partitions": [
@@ -130,7 +130,7 @@
               "predictor": {
                 "class": "erasure.model.TorchModel.TorchModel",
                 "parameters": {
-                  "epochs": 400,
+                  "epochs": 200,
                   "optimizer": {
                     "class": "torch.optim.RMSprop",
                     "parameters": {
@@ -149,8 +149,8 @@
                   }
                 }
               },
-              "n_models": 50,
-              "n_samples": 3000,
+              "n_models": 20,
+              "n_samples": 1000,
               "ref_data": "train"
             },
             "gold_model": {
