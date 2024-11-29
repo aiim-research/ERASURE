@@ -8,18 +8,18 @@
           "path": "torchvision.datasets.FashionMNIST"
         }
       },
-      "splits": [
+      "partitions": [
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"splits_names": ["all_reduced", "-"], "percentage": 0.125}
+          "parameters": {"parts_names": ["all_reduced", "-"], "percentage": 0.125}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
+          "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
-          "parameters": {"splits_names": ["forget", "retain"], "label": 1, "ref_data": "train"}
+          "parameters": {"parts_names": ["forget", "retain"], "label": 1, "ref_data": "train"}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
-          "parameters": {"splits_names": ["example", "-"], "n_samples": 100, "ref_data": "forget"}
+          "parameters": {"parts_names": ["example", "-"], "n_samples": 100, "ref_data": "forget"}
         }
       ],
       "batch_size": 128,
@@ -72,12 +72,12 @@
                     "path": "tmp/mia.pt"
                   }
                 },
-                "splits": [
+                "partitions": [
                   { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"splits_names": ["tt", "attack"], "percentage": 0.7, "ref_data": "all"}
+                    "parameters": {"parts_names": ["tt", "attack"], "percentage": 0.7, "ref_data": "all"}
                   },
                   { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "tt"}
+                    "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "tt"}
                   }
                 ],
                 "batch_size": 128,
@@ -118,9 +118,9 @@
                       "path": "tmp/shadow.pt"
                     }
                   },
-                  "splits": [
+                  "partitions": [
                     { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                      "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
+                      "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
                     }
                   ],
                   "batch_size": 128,
