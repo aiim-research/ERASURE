@@ -35,7 +35,6 @@ def get_instance_config(config):
 
 def get_instance(kls, param):
     GLogger.getLogger().info("Instantiating: "+kls)
-    print(param)
     return  get_class(kls)(param)
 
 def get_class( kls ):

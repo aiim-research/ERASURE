@@ -294,4 +294,124 @@
             "1": 1.0
         }
     }
+},{
+    "unlearner": "Identity",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 1.1682510375976562e-05,
+    "sklearn.metrics.f1_score.test.unlearned": 0.3111111111111111,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.test.original": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.0,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6792452830188679,
+    "sklearn.metrics.accuracy_score.retain.original": 0.6792452830188679,
+    "AUS": 0.6363636363636364,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 3,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "Identity",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 1.1682510375976562e-05,
+    "sklearn.metrics.f1_score.test.unlearned": 0.3111111111111111,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.test.original": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.0,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6792452830188679,
+    "sklearn.metrics.accuracy_score.retain.original": 0.6792452830188679,
+    "AUS": 0.6363636363636364,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 3,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "Identity",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 1.0967254638671875e-05,
+    "sklearn.metrics.f1_score.test.unlearned": 0.3111111111111111,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.test.original": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.0,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6792452830188679,
+    "sklearn.metrics.accuracy_score.retain.original": 0.6792452830188679,
+    "AUS": 0.6363636363636364,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 3,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "Identity",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 1.0967254638671875e-05,
+    "sklearn.metrics.f1_score.test.unlearned": 0.3111111111111111,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.test.original": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.0,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6792452830188679,
+    "sklearn.metrics.accuracy_score.retain.original": 0.6792452830188679,
+    "AUS": 0.6363636363636364,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 3,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "Identity",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 9.059906005859375e-06,
+    "sklearn.metrics.f1_score.test.unlearned": 0.3111111111111111,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.test.original": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.0,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6792452830188679,
+    "sklearn.metrics.accuracy_score.retain.original": 0.6792452830188679,
+    "AUS": 0.6363636363636364,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 3,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "Identity",
+    "dataset": "FashionMNIST",
+    "parameters": {},
+    "RunTime": 9.775161743164062e-06,
+    "sklearn.metrics.f1_score.test.unlearned": 0.3111111111111111,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.test.original": 0.5714285714285714,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.0,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6792452830188679,
+    "sklearn.metrics.accuracy_score.retain.original": 0.6792452830188679,
+    "AUS": 0.6363636363636364,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 3,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
 },

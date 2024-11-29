@@ -1,6 +1,5 @@
 import json
 from collections import defaultdict
-import sklearn.metrics
 import torch
 import numpy as np
 
@@ -109,7 +108,7 @@ class AUS(Measure):
 
         aus = (1 - (or_test_accuracy - ul_test_accuracy)) / (1 + abs(ul_test_accuracy - ul_forget_accuracy))
 
-        print("Adaptive Unlearning Score:", aus)
+        self.info(f"Adaptive Unlearning Score: {aus}")
         e.add_value("AUS", aus)
 
         return e
