@@ -27,7 +27,7 @@
               {
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
                   "parameters": {
-                      "splits_names": ["forget", "other_classes"],
+                      "splits_names": ["forget", "retain"],
                       "label": 1,
                       "ref_data": "train"
                   }
