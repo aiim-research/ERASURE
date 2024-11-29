@@ -62,7 +62,7 @@ class BadTeaching(TorchUnlearner):
         Bad Teaching unlearning algorithm as proposed by https://arxiv.org/abs/2205.08096. The method uses a distillation method between two teachers and a student model:
         
         1. The student model and the good teacher are both initialized with the same weights, the ones of the model before unlearning. The bad teacher is initialized with random weights or could be finetuned for few epochs on the retain set. 
-        2. The KL-divergence of the logits between the good teacher and the student are minimized on the retain set, while the KL-divergence of the logits between the bad teacher and the student is minimized on the forget set.
+        2. The KL-divergence of the logits between the good teacher and the student are minimized on the retain set, while the KL-divergence of the logits between the bad teacher and the student is minimized on the forget.
         """
 
         self.global_ctx.logger.info(f'Starting BadTeaching with {self.epochs} epochs')
@@ -96,7 +96,7 @@ class BadTeaching(TorchUnlearner):
 
         self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
 
         self.transform = self.local.config['parameters'].get("transform", None)
         self.batch_size = self.local.config['parameters'].get("batch_size", 64)

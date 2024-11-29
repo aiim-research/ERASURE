@@ -16,10 +16,10 @@
           "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
-          "parameters": {"splits_names": ["forget set", "other_classes"], "label": 1, "ref_data": "train"}
+          "parameters": {"splits_names": ["forget", "other_classes"], "label": 1, "ref_data": "train"}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
-          "parameters": {"splits_names": ["example", "-"], "n_samples": 100, "ref_data": "forget set"}
+          "parameters": {"splits_names": ["example", "-"], "n_samples": 100, "ref_data": "forget"}
         }
       ],
       "batch_size": 128,
@@ -156,7 +156,7 @@
             "gold_model": {
                 "class": "erasure.unlearners.GoldModel.GoldModel",
                 "parameters": {
-                  "ref_data": "forget set",
+                  "ref_data": "forget",
                   "train_data": "train"
                 }
             }

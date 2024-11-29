@@ -7,7 +7,7 @@ class Evaluation():
         self.unlearned_model = None
         self.unlearner = unlearner
         self.predictor = predictor
-        self.forget_set = unlearner.dataset.partitions['forget set']
+        #self.forget_set = unlearner.dataset.partitions[default_forget]
         self.data_info['unlearner'] = unlearner.__class__.__name__
         self.data_info['dataset'] = unlearner.dataset.name
         self.data_info['parameters'] = unlearner.params

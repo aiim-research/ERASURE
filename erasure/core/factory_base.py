@@ -24,6 +24,11 @@ def get_instance_kvargs(kls, param):
     GLogger.getLogger().info("Instantiating: "+kls)
     return  get_class(kls)(**param)
 
+def get_function(func):    
+    func = get_class( func )
+    GLogger.getLogger().info("Loaded: "+str(func))
+    return  func
+
 def get_instance_config(config):
     GLogger.getLogger().info("Instantiating: "+config['class'])
     return  get_class(config['class'])(**config['parameters'])
@@ -38,7 +43,7 @@ def get_class( kls ):
     module = ".".join(parts[:-1])
     m = __import__( module )
     for comp in parts[1:]:
-        m = getattr(m, comp)            
+        m = getattr(m, comp)         
     return m
     
 __cls_param_ptrn = re.compile('(^.*)'+ '\(' +'(.*)'+'\)')

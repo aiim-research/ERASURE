@@ -1,0 +1,77 @@
+{
+    "data": {
+        "class": "erasure.data.datasets.DatasetManager.DatasetManager",
+        "parameters": {
+            "DataSource": {
+                "class": "erasure.data.data_sources.TVDataSource.TVDataSource",
+                "parameters": {
+                    "path": "torchvision.datasets.FashionMNIST"
+                }
+            },
+            "splits": [
+                {
+                    "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
+                    "parameters": {
+                        "splits_names": ["all_reduced", "-"],
+                        "percentage": 0.001
+                    }
+                },
+                {
+                    "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
+                    "parameters": {
+                        "splits_names": ["train", "test"],
+                        "percentage": 0.8,
+                        "ref_data": "all_reduced"
+                    }
+                },
+                {
+                    "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
+                    "parameters": {
+                        "splits_names": ["forget", "retain"],
+                        "label": 1,
+                        "ref_data": "train"
+                    }
+                },
+                {
+                    "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
+                    "parameters": {
+                        "splits_names": ["example", "-"],
+                        "n_samples": 100,
+                        "ref_data": "forget"
+                    }
+                }
+            ],
+            "batch_size": 256,
+            "split_seed": 16
+        }
+    },
+    "predictor": {
+        "class": "erasure.model.TorchModel.TorchModel",
+        "parameters": {
+            "epochs": 15,
+            "optimizer": {
+                "class": "torch.optim.Adam",
+                "parameters": {
+                    "lr": 0.01
+                }
+            },
+            "loss_fn": {
+                "class": "torch.nn.CrossEntropyLoss",
+                "parameters": {
+                    "reduction": "mean"
+                }
+            },
+            "model": {
+                "class": "erasure.model.cnns.standardCNN.FashionCNN",
+                "parameters": {}
+            }
+        }
+    },
+    // THIS IS A TEST COMMENT
+    "unlearners": [
+      {"compose_idt" : "configs/snippets/u_id.json"},
+      {"compose_idt" : "configs/snippets/u_id.json"}
+    ],
+    "compose_eval":"configs/snippets/default_evaluation.json"
+  }
+  

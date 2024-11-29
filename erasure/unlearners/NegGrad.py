@@ -58,4 +58,4 @@ class NegGrad(TorchUnlearner):
         super().check_configuration()
 
         self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
-        self.ref_data = self.local.config['parameters'].get("ref_data", 'forget set')  # Default reference data is forget
+        self.ref_data = self.local.config['parameters'].get("ref_data", 'forget')  # Default reference data is forget

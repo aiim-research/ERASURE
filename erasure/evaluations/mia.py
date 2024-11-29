@@ -44,8 +44,8 @@ class MembershipInference(Measure):
         # Test data
         train_loader, _ = target_model.dataset.get_loader_for("train")
 
-        original_foget = self.__test_dataset(attack_models, original_model, "forget set")
-        target_forget = self.__test_dataset(attack_models, target_model, "forget set")
+        original_foget = self.__test_dataset(attack_models, original_model, "forget")
+        target_forget = self.__test_dataset(attack_models, target_model, "forget")
         self.info(f"Original Forget: {original_foget/original_foget.sum()}")
         self.info(f"Target Forget: {target_forget/target_forget.sum()}")
 

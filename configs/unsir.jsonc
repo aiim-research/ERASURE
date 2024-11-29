@@ -27,7 +27,7 @@
               {
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
                   "parameters": {
-                      "splits_names": ["forget set", "other_classes"],
+                      "splits_names": ["forget", "other_classes"],
                       "label": 1,
                       "ref_data": "train"
                   }
@@ -37,7 +37,7 @@
                   "parameters": {
                       "splits_names": ["example", "-"],
                       "n_samples": 100,
-                      "ref_data": "forget set"
+                      "ref_data": "forget"
                   }
               }
           ],
@@ -77,7 +77,7 @@
                     "parameters": {
                         "epochs": 1,
                         "ref_data_retain": "train", 
-                        "ref_data_forget": "forget set", 
+                        "ref_data_forget": "forget", 
                         "noise_lr": 0.01
                     }
                 }, 
@@ -92,16 +92,5 @@
         }
     }
   ],
-  "evaluator":{
-      "class": "erasure.evaluations.manager.Evaluator",
-      "parameters": {
-        "measures":[
-          { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
-          {"class": "erasure.evaluations.measures.Accuracy", "parameters":{}},
-          {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
-          {"class": "erasure.evaluations.measures.ForgetSetInfo", "parameters":{}},
-          {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/test_run.json"}}
-        ]
-      }
-    }
+  "compose_eval":"configs/snippets/default_evaluation.json"
 }
