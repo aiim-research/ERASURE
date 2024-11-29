@@ -5,6 +5,9 @@ from erasure.core.measure import Measure
 from erasure.evaluations.evaluation import Evaluation
 from erasure.evaluations.utils import compute_accuracy, compute_relearn_time
 from erasure.utils.config.local_ctx import Local
+import pandas as pd 
+import os
+import yaml
 
 
 class Accuracy(Measure):
@@ -101,14 +104,73 @@ class SaveValues(Accuracy):
     def __init__(self, global_ctx, local_ctx):
         super().__init__(global_ctx, local_ctx)
         self.path = self.params['path']
+        self.output_format = self.local_config['parameters'].get('output_format', self.path.split(".")[-1])
+
+        valid_extensions = {'json': '.json', 'csv': '.csv', 'yaml':'.yaml', 'xlsx':'.xlsx'}
+        if self.output_format not in valid_extensions:
+            self.global_ctx.logger.info(f"Unsupported output format: {self.output_format}, defaulting to JSON")
+            self.output_format = 'json'
+        if not self.path.endswith(valid_extensions[self.output_format]):
+            self.global_ctx.logger.info(f"File extension in path '{self.path}' does not match the specified output format '{self.output_format}'. "
+                f"Expected extension: '{valid_extensions[self.output_format]}'."
+                f"Defaulting to json.")
+            self.output_format = 'json'
+            self.path = "".join(self.path.split(".")[:-1]) + ".json"
+
 
     def process(self, e:Evaluation):
 
+        if self.output_format == 'json':
+            self.process_json(e)
+   
+        elif self.output_format == 'csv':
+            self.process_csv(e)
+
+        elif self.output_format == 'yaml':
+            self.process_yaml(e)
+
+        elif self.output_format == 'xlsx':
+            self.process_excel(e)
+
+        return e
+    
+    def process_json(self, e):
         with open(self.path, 'a') as json_file:
             json.dump(e.data_info, json_file, indent=4)
             json_file.write(',')
 
-        return e
+    def process_csv(self, e):
+        df = pd.DataFrame.from_dict([self.flatten_dict(e.data_info)])
+        if not pd.io.common.file_exists(self.path):
+            df.to_csv(self.path, mode='w', index=False)  
+        else:
+            df.to_csv(self.path, mode='a', index=False, header=False) 
+
+    def process_excel(self, e):
+        df = pd.DataFrame.from_dict([self.flatten_dict(e.data_info)])
+        if not os.path.exists(self.path):  
+            df.to_excel(self.path, index=False, engine='openpyxl')  
+        else:
+            with pd.ExcelWriter(self.path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
+                sheet_name = "Sheet1"
+                startrow = writer.sheets[sheet_name].max_row
+                df.to_excel(writer, index=False, header=False, startrow=startrow)
+
+    def process_yaml(self, e):
+        flat_data = self.flatten_dict(e.data_info)
+        with open(self.path, 'a') as yaml_file:  
+            yaml.dump(flat_data, yaml_file, default_flow_style=False)
+
+    
+    def flatten_dict(self, d, parent_key='', sep='.'):
+        items = []
+        for k, v in d.items():
+            new_key = f"{parent_key}{sep}{k}" if parent_key else k
+            if isinstance(v, dict):
+                items.extend(self.flatten_dict(v, new_key, sep=sep).items())
+            else:
+                items.append((new_key, v))
+        return dict(items)
 
 
 class RelearnTime(Measure):
