@@ -26,7 +26,7 @@ class TVDataSource(DataSource):
 
         params = inspect.signature(dataset_class.__init__).parameters
 
-    
+        #TODO externalise root path
         #try:
         if 'train' in params:
             train = dataset_class(train=True, root='resources/data', download=True, transform=lib.transforms.ToTensor())

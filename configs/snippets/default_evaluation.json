@@ -1,0 +1,20 @@
+{
+    "evaluator":{
+        "class": "erasure.evaluations.manager.Evaluator",
+        "parameters": {
+          "measures":[
+            {"class":"erasure.evaluations.running.RunTime", "parameters":{}},
+            {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"function":{"class":"sklearn.metrics.f1_score", "parameters":{"average":"macro"}}}},
+            {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"unlearned"}},
+            {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"original"}},
+            {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"unlearned"}},
+            {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
+            {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
+            {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
+            {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
+            {"class": "erasure.evaluations.measures.PartitionInfo", "parameters":{}},
+            {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/test_run.json"}}
+          ]
+        }
+      }
+}

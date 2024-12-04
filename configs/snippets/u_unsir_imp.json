@@ -3,7 +3,7 @@
     "parameters": {
         "epochs": 1,
         "ref_data_retain": "train", 
-        "ref_data_forget": "forget set", 
+        "ref_data_forget": "forget", 
         "noise_lr": 1e-30
     }
 }

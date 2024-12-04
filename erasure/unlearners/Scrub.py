@@ -124,5 +124,5 @@ class Scrub(TorchUnlearner):
 
         self.epochs = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
         self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
+        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.T = self.local.config['parameters'].get("T", 4.0)  # Default temperature is 4.0

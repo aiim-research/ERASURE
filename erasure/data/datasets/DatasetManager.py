@@ -16,7 +16,7 @@ class DatasetManager(Configurable):
         self.info(self.params['DataSource'])
         datasource = get_instance_config(self.params['DataSource'])
         self.partitions['all'] = datasource.validate_and_create_data()
-        self.splits_cfgs = self.params['splits']
+        self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)
         self.batch_size=self.params['batch_size']
         self.name = datasource.get_name()
@@ -24,11 +24,11 @@ class DatasetManager(Configurable):
         #count number of classes in the dataset
         self.n_classes = self.partitions['all'].get_n_classes()
 
-        self.__prepare_splits()
+        self.__prepare_partitions()
 
-    def __prepare_splits(self):
+    def __prepare_partitions(self):
         
-        for split in self.splits_cfgs: 
+        for split in self.parts_cfgs: 
            splitted_data = get_instance_config(split)
            
            self.partitions = splitted_data.split_data(self.partitions)

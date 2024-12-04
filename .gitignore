@@ -4,3 +4,4 @@ output/logs
 train_loader/*
 configs/example_hf.jsonc
 configs/example_uci.jsonc
+resources/data/*
