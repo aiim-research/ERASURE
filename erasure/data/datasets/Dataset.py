@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from torch.utils.data import ConcatDataset
-
+import torch
 
 class Dataset:
 
@@ -8,9 +8,13 @@ class Dataset:
     def __init__(self, data):
         self.data = data 
 
-
     def get_n_classes(self):
-        return len(self.data.datasets[0].classes)
+        ##access data from Dataset
+        ##access datasets[0] because Dataset contains a ConcatDataset and the first one is the Training set
+        ##so we get the number of classes from the training set
+        n_classes = len(self.data.datasets[0].classes)
+
+        return n_classes
 
     @abstractmethod
     def __len__(self):

@@ -15,7 +15,7 @@ class DatasetManager(Configurable):
         self.partitions = {}
         self.info(self.params['DataSource'])
         datasource = get_instance_config(self.params['DataSource'])
-        self.partitions['all'] = datasource.create_data()
+        self.partitions['all'] = datasource.validate_and_create_data()
         self.splits_cfgs = self.params['splits']
         self.info(self.partitions['all'].data)
         self.batch_size=self.params['batch_size']

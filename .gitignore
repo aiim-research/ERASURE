@@ -1,3 +1,6 @@
 __pycache__/
 output/logs
 .idea/
+train_loader/*
+configs/example_hf.jsonc
+configs/example_uci.jsonc
