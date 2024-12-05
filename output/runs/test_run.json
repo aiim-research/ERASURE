@@ -1349,4 +1349,24 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "SelectiveSynapticDampening",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data_train": "train",
+        "ref_data_forget": "forget set",
+        "lr": 0.1,
+        "dampening_constant": 0.1,
+        "selection_weighting": 1
+    },
+    "RunTime": 0.1522364616394043,
+    "Accuracies": {
+        "Original_accuracy:": 0.7828571428571428,
+        "New_accuracy:": 0.07428571428571429
+    },
+    "AUS": 0.2712765957446809,
+    "Size of identified forget set": 69,
+    "Distribution of classes in the forget set": {
+        "1": 1.0
+    }
 },
