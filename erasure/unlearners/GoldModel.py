@@ -17,7 +17,7 @@ class GoldModel(Unlearner):
         self.forget_set = self.dataset.partitions[self.ref_data]
     
     def __unlearn__(self):
-        # retrain the model by removing the reference data (forget set by default)
+        # retrain the model by removing the reference data (forget by default)
 
         cfg_dataset = self.dataset.local_config 
         cfg_model = self.predictor.local_config
@@ -37,4 +37,4 @@ class GoldModel(Unlearner):
         super().check_configuration()
 
         self.train_data = self.local.config['parameters'].get("train_data", 'train')  # Default train data is train
-        self.ref_data = self.local.config['parameters'].get("ref_data", 'forget set')  # Default reference data is forget
+        self.ref_data = self.local.config['parameters'].get("ref_data", 'forget')  # Default reference data is forget

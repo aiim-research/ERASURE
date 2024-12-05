@@ -6,9 +6,9 @@ from .Dataset import Dataset
 
 
 class DataSplitter(ABC):
-    def __init__(self, ref_data,splits_names):
+    def __init__(self, ref_data,parts_names):
         self.ref_data = ref_data
-        self.splits_names = splits_names
+        self.parts_names = parts_names
     
     @abstractmethod
     def split_data(self, data):
@@ -16,8 +16,8 @@ class DataSplitter(ABC):
 
     
 class DataSplitterPercentage(DataSplitter):
-    def __init__(self, percentage, splits_names, ref_data = 'all'):
-        super().__init__(ref_data,splits_names) 
+    def __init__(self, percentage, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
         self.percentage = percentage
 
     def split_data(self,partitions):
@@ -31,14 +31,14 @@ class DataSplitterPercentage(DataSplitter):
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
 
-        partitions[self.splits_names[0]] = split_indices_1
-        partitions[self.splits_names[1]] = split_indices_2
+        partitions[self.parts_names[0]] = split_indices_1
+        partitions[self.parts_names[1]] = split_indices_2
 
         return partitions
 
 class DataSplitterClass(DataSplitter):
-    def __init__(self, label, splits_names, ref_data = 'all'):
-        super().__init__(ref_data,splits_names) 
+    def __init__(self, label, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
         self.label = label
 
 
@@ -49,8 +49,8 @@ class DataSplitterClass(DataSplitter):
 
         other_indices = [idx for idx, (_,label) in enumerate(ref_data.data) if idx not in filtered_indices]
 
-        partitions[self.splits_names[0]] = filtered_indices 
-        partitions[self.splits_names[1]] = other_indices
+        partitions[self.parts_names[0]] = filtered_indices 
+        partitions[self.parts_names[1]] = other_indices
 
         return partitions
 
@@ -70,15 +70,15 @@ class DataSplitterClass(DataSplitter):
         split_indices_2 = list(all_indices - set(label_indices))
 
 
-        partitions[self.splits_names[0]] = label_indices
-        partitions[self.splits_names[1]] = split_indices_2
+        partitions[self.parts_names[0]] = label_indices
+        partitions[self.parts_names[1]] = split_indices_2
     
         return partitions
     ''' 
 
 class DataSplitterNSamples(DataSplitter):
-    def __init__(self, n_samples, splits_names, ref_data = 'all'):
-        super().__init__(ref_data,splits_names) 
+    def __init__(self, n_samples, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
         self.n_samples = n_samples
 
     def split_data(self,partitions):
@@ -97,14 +97,14 @@ class DataSplitterNSamples(DataSplitter):
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
 
-        partitions[self.splits_names[0]] = split_indices_1
-        partitions[self.splits_names[1]] = split_indices_2
+        partitions[self.parts_names[0]] = split_indices_1
+        partitions[self.parts_names[1]] = split_indices_2
 
         return partitions
     
 class DataSplitterList(DataSplitter):
-    def __init__(self, samples_ids, splits_names, ref_data = 'all'):
-        super().__init__(ref_data,splits_names) 
+    def __init__(self, samples_ids, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
         self.samples_ids = samples_ids
 
     def split_data(self,partitions):
@@ -119,8 +119,8 @@ class DataSplitterList(DataSplitter):
             split_indices_2 = [id for id in indices if id not in self.samples_ids]
 
 
-        partitions[self.splits_names[0]] = split_indices_1
-        partitions[self.splits_names[1]] = split_indices_2
+        partitions[self.parts_names[0]] = split_indices_1
+        partitions[self.parts_names[1]] = split_indices_2
 
         return partitions
     

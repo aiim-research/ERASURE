@@ -8,18 +8,18 @@
           "path": "torchvision.datasets.FashionMNIST"
         }
       },
-      "splits": [
+      "partitions": [
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"splits_names": ["all_reduced", "-"], "percentage": 0.125}
+          "parameters": {"parts_names": ["all_reduced", "-"], "percentage": 0.125}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
+          "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
-          "parameters": {"splits_names": ["forget set", "other_classes"], "label": 1, "ref_data": "train"}
+          "parameters": {"parts_names": ["forget", "retain"], "label": 1, "ref_data": "train"}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
-          "parameters": {"splits_names": ["example", "-"], "n_samples": 100, "ref_data": "forget set"}
+          "parameters": {"parts_names": ["example", "-"], "n_samples": 100, "ref_data": "forget"}
         }
       ],
       "batch_size": 128,
@@ -69,15 +69,15 @@
                 "DataSource": {
                   "class": "erasure.evaluations.modules.MIADataSource",
                   "parameters": {
-                    "path": "tmp/mia.pt"
+                    "path": "resources/data/mia/mia.pt"
                   }
                 },
-                "splits": [
+                "partitions": [
                   { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"splits_names": ["tt", "attack"], "percentage": 0.7, "ref_data": "all"}
+                    "parameters": {"parts_names": ["tt", "attack"], "percentage": 0.7, "ref_data": "all"}
                   },
                   { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "tt"}
+                    "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "tt"}
                   }
                 ],
                 "batch_size": 128,
@@ -115,12 +115,12 @@
                   "DataSource": {
                     "class": "erasure.evaluations.modules.MIADataSource",
                     "parameters": {
-                      "path": "tmp/shadow.pt"
+                      "path": "resources/data/mia/shadow.pt"
                     }
                   },
-                  "splits": [
+                  "partitions": [
                     { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                      "parameters": {"splits_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
+                      "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
                     }
                   ],
                   "batch_size": 128,
@@ -130,7 +130,7 @@
               "predictor": {
                 "class": "erasure.model.TorchModel.TorchModel",
                 "parameters": {
-                  "epochs": 400,
+                  "epochs": 100,
                   "optimizer": {
                     "class": "torch.optim.RMSprop",
                     "parameters": {
@@ -149,14 +149,14 @@
                   }
                 }
               },
-              "n_models": 50,
-              "n_samples": 3000,
+              "n_models": 20,
+              "n_samples": 500,
               "ref_data": "train"
             },
             "gold_model": {
                 "class": "erasure.unlearners.GoldModel.GoldModel",
                 "parameters": {
-                  "ref_data": "forget set",
+                  "ref_data": "forget",
                   "train_data": "train"
                 }
             }

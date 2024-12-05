@@ -8,18 +8,18 @@
                   "path": "torchvision.datasets.FashionMNIST"
               }
           },
-          "splits": [
+          "partitions": [
               {
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
-                      "splits_names": ["all_reduced", "-"],
+                      "parts_names": ["all_reduced", "-"],
                       "percentage": 0.0125
                   }
               },
               {
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
-                      "splits_names": ["train", "test"],
+                      "parts_names": ["train", "test"],
                       "percentage": 0.8,
                       "ref_data": "all_reduced"
                   }
@@ -27,7 +27,7 @@
               {
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
                   "parameters": {
-                      "splits_names": ["forget set", "other_classes"],
+                      "parts_names": ["forget", "retain"],
                       "label": 1,
                       "ref_data": "train"
                   }
@@ -35,9 +35,9 @@
               {
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
                   "parameters": {
-                      "splits_names": ["example", "-"],
+                      "parts_names": ["example", "-"],
                       "n_samples": 100,
-                      "ref_data": "forget set"
+                      "ref_data": "forget"
                   }
               }
           ],
@@ -73,20 +73,9 @@
           "parameters": {
               "epochs": 1, 
               "ref_data_retain": "train", 
-              "ref_data_forget": "forget set"
+              "ref_data_forget": "forget"
           }
       }
   ],
-  "evaluator":{
-      "class": "erasure.evaluations.manager.Evaluator",
-      "parameters": {
-        "measures":[
-          { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
-          {"class": "erasure.evaluations.measures.Accuracy", "parameters":{}},
-          {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
-          {"class": "erasure.evaluations.measures.ForgetSetInfo", "parameters":{}},
-          {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/test_run.json"}}
-        ]
-      }
-    }
+  "compose_eval":"configs/snippets/default_evaluation.json"
 }

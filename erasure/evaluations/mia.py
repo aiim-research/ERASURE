@@ -1,5 +1,6 @@
 from collections import defaultdict
 from copy import deepcopy
+import os
 
 import torch
 from torch.utils.data import DataLoader
@@ -44,8 +45,8 @@ class MembershipInference(Measure):
         # Test data
         train_loader, _ = target_model.dataset.get_loader_for("train")
 
-        original_foget = self.__test_dataset(attack_models, original_model, "forget set")
-        target_forget = self.__test_dataset(attack_models, target_model, "forget set")
+        original_foget = self.__test_dataset(attack_models, original_model, "forget")
+        target_forget = self.__test_dataset(attack_models, target_model, "forget")
         self.info(f"Original Forget: {original_foget/original_foget.sum()}")
         self.info(f"Target Forget: {target_forget/target_forget.sum()}")
 
@@ -67,6 +68,7 @@ class MembershipInference(Measure):
 
         # Create DatasetManager for shadow dataset
         data_path = self.params["shadow"]["data"]["parameters"]["DataSource"]["parameters"]["path"]
+        os.makedirs(data_path, exist_ok=True)
         shadow_data = deepcopy(self.params["shadow"]["data"])
         shadow_data["parameters"]["DataSource"]["parameters"]["path"] = data_path+str(k)
         torch.save(shadow_dataset, data_path+str(k))
@@ -109,6 +111,7 @@ class MembershipInference(Measure):
         # create DataManagers for the Attack model
         attack_datamanagers = {}
         data_path = self.params['data']['parameters']['DataSource']['parameters']['path']
+        os.makedirs(data_path, exist_ok=True)
         for c in range(n_classes):
             torch.save(attack_datasets[c], data_path+str(c))
             attack_data = deepcopy(self.local_config["parameters"]["data"])
