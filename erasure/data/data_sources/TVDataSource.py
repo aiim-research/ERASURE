@@ -1,12 +1,15 @@
 from .datasource import DataSource
 from erasure.data.datasets.Dataset import Dataset 
 from torch.utils.data import ConcatDataset
+from erasure.utils.config.global_ctx import Global
+from erasure.utils.config.local_ctx import Local
 import inspect 
 
 class TVDataSource(DataSource):
-    def __init__(self, path):
-        self.path = path
-
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+        self.dataset = None
+        self.path = self.local_config['parameters']['path']
     
     def get_name(self):
         return self.path.split(".")[-1] 

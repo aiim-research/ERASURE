@@ -2,11 +2,12 @@ from erasure.core.base import Configurable
 from erasure.core.factory_base import *
 from fractions import Fraction
 import numpy as np
+from erasure.utils.config.global_ctx import Global
+from erasure.utils.config.local_ctx import Local
 from .Dataset import Dataset
 import torch
 from torch.utils.data import DataLoader, Subset
 from torch.utils.data.dataloader import default_collate
-
 
 class DatasetManager(Configurable):
 
@@ -14,7 +15,7 @@ class DatasetManager(Configurable):
         super().__init__(global_ctx, local_ctx)
         self.partitions = {}
         self.info(self.params['DataSource'])
-        datasource = get_instance_config(self.params['DataSource'])
+        datasource = global_ctx.factory.get_object( Local (self.params['DataSource']) )
         self.partitions['all'] = datasource.validate_and_create_data()
         self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)

@@ -514,4 +514,27 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "GoldModel",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data": "forget",
+        "train_data": "train"
+    },
+    "RunTime": 25.094445943832397,
+    "sklearn.metrics.f1_score.test.unlearned": 0.6170862906157024,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.6571428571428571,
+    "sklearn.metrics.accuracy_score.test.original": 0.8342857142857143,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.9683042789223455,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9873217115689382,
+    "AUS": 0.4965517241379311,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
 },

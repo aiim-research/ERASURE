@@ -1,13 +1,16 @@
 from .datasource import DataSource
 from erasure.data.datasets.Dataset import Dataset 
 from torch.utils.data import ConcatDataset
-import inspect 
+from erasure.utils.config.global_ctx import Global
+from erasure.utils.config.local_ctx import Local
 from datasets import load_dataset, DatasetDict, concatenate_datasets
 
 
 class HFDataSource(DataSource):
-    def __init__(self, path):
-        self.path = path
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+        self.dataset = None
+        self.path = self.local_config['parameters']['path']
 
     def get_name(self):
         return self.path.split("/")[-1] 
@@ -16,10 +19,8 @@ class HFDataSource(DataSource):
         ds = load_dataset("/".join(self.path.split("/")[:-1]), self.path.split("/")[-1])
 
         if isinstance(ds, DatasetDict):
-            print("Splits available:", ds.keys())
             splits = [ds[split] for split in ds.keys()]
         else:
-            print("Single Dataset with no splits.")
             splits = [ds]
 
         concat = ConcatDataset(splits)
