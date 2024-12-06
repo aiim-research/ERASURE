@@ -69,7 +69,7 @@
   },
   "unlearners": [
       {
-          "class": "erasure.unlearners.scrub.scrub",
+          "class": "erasure.unlearners.Scrub.Scrub",
           "parameters": {
               "epochs": 1, 
               "ref_data_retain": "train", 

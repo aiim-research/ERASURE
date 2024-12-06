@@ -616,4 +616,442 @@
             "1": 1.0
         }
     }
+},{
+    "unlearner": "Finetuning",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 5,
+        "ref_data": "train"
+    },
+    "RunTime": 0.2566666603088379,
+    "sklearn.metrics.f1_score.test.unlearned": 0.7519479143008555,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.7771428571428571,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.9397781299524565,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.8643006263048016,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "GoldModel",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data": "forget",
+        "train_data": "train"
+    },
+    "RunTime": 2.0870895385742188,
+    "sklearn.metrics.f1_score.test.unlearned": 0.6286757851620075,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.6571428571428571,
+    "sklearn.metrics.accuracy_score.test.original": 0.8171428571428572,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.9565217391304348,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.9762282091917591,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9841521394611727,
+    "AUS": 0.506896551724138,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "AdvancedNegGrad",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget"
+    },
+    "RunTime": 0.1007833480834961,
+    "sklearn.metrics.f1_score.test.unlearned": 0.17851292735407628,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.2342857142857143,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.2694136291600634,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.3657407407407408,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "NegGrad",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 5,
+        "ref_data": "forget"
+    },
+    "RunTime": 0.0471653938293457,
+    "sklearn.metrics.f1_score.test.unlearned": 0.22808630393996246,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.28,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.3676703645007924,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.3883928571428572,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "Scrub",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget",
+        "T": 4.0
+    },
+    "RunTime": 0.12553024291992188,
+    "sklearn.metrics.f1_score.test.unlearned": 0.7771290789398327,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.8,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.9710144927536232,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.9239302694136292,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.8685997171145687,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "SelectiveSynapticDampening",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data_train": "train",
+        "ref_data_forget": "forget",
+        "lr": 0.1,
+        "dampening_constant": 0.1,
+        "selection_weighting": 20
+    },
+    "RunTime": 0.13880038261413574,
+    "sklearn.metrics.f1_score.test.unlearned": 0.6315257252326217,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.6457142857142857,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.8827258320126783,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.5243055555555556,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "Cascade",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "sub_unlearner": [
+            {
+                "class": "erasure.unlearners.UNSIR.UNSIR",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data_retain": "train",
+                    "ref_data_forget": "forget",
+                    "noise_lr": 0.01
+                }
+            },
+            {
+                "class": "erasure.unlearners.Finetuning.Finetuning",
+                "parameters": {
+                    "epochs": 1,
+                    "ref_data": "train"
+                }
+            }
+        ]
+    },
+    "RunTime": 0.740727424621582,
+    "sklearn.metrics.f1_score.test.unlearned": 0.8547060270017178,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.852,
+    "sklearn.metrics.accuracy_score.test.original": 0.8742857142857143,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.8395225464190982,
+    "sklearn.metrics.accuracy_score.forget.original": 0.6458885941644562,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.8802433557476785,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9265129682997119,
+    "AUS": 0.9656652424765937,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 754,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "BadTeaching",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget",
+        "optimizer": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+                "lr": 0.01,
+                "betas": [
+                    0.9,
+                    0.999
+                ],
+                "eps": 1e-08,
+                "weight_decay": 0,
+                "amsgrad": false,
+                "maximize": false,
+                "capturable": false,
+                "differentiable": false
+            }
+        },
+        "batch_size": 64,
+        "KL_temperature": 1.0,
+        "bad_teacher": {
+            "class": "erasure.model.TorchModel.TorchModel",
+            "parameters": {
+                "epochs": 20,
+                "training_set": "train",
+                "optimizer": {
+                    "class": "torch.optim.Adam",
+                    "parameters": {
+                        "lr": 0.01,
+                        "betas": [
+                            0.9,
+                            0.999
+                        ],
+                        "eps": 1e-08,
+                        "weight_decay": 0,
+                        "amsgrad": false,
+                        "maximize": false,
+                        "capturable": false,
+                        "differentiable": false
+                    }
+                },
+                "loss_fn": {
+                    "class": "torch.nn.CrossEntropyLoss",
+                    "parameters": {
+                        "ignore_index": -100,
+                        "reduction": "mean",
+                        "label_smoothing": 0.0
+                    }
+                },
+                "model": {
+                    "class": "erasure.model.cnns.standardCNN.FashionCNN",
+                    "parameters": {
+                        "n_classes": 10
+                    }
+                },
+                "fold_id": -1,
+                "batch_size": 4,
+                "early_stopping_threshold": null
+            }
+        },
+        "transform": null
+    },
+    "RunTime": 0.15969467163085938,
+    "sklearn.metrics.f1_score.test.unlearned": 0.5215609008543791,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5771428571428572,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.9420289855072463,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.5039619651347068,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.5819428432740733,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "BadTeaching",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget",
+        "optimizer": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+                "lr": 0.01
+            }
+        },
+        "batch_size": 64,
+        "KL_temperature": 1.0,
+        "bad_teacher": {
+            "class": "erasure.model.TorchModel.TorchModel",
+            "parameters": {
+                "epochs": 20,
+                "training_set": "train",
+                "optimizer": {
+                    "class": "torch.optim.Adam",
+                    "parameters": {
+                        "lr": 0.01,
+                        "betas": [
+                            0.9,
+                            0.999
+                        ],
+                        "eps": 1e-08,
+                        "weight_decay": 0,
+                        "amsgrad": false,
+                        "maximize": false,
+                        "capturable": false,
+                        "differentiable": false
+                    }
+                },
+                "loss_fn": {
+                    "class": "torch.nn.CrossEntropyLoss",
+                    "parameters": {
+                        "ignore_index": -100,
+                        "reduction": "mean",
+                        "label_smoothing": 0.0
+                    }
+                },
+                "model": {
+                    "class": "erasure.model.cnns.standardCNN.FashionCNN",
+                    "parameters": {
+                        "n_classes": 10
+                    }
+                },
+                "fold_id": -1,
+                "batch_size": 4,
+                "early_stopping_threshold": null
+            }
+        },
+        "transform": null,
+        "optimizers": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+                "lr": 0.001,
+                "betas": [
+                    0.9,
+                    0.999
+                ],
+                "eps": 1e-08,
+                "weight_decay": 0,
+                "amsgrad": false,
+                "maximize": false,
+                "capturable": false,
+                "differentiable": false
+            }
+        }
+    },
+    "RunTime": 0.14324355125427246,
+    "sklearn.metrics.f1_score.test.unlearned": 0.5215609008543791,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5771428571428572,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.9420289855072463,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.5039619651347068,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.5819428432740733,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "BadTeaching",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget",
+        "optimizer": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+                "lr": 0.01,
+                "betas": [
+                    0.9,
+                    0.999
+                ],
+                "eps": 1e-08,
+                "weight_decay": 0,
+                "amsgrad": false,
+                "maximize": false,
+                "capturable": false,
+                "differentiable": false
+            }
+        },
+        "batch_size": 64,
+        "KL_temperature": 1.0,
+        "bad_teacher": {
+            "class": "erasure.model.TorchModel.TorchModel",
+            "parameters": {
+                "epochs": 20,
+                "training_set": "train",
+                "optimizer": {
+                    "class": "torch.optim.Adam",
+                    "parameters": {
+                        "lr": 0.01,
+                        "betas": [
+                            0.9,
+                            0.999
+                        ],
+                        "eps": 1e-08,
+                        "weight_decay": 0,
+                        "amsgrad": false,
+                        "maximize": false,
+                        "capturable": false,
+                        "differentiable": false
+                    }
+                },
+                "loss_fn": {
+                    "class": "torch.nn.CrossEntropyLoss",
+                    "parameters": {
+                        "ignore_index": -100,
+                        "reduction": "mean",
+                        "label_smoothing": 0.0
+                    }
+                },
+                "model": {
+                    "class": "erasure.model.cnns.standardCNN.FashionCNN",
+                    "parameters": {
+                        "n_classes": 10
+                    }
+                },
+                "fold_id": -1,
+                "batch_size": 4,
+                "early_stopping_threshold": null
+            }
+        },
+        "transform": null
+    },
+    "RunTime": 0.14151263236999512,
+    "sklearn.metrics.f1_score.test.unlearned": 0.5215609008543791,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.5771428571428572,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.9420289855072463,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.5039619651347068,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.5819428432740733,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
 },

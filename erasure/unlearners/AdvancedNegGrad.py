@@ -14,6 +14,11 @@ class AdvancedNegGrad(TorchUnlearner):
 
         super().__init__(global_ctx, local_ctx)
 
+        self.epochs = self.local.config['parameters']['epochs']
+        self.ref_data_retain = self.local.config['parameters']['ref_data_retain']  
+        self.ref_data_forget = self.local.config['parameters']['ref_data_forget'] 
+
+
     def __unlearn__(self):
         """
         Advanced NegGrad unlearning algorithm proposed by https://arxiv.org/pdf/2311.02240. 
@@ -71,6 +76,6 @@ class AdvancedNegGrad(TorchUnlearner):
     def check_configuration(self):
         super().check_configuration()
 
-        self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
-        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
+        self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget

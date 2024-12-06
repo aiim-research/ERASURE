@@ -15,6 +15,9 @@ class NegGrad(TorchUnlearner):
 
         super().__init__(global_ctx, local_ctx)
 
+        self.epochs = self.local.config['parameters']['epochs']  
+        self.ref_data = self.local.config['parameters']['ref_data'] 
+
     def __unlearn__(self):
         """
         Negative Gradient (NegGrad) unlearning algorithm for selective forgetting as proposed by https://arxiv.org/abs/1911.04933. This method fine-tunes the model to forget specific data points by reversing the gradient direction on the forget data, encouraging the model to minimize the influence of these samples.
@@ -57,5 +60,5 @@ class NegGrad(TorchUnlearner):
     def check_configuration(self):
         super().check_configuration()
 
-        self.epochs = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
-        self.ref_data = self.local.config['parameters'].get("ref_data", 'forget')  # Default reference data is forget
+        self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
+        self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'forget')  # Default reference data is forget

@@ -29,6 +29,11 @@ class UNSIR(TorchUnlearner):
             local_ctx (Local): The local context containing specific configurations for this instance.
         """
         super().__init__(global_ctx, local_ctx)
+
+        self.epochs = self.local.config['parameters']['epochs'] 
+        self.ref_data_retain = self.local.config['parameters']['ref_data_retain']
+        self.ref_data_forget = self.local.config['parameters']['ref_data_forget']
+        self.noise_lr = self.local.config['parameters']['noise_lr']
     
     def __unlearn__(self):
         """
@@ -99,7 +104,7 @@ class UNSIR(TorchUnlearner):
     def check_configuration(self):
         super().check_configuration()
 
-        self.epochs = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
-        self.ref_data_retain = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
-        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
-        self.noise_lr = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
+        self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
+        self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
+        self.local.config['parameters']['noise_lr'] = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
