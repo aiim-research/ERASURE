@@ -21,6 +21,23 @@ class SelectiveSynapticDampening(TorchUnlearner):
 
         super().__init__(global_ctx, local_ctx)
 
+        self.ref_data_train = self.local.config['parameters']['ref_data_train']
+        self.ref_data_forget = self.local.config['parameters']['ref_data_forget']
+        self.lr = self.local.config['parameters']['lr']
+        self.dampening_constant = self.local.config['parameters']['dampening_constant']
+        self.selection_weighting = self.local.config['parameters']['selection_weighting']
+
+        self.parameters = {
+        'lower_bound': 1,
+        'exponent': 1,
+        'magnitude_diff': None,
+        'min_layer': -1,
+        'max_layer': -1,
+        'forget_threshold': 1,
+        'dampening_constant': self.dampening_constant,
+        'selection_weighting': self.selection_weighting,
+        }
+
     def __unlearn__(self):
         """
         Selective Synaptic Dampening unlearning algorithm proposed by https://arxiv.org/abs/2308.07707. 
@@ -53,22 +70,11 @@ class SelectiveSynapticDampening(TorchUnlearner):
     def check_configuration(self):
         super().check_configuration()
 
-        self.ref_data_train = self.local.config['parameters'].get("ref_data_train", 'train set')  # Default reference data is train
-        self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
-        self.lr = self.local.config['parameters'].get("lr", 0.1)  # Default learning rate is 0.1
-        self.dampening_constant = self.local.config['parameters'].get("dampening_constant", 0.1)  # The "lambda" parameter in the paper
-        self.selection_weighting = self.local.config['parameters'].get("selection_weighting", 10) # The "alpha" parameter in the paper
-
-        self.parameters = {
-        "lower_bound": 1,
-        "exponent": 1,
-        "magnitude_diff": None,
-        "min_layer": -1,
-        "max_layer": -1,
-        "forget_threshold": 1,
-        "dampening_constant": self.dampening_constant,
-        "selection_weighting": self.selection_weighting,
-        }
+        self.local.config['parameters']['ref_data_train'] = self.local.config['parameters'].get('ref_data_train', 'train set')  # Default reference data is train
+        self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get('ref_data_forget', 'forget set')  # Default reference data is forget
+        self.local.config['parameters']['lr'] = self.local.config['parameters'].get('lr', 0.1)  # Default learning rate is 0.1
+        self.local.config['parameters']['dampening_constant'] = self.local.config['parameters'].get('dampening_constant', 0.1)  # The 'lambda' parameter in the paper
+        self.local.config['parameters']['selection_weighting'] = self.local.config['parameters'].get('selection_weighting', 10) # The 'alpha' parameter in the paper
 
 class ParameterPerturber:
     def __init__(

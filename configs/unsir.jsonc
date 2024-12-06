@@ -76,7 +76,7 @@
                     "class": "erasure.unlearners.UNSIR.UNSIR",
                     "parameters": {
                         "epochs": 1,
-                        "ref_data_retain": "train", 
+                        "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
                         "noise_lr": 0.01
                     }
@@ -85,7 +85,7 @@
                   "class": "erasure.unlearners.Finetuning.Finetuning",
                   "parameters": {
                       "epochs": 1, 
-                      "ref_data":"train"
+                      "ref_data":"retain"
                   }
               }
             ]

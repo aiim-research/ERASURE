@@ -72,7 +72,7 @@
           "class": "erasure.unlearners.BadTeaching.BadTeaching",
           "parameters": {
               "epochs": 1, 
-              "ref_data_retain": "train", 
+              "ref_data_retain": "retain", 
               "ref_data_forget": "forget",
               "optimizer": {
                   "class": "torch.optim.Adam",
@@ -85,8 +85,8 @@
               "bad_teacher": {
                     "class": "erasure.model.TorchModel.TorchModel",
                     "parameters": {
-                        "epochs": 20,
-                        "training_set": "train", //should be retain set
+                        "epochs": 0,
+                        "training_set": "retain",
                         "optimizer": {
                             "class": "torch.optim.Adam",
                             "parameters": {
@@ -106,7 +106,6 @@
                     }
                 }
           }
-          // aggancia quello di default se non c'è un predictor
       }
   ],
   "compose_eval":"configs/snippets/default_evaluation.json"
