@@ -72,7 +72,7 @@
           "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
           "parameters": {
               "epochs": 1, 
-              "ref_data_retain": "train", 
+              "ref_data_retain": "retain", 
               "ref_data_forget": "forget"
           }
       }

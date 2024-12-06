@@ -55,4 +55,4 @@ class Finetuning(TorchUnlearner):
         super().check_configuration()
 
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
-        self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'retain set')  # Default reference data is retain
+        self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'retain')  # Default reference data is retain

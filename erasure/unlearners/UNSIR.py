@@ -17,8 +17,6 @@ class Noise(nn.Module):
     def forward(self):
         return self.noise
 
-#TODO: check
-
 class UNSIR(TorchUnlearner):
     def __init__(self, global_ctx: Global, local_ctx):
         """
@@ -105,6 +103,6 @@ class UNSIR(TorchUnlearner):
         super().check_configuration()
 
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 1)  # Default 1 epoch
-        self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain set')  # Default reference data is retain
+        self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain')  # Default reference data is retain
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.local.config['parameters']['noise_lr'] = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
