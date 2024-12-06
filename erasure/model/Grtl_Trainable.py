@@ -6,7 +6,8 @@ from erasure.utils.cfg_utils import retake_dataset
 from erasure.core.base import Configurable
 from erasure.utils.config.global_ctx import Global, clean_cfg
 
-class Trainable(Configurable, metaclass=ABCMeta):
+# TODO: REMOVE
+class GRTL_Trainable(Configurable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx, local_ctx):
         super().__init__(global_ctx, local_ctx)
