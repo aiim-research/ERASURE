@@ -514,4 +514,106 @@
     "Distribution of classes in the forget set": {
         "1": 1.0
     }
+},{
+    "unlearner": "AdvancedNegGrad",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "epochs": 1,
+        "ref_data_retain": "train",
+        "ref_data_forget": "forget"
+    },
+    "RunTime": 0.10237550735473633,
+    "sklearn.metrics.f1_score.test.unlearned": 0.17851292735407628,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.2342857142857143,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.2694136291600634,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.3657407407407408,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "SelectiveSynapticDampening",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data_train": "train",
+        "ref_data_forget": "forget",
+        "lr": 0.1,
+        "dampening_constant": 0.1,
+        "selection_weighting": 10
+    },
+    "RunTime": 0.16700220108032227,
+    "sklearn.metrics.f1_score.test.unlearned": 0.45896600710033547,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.48,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6259904912836767,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.47104247104247104,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "SelectiveSynapticDampening",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data_train": "train",
+        "ref_data_forget": "forget",
+        "lr": 0.1,
+        "dampening_constant": 0.1,
+        "selection_weighting": 10
+    },
+    "RunTime": 0.13472867012023926,
+    "sklearn.metrics.f1_score.test.unlearned": 0.45896600710033547,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.48,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.6259904912836767,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.47104247104247104,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
+},{
+    "unlearner": "SelectiveSynapticDampening",
+    "dataset": "FashionMNIST",
+    "parameters": {
+        "ref_data_train": "train",
+        "ref_data_forget": "forget",
+        "lr": 0.1,
+        "dampening_constant": 0.1,
+        "selection_weighting": 20
+    },
+    "RunTime": 0.14534783363342285,
+    "sklearn.metrics.f1_score.test.unlearned": 0.6315257252326217,
+    "sklearn.metrics.accuracy_score.test.unlearned": 0.6457142857142857,
+    "sklearn.metrics.accuracy_score.test.original": 0.7828571428571428,
+    "sklearn.metrics.accuracy_score.forget.unlearned": 0.0,
+    "sklearn.metrics.accuracy_score.forget.original": 0.927536231884058,
+    "sklearn.metrics.accuracy_score.retain.unlearned": 0.8827258320126783,
+    "sklearn.metrics.accuracy_score.retain.original": 0.9239302694136292,
+    "AUS": 0.5243055555555556,
+    "part_info.forget": {
+        "name": "forget",
+        "size": 69,
+        "classes_dist": {
+            "1": 1.0
+        }
+    }
 },

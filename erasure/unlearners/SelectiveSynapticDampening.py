@@ -56,8 +56,8 @@ class SelectiveSynapticDampening(TorchUnlearner):
         self.ref_data_train = self.local.config['parameters'].get("ref_data_train", 'train set')  # Default reference data is train
         self.ref_data_forget = self.local.config['parameters'].get("ref_data_forget", 'forget set')  # Default reference data is forget
         self.lr = self.local.config['parameters'].get("lr", 0.1)  # Default learning rate is 0.1
-        self.dampening_constant = self.local.config['parameters'].get("dampening_constant", 0.1)  # Default dampening constant is 0.1
-        self.selection_weighting = self.local.config['parameters'].get("selection_weighting", 1)
+        self.dampening_constant = self.local.config['parameters'].get("dampening_constant", 0.1)  # The "lambda" parameter in the paper
+        self.selection_weighting = self.local.config['parameters'].get("selection_weighting", 10) # The "alpha" parameter in the paper
 
         self.parameters = {
         "lower_bound": 1,
