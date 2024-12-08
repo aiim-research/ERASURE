@@ -1,4 +1,3 @@
-from collections import defaultdict
 from copy import deepcopy
 import os
 
@@ -47,10 +46,12 @@ class MembershipInference(Measure):
 
         original_foget = self.__test_dataset(attack_models, original_model, "forget")
         target_forget = self.__test_dataset(attack_models, target_model, "forget")
+        target_test = self.__test_dataset(attack_models, target_model, "test")
         self.info(f"Original Forget: {original_foget/original_foget.sum()}")
         self.info(f"Target Forget: {target_forget/target_forget.sum()}")
+        self.info(f"Target Test: {target_test/target_test.sum()}")
 
-        # Forgetting Rate
+        # Forgetting Rate (doi: 10.1109/TDSC.2022.3194884)
         fr = (target_forget[0] - original_foget[0]) / original_foget[1]
         self.info(f"Forgetting Rate: {fr}")
         e.add_value("Forgetting Rate", fr)

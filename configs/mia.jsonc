@@ -74,10 +74,7 @@
                 },
                 "partitions": [
                   { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"parts_names": ["tt", "attack"], "percentage": 0.7, "ref_data": "all"}
-                  },
-                  { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                    "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "tt"}
+                    "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
                   }
                 ],
                 "batch_size": 128,
