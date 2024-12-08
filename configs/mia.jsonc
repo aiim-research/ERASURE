@@ -67,7 +67,7 @@
               "class": "erasure.data.datasets.DatasetManager.DatasetManager",
               "parameters": {
                 "DataSource": {
-                  "class": "erasure.evaluations.modules.MIADataSource",
+                  "class": "erasure.data.data_sources.TorchFileDataSource.TorchFileDataSource",
                   "parameters": {
                     "path": "resources/data/mia/mia.pt"
                   }
@@ -113,7 +113,7 @@
                 "class": "erasure.data.datasets.DatasetManager.DatasetManager",
                 "parameters": {
                   "DataSource": {
-                    "class": "erasure.evaluations.modules.MIADataSource",
+                    "class": "erasure.data.data_sources.TorchFileDataSource.TorchFileDataSource",
                     "parameters": {
                       "path": "resources/data/mia/shadow.pt"
                     }
