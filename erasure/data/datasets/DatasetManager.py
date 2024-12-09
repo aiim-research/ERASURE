@@ -28,11 +28,21 @@ class DatasetManager(Configurable):
         self.__prepare_partitions()
 
     def __prepare_partitions(self):
-        
-        for split in self.parts_cfgs: 
-           splitted_data = get_instance_config(split)
-           
-           self.partitions = splitted_data.split_data(self.partitions)
+        self.add_partitions(self.parts_cfgs)
+
+
+    def add_partitions(self, splits, postfix=""):
+        for split in splits:
+            self.add_partition(split,postfix)
+            
+        self.info(list(self.partitions.keys()))
+
+    def add_partition(self, split, postfix = ""):
+        split['parameters']['parts_names'] = [p + postfix for p in split['parameters']['parts_names']]
+
+        splitted_data = get_instance_config(split)
+
+        self.partitions = splitted_data.split_data(self.partitions)
 
         self.info(list(self.partitions.keys()))
 
