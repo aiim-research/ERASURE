@@ -99,7 +99,7 @@
                   }
                 },
                 "model": {
-                  "class": "erasure.evaluations.modules.MIAAttack",
+                  "class": "erasure.model.FF.MIAAttack",
                   "parameters": {}
                 }
               }

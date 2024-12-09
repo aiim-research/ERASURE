@@ -30,7 +30,6 @@ class DatasetManager(Configurable):
     def __prepare_partitions(self):
         self.add_partitions(self.parts_cfgs)
 
-
     def add_partitions(self, splits, postfix=""):
         for split in splits:
             self.add_partition(split,postfix)
