@@ -53,7 +53,7 @@
         "dataset_preproc":[
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 0.005, "ref_data": "train"}
+            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 0.5, "ref_data": "train"}
           }
         ],
         "per_shadows_partition":      

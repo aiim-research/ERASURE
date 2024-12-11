@@ -66,7 +66,7 @@ class MembershipInference(Measure):
         original = e.predictor
         unlearned = e.unlearned_model      
 
-        forget_dataloader = original.dataset.get_loader_for(self.forget_part)
+        forget_dataloader, _ = original.dataset.get_loader_for(self.forget_part)
 
         original_forget = self.__test_dataset(self.attack_models, original, forget_dataloader )
         target_forget = self.__test_dataset(self.attack_models, unlearned, forget_dataloader )
@@ -124,8 +124,8 @@ class MembershipInference(Measure):
 
         # create DataManagers for the Attack model
         attack_datamanagers = {}
-        
-        os.makedirs(self.data_out_path, exist_ok=True) # TODO Random temp path
+
+        os.makedirs(os.path.dirname(self.data_out_path), exist_ok=True) # TODO Random temp path
         for c in range(self.dataset.n_classes):
             file_path = self.data_out_path+str(c)
             torch.save(attack_datasets[c], file_path)
