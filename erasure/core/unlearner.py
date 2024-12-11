@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod
 import copy
 from erasure.core.base import Configurable
-from erasure.data.datasets.Dataset import Dataset
+from erasure.data.datasets.Dataset import DatasetWrapper
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 
