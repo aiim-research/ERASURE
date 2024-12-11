@@ -4,7 +4,7 @@ from fractions import Fraction
 import numpy as np
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
-from .Dataset import Dataset
+from .Dataset import DatasetWrapper
 import torch
 from torch.utils.data import DataLoader, Subset
 from torch.utils.data.dataloader import default_collate
@@ -15,20 +15,31 @@ class DatasetManager(Configurable):
         super().__init__(global_ctx, local_ctx)
         self.partitions = {}
         self.info(self.params['DataSource'])
-        datasource = global_ctx.factory.get_object( Local (self.params['DataSource']) )
-        self.partitions['all'] = datasource.validate_and_create_data()
+        self.__init_preprocess__(global_ctx)
+        self.datasource = global_ctx.factory.get_object( Local (self.params['DataSource']) )
+        self.datasource.set_preprocess(self.preprocess)
+        self.partitions['all'] = self.datasource.create_and_validate_data()
         self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)
         self.batch_size=self.params['batch_size']
-        self.name = datasource.get_name()
+        self.name = self.datasource.get_name()
 
         #count number of classes in the dataset
         self.n_classes = self.partitions['all'].get_n_classes()
 
         self.__prepare_partitions()
 
+    def __init_preprocess__(self, global_ctx):
+        self.preprocess = []
+        preprocesses =  self.params.get('preprocess',[])
+
+        for preprocess in preprocesses:
+            current = Local(preprocess)
+            self.preprocess.append( global_ctx.factory.get_object( current ) )
+
     def __prepare_partitions(self):
         self.add_partitions(self.parts_cfgs)
+
 
     def add_partitions(self, splits, postfix=""):
         for split in splits:
@@ -40,6 +51,7 @@ class DatasetManager(Configurable):
         split['parameters']['parts_names'] = [p + postfix for p in split['parameters']['parts_names']]
 
         splitted_data = get_instance_config(split)
+        splitted_data.set_source(self.datasource)
 
         self.partitions = splitted_data.split_data(self.partitions)
 
@@ -58,7 +70,9 @@ class DatasetManager(Configurable):
 
         fold_fraction = None
 
-        dataset = self.partitions['all'].data if split_id == 'all' else Dataset(Subset(self.partitions['all'].data, self.partitions[split_id])).data
+        dataset = self.datasource.get_wrapper(self.partitions['all'].data) if split_id == 'all' else self.datasource.get_wrapper(Subset(self.partitions['all'].data, self.partitions[split_id]))
+
+        #dataset = self.partitions['all'].data if split_id == 'all' else DatasetWrapper(Subset(self.partitions['all'].data, self.partitions[split_id])).data
 
         num_samples = len(dataset)
 
@@ -66,22 +80,8 @@ class DatasetManager(Configurable):
             self.info(f"TRAINING WITH {num_samples} samples")
 
         if fold_fraction is not None:
-            number_of_folds = fold_fraction.denominator
-
-            fold_id = fold_fraction.numerator
-
-            fold_size = num_samples // number_of_folds
-
-            indices = np.arange(num_samples)
-
-            folds = [indices[i*fold_size:(i+1)*fold_size] for i in range(number_of_folds)]
-
-            fold_indices = folds[fold_id]
-
-            main_indices = np.concatenate([folds[i] for i in range(number_of_folds) if i != fold_id])
-    
-            main_loader = DataLoader(Subset(dataset, main_indices), batch_size=self.batch_size, collate_fn = skip_nones_collate,shuffle=False, worker_init_fn = torch.initial_seed())
-            fold_loader = DataLoader(Subset(dataset, fold_indices), batch_size=self.batch_size, collate_fn = skip_nones_collate,shuffle=False, worker_init_fn = torch.initial_seed())
+            ##TODO
+            pass
 
         else:
             main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
@@ -110,7 +110,7 @@ class DatasetManager(Configurable):
             Dataset: The dataset corresponding to the partition ID.
         """
         if split_id in self.partitions:
-            return self.partitions['all'].data if split_id == 'all' else Dataset(Subset(self.partitions['all'].data, self.partitions[split_id])).data
+            return self.partitions['all'].data if split_id == 'all' else DatasetWrapper(Subset(self.partitions['all'].data, self.partitions[split_id])).data
         else:
             raise ValueError(f"Partition ID '{split_id}' not found in partitions.")
    
