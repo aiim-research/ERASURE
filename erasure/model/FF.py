@@ -29,22 +29,3 @@ class MIAAttack(nn.Module):
         #x = self.softmax(x)
         return intermediate_output, x
 
-
-class MIADataSource(DataSource):
-
-    def __init__(self, path):
-        self.path = path
-
-    def get_name(self):
-        return "MIAAttackDataset"
-
-    def create_data(self) -> Dataset:
-        torch_dataset = torch.load(self.path)
-        # return MIADataset(torch_dataset)
-        return MIADataset(torch_dataset)
-
-
-class MIADataset(Dataset):
-    def get_n_classes(self):
-        return self.data.n_classes
-
