@@ -68,7 +68,7 @@
             "DataSource": {
               "class": "erasure.data.data_sources.TVDataSource.TVDataSource",
               "parameters": {
-                "path": "torchvision.datasets.FashionMNIST"
+                "path": "torchvision.datasets.FashionMNIST", "transform":["ToTensor"]
               }
             },
             "partitions": [

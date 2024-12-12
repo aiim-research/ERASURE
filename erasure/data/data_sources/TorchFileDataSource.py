@@ -26,6 +26,9 @@ class TorchFileDataSource(DataSource):
         torch_dataset = torch.load(self.path, weights_only=False)
         return TorchFileDataset(torch_dataset)
 
+    def get_wrapper(self, data):
+        return DatasetWrapper(data, self.preprocess)
+
 
 class TorchFileDataset(DatasetWrapper):
     def get_n_classes(self):
