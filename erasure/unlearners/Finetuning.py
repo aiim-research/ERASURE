@@ -20,7 +20,7 @@ class Finetuning(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Fine-tunes the model to forget specific data points in the forget_set by training the model on the retain_set solely.
+        Fine-tunes the model with a specific (sub)set of the full dataset (usually retain set)
         """
 
         self.global_ctx.logger.info(f'Starting Finetuning with {self.epochs} epochs')

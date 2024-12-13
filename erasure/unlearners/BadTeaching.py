@@ -78,10 +78,10 @@ class BadTeaching(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Bad Teaching unlearning algorithm as proposed by https://arxiv.org/abs/2205.08096. The method uses a distillation method between two teachers and a student model:
+        An implementation of the Bad Teaching unlearning algorithm proposed in the following paper:
+        "Chundawat, V.S., Tarun, A.K., Mandal, M. and Kankanhalli, M., 2023, June. Can bad teaching induce forgetting? unlearning in deep networks using an incompetent teacher. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 6, pp. 7210-7217)."
         
-        1. The student model and the good teacher are both initialized with the same weights, the ones of the model before unlearning. The bad teacher is initialized with random weights or could be finetuned for few epochs on the retain set. 
-        2. The KL-divergence of the logits between the good teacher and the student are minimized on the retain set, while the KL-divergence of the logits between the bad teacher and the student is minimized on the forget.
+        Codebase taken from the original implementation: https://github.com/vikram2000b/bad-teaching-unlearning
         """
 
         self.global_ctx.logger.info(f'Starting BadTeaching with {self.epochs} epochs')

@@ -40,12 +40,10 @@ class Scrub(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        SCRUB unlearning algorithm as proposed by https://arxiv.org/pdf/2302.09880. The method operates in two main stages:
+        An implementation of the SCRUB unlearning algorithm proposed in the following paper:
+        "Kurmanji, M., Triantafillou, P., Hayes, J. and Triantafillou, E., 2024. Towards unbounded machine unlearning. Advances in neural information processing systems, 36."
         
-        1. Training on Retain Data: The model (student) is trained using the data to be retained, guided by a frozen version of the model (teacher) to minimize divergence and finetune on retain data.
-        2. Divergence on Forget Data: The model then maximizes divergence between its outputs and the teacher's outputs on the data to be forgotten, aiming to remove learned information specific to these samples.
-
-        During each epoch, loss is calculated for both retain and forget data.
+        Codebase taken from this implementation: https://github.com/ndb796/MachineUnlearning
         """
 
 

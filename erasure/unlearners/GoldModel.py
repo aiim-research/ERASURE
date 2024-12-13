@@ -19,7 +19,9 @@ class GoldModel(Unlearner):
         self.forget_set = self.dataset.partitions[self.ref_data]
     
     def __unlearn__(self):
-        # retrain the model by removing the reference data (forget by default)
+        """
+        Retrain the model from scratch with a specific (sub)set of the full dataset (usually retain set to evaluate the performance of the model after unlearning)
+        """
 
         cfg_dataset = self.dataset.local_config 
         cfg_model = self.predictor.local_config

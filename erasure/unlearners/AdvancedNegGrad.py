@@ -21,9 +21,10 @@ class AdvancedNegGrad(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Advanced NegGrad unlearning algorithm proposed by https://arxiv.org/pdf/2311.02240. 
+        An implementation of the Advanced NegGrad unlearning algorithm proposed in the following paper:
+        "Choi, D. and Na, D., 2023. Towards machine unlearning benchmarks: Forgetting the personal identities in facial recognition systems. arXiv preprint arXiv:2311.02240."
         
-        The algorithm is based on the NegGrad algorithm, but it also includes the loss of the retained data points in the loss function.
+        Codebase taken from the original implementation: https://github.com/ndb796/MachineUnlearning
         """
 
         self.global_ctx.logger.info(f'Starting AdvancedNegGrad with {self.epochs} epochs')

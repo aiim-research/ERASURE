@@ -35,12 +35,12 @@ class UNSIR(TorchUnlearner):
     
     def __unlearn__(self):
         """
-        UNSIR unlearning algorithm for task agnostic setting proposed by https://arxiv.org/pdf/2111.08947, since the original method is thought for class-unlearning setting, we propose here the modified version proposed by https://arxiv.org/pdf/2311.02240. 
-        The method is divided in two phases:
-        1. In the first phase (Impair), noise is added to perturb the weights of the model.
-        2. In the second phase (Repair), the model is trained with the retain data to restore its performance.
-
-        Since the second phase of the model is a simple finetuning, we can use the Finetuning unlearner to implement the second phase and here only the first phase is implemented.
+        An implementation of the UNSIR unlearning algorithm proposed in the following paper:
+        "Tarun, A.K., Chundawat, V.S., Mandal, M. and Kankanhalli, M., 2023. Fast yet effective machine unlearning. IEEE Transactions on Neural Networks and Learning Systems."
+        Since the original method is thought for class-unlearning setting, we propose here the modified version proposed in the following paper: 
+        "Choi, D. and Na, D., 2023. Towards machine unlearning benchmarks: Forgetting the personal identities in facial recognition systems. arXiv preprint arXiv:2311.02240."
+        
+        Codebase taken from this implementation: https://github.com/ndb796/MachineUnlearning
         """
 
         self.info(f'Starting UNSIR with {self.epochs} epochs for the impair phase')
