@@ -1,15 +1,13 @@
-from copy import deepcopy
 import copy
+from copy import deepcopy
 import os
 
 import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 
-from erasure.core.factory_base import get_function
 from erasure.core.measure import Measure
 from erasure.evaluations.evaluation import Evaluation
-from erasure.utils.cfg_utils import init_dflts_to_of
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 
@@ -18,6 +16,7 @@ class MembershipInference(Measure):
     """ Membership Inference Attack (MIA)
         as presented in https://doi.org/10.1109/SP.2017.41
     """
+
     def __init__(self, global_ctx: Global, local_ctx):
         super().__init__(global_ctx, local_ctx)
 
@@ -31,18 +30,18 @@ class MembershipInference(Measure):
         self.forget_part = 'forget'
         #self.test_part = 'test'
 
-        self.dataset = global_ctx.factory.get_object( Local( self.local.config['parameters']['shadows']['shadow_in_data'] ))
+        self.dataset = global_ctx.factory.get_object(Local(self.local.config['parameters']['shadows']['shadow_in_data']))
         self.dataset.add_partitions(self.local.config['parameters']['shadows']['dataset_preproc'])
-         
-         # Shadow Models
+
+        # Shadow Models
         shadow_models = []
         for k in range(self.n_shadows):
             self.info(f"Creating shadow model {k}")
             self.dataset.add_partitions(copy.deepcopy([self.local.config['parameters']['shadows']['per_shadows_partition']]), "_"+str(k))
-            shadow_models.append(self.__create_shadow_model(k))
+            shadow_models.append(self.create_shadow_model(k))
 
         # Attack DataManagers
-        attack_datasets = self.__create_attack_datasets(shadow_models)
+        attack_datasets = self.create_attack_datasets(shadow_models)
 
         # Attack Models
         self.attack_models = {}
@@ -51,7 +50,7 @@ class MembershipInference(Measure):
             current = Local(self.local_config['parameters']['attack_model'])
             current.dataset = dataset
             self.attack_models[c] = self.global_ctx.factory.get_object(current)
-        
+
     def check_configuration(self):
         super().check_configuration()
         #init_dflts_to_of(self.local.config, 'function', 'sklearn.metrics.accuracy_score') # Default empty node for: sklearn.metrics.accuracy_score
@@ -64,16 +63,16 @@ class MembershipInference(Measure):
 
         # Target Model (unlearned model)
         original = e.predictor
-        unlearned = e.unlearned_model      
+        unlearned = e.unlearned_model
 
         forget_dataloader, _ = original.dataset.get_loader_for(self.forget_part)
 
-        original_forget = self.__test_dataset(self.attack_models, original, forget_dataloader )
-        target_forget = self.__test_dataset(self.attack_models, unlearned, forget_dataloader )
+        original_forget = self.test_dataset(self.attack_models, original, forget_dataloader)
+        target_forget = self.test_dataset(self.attack_models, unlearned, forget_dataloader)
         #target_test = self.__test_dataset(self.attack_models, unlearned, "test")
 
-        self.info(f"Original Forget: {original_forget/original_forget.sum()}")
-        self.info(f"Target Forget: {target_forget/target_forget.sum()}")
+        self.info(f"Original Forget: {original_forget / original_forget.sum()}")
+        self.info(f"Target Forget: {target_forget / target_forget.sum()}")
         #self.info(f"Target Test: {target_test/target_test.sum()}")
 
         # Forgetting Rate (doi: 10.1109/TDSC.2022.3194884)
@@ -83,7 +82,7 @@ class MembershipInference(Measure):
 
         return e
 
-    def __create_shadow_model(self, k):
+    def create_shadow_model(self, k):
         """ create generic Shadow Model """
         # create shadow model
         shadow_base_model = copy.deepcopy(self.base_model_cfg)
@@ -95,14 +94,14 @@ class MembershipInference(Measure):
 
         return shadow_model
 
-    def __create_attack_datasets(self, shadow_models):
+    def create_attack_datasets(self, shadow_models):
         """ Create n_classes attack datasets from the given shadow models """
         attack_samples = []
         attack_labels = []
 
         # Attack Dataset creation
         for k in range(self.n_shadows):
-            samples, labels = self.__get_attack_samples(shadow_models[k],k)
+            samples, labels = self.get_attack_samples(shadow_models[k], k)
             attack_samples.append(samples)
             attack_labels.append(labels)
 
@@ -136,7 +135,7 @@ class MembershipInference(Measure):
 
         return attack_datamanagers
 
-    def __get_attack_samples(self, shadow_model,k):
+    def get_attack_samples(self, shadow_model, k):
         """ From the shadow model, generate the attack samples """
 
         train_loader, _ = self.dataset.get_loader_for(self.train_part_plh +"_"+str(k))
@@ -146,17 +145,17 @@ class MembershipInference(Measure):
         attack_samples = []
         attack_labels = []
 
-        samples, labels = self.__generate_samples(shadow_model, train_loader, 1)
+        samples, labels = self.generate_samples(shadow_model, train_loader, 1)
         attack_samples.append(samples)
         attack_labels.append(labels)
 
-        samples, labels = self.__generate_samples(shadow_model, test_loader, 0)
+        samples, labels = self.generate_samples(shadow_model, test_loader, 0)
         attack_samples.append(samples)
         attack_labels.append(labels)
 
         return torch.cat(attack_samples), torch.cat(attack_labels)
 
-    def __generate_samples(self, model, loader, label_value):
+    def generate_samples(self, model, loader, label_value):
         attack_samples = []
         attack_labels = []
 
@@ -176,7 +175,7 @@ class MembershipInference(Measure):
 
         return torch.cat(attack_samples), torch.cat(attack_labels)
 
-    def __test_dataset(self, attack_models, target_model, dataloader):
+    def test_dataset(self, attack_models, target_model, dataloader):
         """ tests samples from the original dataset """
 
         #loader, _ = target_model.dataset.get_loader_for(split_name)

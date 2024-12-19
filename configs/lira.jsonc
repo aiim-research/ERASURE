@@ -49,6 +49,7 @@
     }
   },
   "unlearners": [
+    {"compose_idt" : "configs/snippets/u_id.json"},
     {
         "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {

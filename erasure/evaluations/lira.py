@@ -1,7 +1,6 @@
 import copy
 from copy import deepcopy
 import os
-from os.path import split
 
 import torch
 from torch.utils.data import DataLoader
@@ -9,61 +8,19 @@ import torch.nn as nn
 
 from erasure.core.measure import Measure
 from erasure.evaluations.evaluation import Evaluation
+from erasure.evaluations.mia import MembershipInference
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 
 
-class LikelihoodRatio(Measure):
+class LikelihoodRatio(MembershipInference):
     """ Likelihood Ratio membership inference Attack (LiRA)
         (https://doi.org/10.48550/arXiv.2403.01218)
-        the Carlini way.
+        the Carlini way
     """
 
-    def __init__(self, global_ctx: Global, local_ctx):
-        super().__init__(global_ctx, local_ctx)
-
-        self.n_shadows = self.local.config['parameters']['shadows']['n_shadows']
-        self.data_out_path = self.local.config['parameters']['shadows']['data_out_path']
-        self.train_part_plh = self.local.config['parameters']['shadows']['train_part_plh']
-        self.test_part_plh = self.local.config['parameters']['shadows']['test_part_plh']
-        self.base_model_cfg = self.params["shadows"]["base_model"]
-        self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]
-
-        self.forget_part = 'forget'
-        # self.test_part = 'test'
-
-        self.dataset = global_ctx.factory.get_object(
-            Local(self.local.config['parameters']['shadows']['shadow_in_data']))
-        self.dataset.add_partitions(self.local.config['parameters']['shadows']['dataset_preproc'])
-
-        # Shadow Models
-        shadow_models = []
-        for k in range(self.n_shadows):
-            self.info(f"Creating shadow model {k}")
-            self.dataset.add_partitions(
-                copy.deepcopy([self.local.config['parameters']['shadows']['per_shadows_partition']]), "_" + str(k))
-            shadow_models.append(self.__create_shadow_model(k))
-
-        # Attack DataManagers
-        attack_datasets = self.__create_attack_datasets(shadow_models)
-
-        # Attack Models
-        self.attack_models = {}
-        for c, dataset in attack_datasets.items():
-            self.info(f"Creating attack model {c}")
-            current = Local(self.local_config['parameters']['attack_model'])
-            current.dataset = dataset
-            self.attack_models[c] = self.global_ctx.factory.get_object(current)
-
-    def check_configuration(self):
-        super().check_configuration()
-        # init_dflts_to_of(self.local.config, 'function', 'sklearn.metrics.accuracy_score') # Default empty node for: sklearn.metrics.accuracy_score
-        # self.local.config['parameters']['partition'] = self.local.config['parameters'].get('partition', 'test')  # Default partition: test
-        # self.local.config['parameters']['name'] = self.local.config['parameters'].get('name', self.local.config['parameters']['function']['class'])  # Default name as metric name
-        # self.local.config['parameters']['target'] = self.local.config['parameters'].get('target', 'unlearned')  # Default partition: test
-
     def process(self, e: Evaluation):
-        self.info("Membership Inference Attack")
+        self.info("Likelihood Ratio")
 
         # Target Model (unlearned model)
         original = e.predictor
@@ -73,13 +30,13 @@ class LikelihoodRatio(Measure):
         forget_ids = original.dataset.partitions[self.forget_part]
         # forget_ids = self.dataset.partitions[self.forget_part]
 
-        original_forget = self.__test_dataset(self.attack_models, original, forget_dataloader, forget_ids)
-        target_forget = self.__test_dataset(self.attack_models, unlearned, forget_dataloader, forget_ids)
+        original_forget = self.test_dataset(self.attack_models, original, forget_dataloader, forget_ids)
+        target_forget = self.test_dataset(self.attack_models, unlearned, forget_dataloader, forget_ids)
         # target_test = self.__test_dataset(self.attack_models, unlearned, "test")
 
         self.info(f"Original Forget: {original_forget / original_forget.sum()}")
         self.info(f"Target Forget: {target_forget / target_forget.sum()}")
-        # self.info(f"Target Test: {target_test/target_test.sum()}")
+        #self.info(f"Target Test: {target_test/target_test.sum()}")
 
         # Forgetting Rate (doi: 10.1109/TDSC.2022.3194884)
         fr = (target_forget[0] - original_forget[0]) / original_forget[1]
@@ -88,19 +45,7 @@ class LikelihoodRatio(Measure):
 
         return e
 
-    def __create_shadow_model(self, k):
-        """ create generic Shadow Model """
-        # create shadow model
-        shadow_base_model = copy.deepcopy(self.base_model_cfg)
-        shadow_base_model['parameters']['training_set'] = self.train_part_plh + "_" + str(k)
-        current = Local(shadow_base_model)
-
-        current.dataset = self.dataset
-        shadow_model = self.global_ctx.factory.get_object(current)
-
-        return shadow_model
-
-    def __create_attack_datasets(self, shadow_models):
+    def create_attack_datasets(self, shadow_models):
         """ Create |forget_set| attack datasets from the given shadow models.
         Each dataset contains samples for the same index """
         attack_samples = []
@@ -108,7 +53,7 @@ class LikelihoodRatio(Measure):
 
         # Attack Dataset creation
         for k in range(self.n_shadows):
-            samples, labels = self.__get_attack_samples(shadow_models[k], k)
+            samples, labels = self.get_attack_samples(shadow_models[k], k)
             attack_samples.append(samples)
             attack_labels.append(labels)
 
@@ -142,7 +87,7 @@ class LikelihoodRatio(Measure):
 
         return attack_datamanagers
 
-    def __get_attack_samples(self, shadow_model, k):
+    def get_attack_samples(self, shadow_model, k):
         """ From the shadow model, generate the attack samples """
 
         forget_loader, _ = self.dataset.get_loader_for(self.forget_part)
@@ -154,13 +99,13 @@ class LikelihoodRatio(Measure):
         attack_samples = []
         attack_labels = []
 
-        samples, labels = self.__generate_samples(shadow_model, forget_loader, label_values)
+        samples, labels = self.generate_samples(shadow_model, forget_loader, label_values)
         attack_samples.append(samples)
         attack_labels.append(labels)
 
         return torch.cat(attack_samples), torch.cat(attack_labels)
 
-    def __generate_samples(self, model, loader, label_values):
+    def generate_samples(self, model, loader, label_values):
 
         attack_samples = []
         attack_labels = []
@@ -182,7 +127,7 @@ class LikelihoodRatio(Measure):
 
         return attack_samples, attack_labels
 
-    def __test_dataset(self, attack_models, target_model, dataloader, data_ids):
+    def test_dataset(self, attack_models, target_model, dataloader, data_ids):
         """ tests samples from the original dataset """
 
         attack_predictions = []

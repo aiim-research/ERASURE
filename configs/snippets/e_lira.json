@@ -46,7 +46,7 @@
      
       
       "shadows": {
-        "n_shadows": 30,
+        "n_shadows": 100,
         "data_out_path": "resources/data/lira/lira.pt",
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
