@@ -24,7 +24,7 @@
       "attack_model": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 5,
+          "epochs": 50,
           "optimizer": {
             "class": "torch.optim.RMSprop",
             "parameters": {
@@ -46,7 +46,7 @@
      
       
       "shadows": {
-        "n_shadows": 50,
+        "n_shadows": 30,
         "data_out_path": "resources/data/lira/lira.pt",
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
@@ -92,7 +92,7 @@
         "base_model": {
           "class": "erasure.model.TorchModel.TorchModel",
           "parameters": {
-            "epochs": 5,
+            "epochs": 50,
             "optimizer": {
               "class": "torch.optim.RMSprop",
               "parameters": {

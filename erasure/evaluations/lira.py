@@ -1,6 +1,7 @@
 import copy
 from copy import deepcopy
 import os
+from os.path import split
 
 import torch
 from torch.utils.data import DataLoader
@@ -15,7 +16,7 @@ from erasure.utils.config.local_ctx import Local
 class LikelihoodRatio(Measure):
     """ Likelihood Ratio membership inference Attack (LiRA)
         (https://doi.org/10.48550/arXiv.2403.01218)
-        the Carlini way
+        the Carlini way.
     """
 
     def __init__(self, global_ctx: Global, local_ctx):
@@ -47,7 +48,6 @@ class LikelihoodRatio(Measure):
         attack_datasets = self.__create_attack_datasets(shadow_models)
 
         # Attack Models
-        # todo: change... maybe
         self.attack_models = {}
         for c, dataset in attack_datasets.items():
             self.info(f"Creating attack model {c}")
@@ -70,9 +70,11 @@ class LikelihoodRatio(Measure):
         unlearned = e.unlearned_model
 
         forget_dataloader, _ = original.dataset.get_loader_for(self.forget_part)
+        forget_ids = original.dataset.partitions[self.forget_part]
+        # forget_ids = self.dataset.partitions[self.forget_part]
 
-        original_forget = self.__test_dataset(self.attack_models, original, forget_dataloader)
-        target_forget = self.__test_dataset(self.attack_models, unlearned, forget_dataloader)
+        original_forget = self.__test_dataset(self.attack_models, original, forget_dataloader, forget_ids)
+        target_forget = self.__test_dataset(self.attack_models, unlearned, forget_dataloader, forget_ids)
         # target_test = self.__test_dataset(self.attack_models, unlearned, "test")
 
         self.info(f"Original Forget: {original_forget / original_forget.sum()}")
@@ -121,7 +123,7 @@ class LikelihoodRatio(Measure):
 
         # create Datasets based on sample index
         attack_datasets = {}
-        for f_id in self.dataset.partitions["forget"]:
+        for f_id in self.dataset.partitions[self.forget_part]:
             f_idxs = (attack_samples[:, 0] == f_id).nonzero(as_tuple=True)[0]
             attack_datasets[f_id] = torch.utils.data.TensorDataset(attack_samples[f_idxs, 1:], attack_labels[f_idxs])
             attack_datasets[f_id].n_classes = self.dataset.n_classes
@@ -130,7 +132,7 @@ class LikelihoodRatio(Measure):
         attack_datamanagers = {}
 
         os.makedirs(os.path.dirname(self.data_out_path), exist_ok=True)  # TODO Random temp path
-        for f_id in self.dataset.partitions["forget"]:
+        for f_id in self.dataset.partitions[self.forget_part]:
             file_path = self.data_out_path + str(f_id)
             torch.save(attack_datasets[f_id], file_path)
             # Create DataMangers and reload data
@@ -143,8 +145,8 @@ class LikelihoodRatio(Measure):
     def __get_attack_samples(self, shadow_model, k):
         """ From the shadow model, generate the attack samples """
 
-        forget_loader, _ = self.dataset.get_loader_for("forget")
-        forget_ids = self.dataset.partitions["forget"]
+        forget_loader, _ = self.dataset.get_loader_for(self.forget_part)
+        forget_ids = self.dataset.partitions[self.forget_part]
         shadow_train_ids = self.dataset.partitions[self.train_part_plh + "_" + str(k)]
 
         label_values = [int(f_id in shadow_train_ids) for f_id in forget_ids]
@@ -174,25 +176,27 @@ class LikelihoodRatio(Measure):
 
         attack_samples = torch.cat(attack_samples)
 
-        forget_ids = torch.tensor(self.dataset.partitions["forget"])[...,None]
+        forget_ids = torch.tensor(self.dataset.partitions[self.forget_part])[...,None]
         attack_samples = torch.cat([forget_ids, attack_samples], dim=1)
         attack_labels = torch.tensor(label_values)
 
         return attack_samples, attack_labels
 
-    def __test_dataset(self, attack_models, target_model, dataloader):
+    def __test_dataset(self, attack_models, target_model, dataloader, data_ids):
         """ tests samples from the original dataset """
 
-        # loader, _ = target_model.dataset.get_loader_for(split_name)
         attack_predictions = []
         with torch.no_grad():
-            for X, labels in dataloader:
+            for batch, (X, labels) in enumerate(dataloader):
                 _, target_predictions = target_model.model(X.to(target_model.device))
                 for i in range(len(target_predictions)):
-                    _, prediction = attack_models[labels[i].item()].model(target_predictions[i])
-                    softmax = nn.Softmax(dim=0)
-                    prediction = softmax(prediction)
-                    attack_predictions.append(prediction)
+                    curr_id = batch*dataloader.batch_size + i
+                    curr_f_id = data_ids[curr_id]
+                    if curr_f_id in attack_models:
+                        _, prediction = attack_models[curr_f_id].model(target_predictions[i])
+                        softmax = nn.Softmax(dim=0)
+                        prediction = softmax(prediction)
+                        attack_predictions.append(prediction)
 
         attack_predictions = torch.stack(attack_predictions)  # convert into a Tensor
         predicted_labels = torch.argmax(attack_predictions, dim=1)  # get the predicted label
