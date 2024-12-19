@@ -133,6 +133,9 @@ class TorchModel(Trainable):
         init_dflts_to_of(local_config, 'loss_fn', 'torch.nn.BCELoss')
 
         self.local_config['parameters']['model']['parameters']['n_classes'] = self.dataset.n_classes
+
+        local_config['parameters']['alias'] = local_config['parameters']['model']['class']
+
         
     def accuracy(self, testy, probs):
         acc = accuracy_score(testy, np.argmax(probs, axis=1))

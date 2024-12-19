@@ -1,6 +1,7 @@
 from copy import deepcopy
 import os
 
+#from erasure.core.factory_base import ConfigurableFactory
 from erasure.utils.config.file_parser import Config
 from erasure.utils.logger import GLogger
 import numpy as np
@@ -9,17 +10,34 @@ import random
 
 class Global:
 
+    logger = GLogger.getLogger()
+    info = logger.info
+
     def __init__(self, config_file):
         # Check that the path to the config file exists
-        self.logger = GLogger.getLogger()
-        self.logger.info("Creating Global Context for: "+config_file)
+        #self.logger = GLogger.getLogger()
+        self.info("Creating Global Context for: "+config_file)
         if not os.path.exists(config_file):
             raise ValueError(f'''The provided config file does not exist. PATH: {config_file}''')
         
         self.config = Config.from_json(config_file)
+        self.set_seed(1)
+
+    def set_seed(self,seed=0):
+        torch.manual_seed(seed)
+        np.random.seed(seed)
+        random.seed(seed)
+        if torch.cuda.is_available():
+            torch.cuda.manual_seed(seed)
+            torch.cuda.manual_seed_all(seed)
+        if torch.backends.mps.is_available():
+            torch.mps.manual_seed(seed)
+        # For more deterministic behavior, you can set the following
+        torch.backends.cudnn.deterministic = True
+        torch.backends.cudnn.benchmark = False
         
 
-    def __setitem__(self, key, value):
+    '''def __setitem__(self, key, value):
         self._data[key] = value
 
     def __getitem__(self, key):
@@ -40,8 +58,9 @@ class Global:
                 setattr(result, k, deepcopy(v, memo))
             else:
                 setattr(result, k, self.logger)
-        return result
+        return result'''
     
+  
 def clean_cfg(cfg):
     if isinstance(cfg,dict):
         new_cfg = {}
@@ -61,15 +80,3 @@ def clean_cfg(cfg):
 
     return new_cfg
 
-def set_seed(seed=0):
-    torch.manual_seed(seed)
-    np.random.seed(seed)
-    random.seed(seed)
-    if torch.cuda.is_available():
-        torch.cuda.manual_seed(seed)
-        torch.cuda.manual_seed_all(seed)
-    if torch.backends.mps.is_available():
-        torch.mps.manual_seed(seed)
-    # For more deterministic behavior, you can set the following
-    torch.backends.cudnn.deterministic = True
-    torch.backends.cudnn.benchmark = False

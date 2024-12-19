@@ -1,11 +1,11 @@
 import pickle
 import time
 from abc import ABCMeta, abstractmethod
-from erasure.core.base import Configurable
+from erasure.core.base import Configurable, Saveable
 from erasure.data.datasets.Dataset import DatasetWrapper
 from erasure.utils.config.global_ctx import Global
 
-class Trainable(Configurable, metaclass=ABCMeta):
+class Trainable(Saveable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx: Global, local_ctx):
         self.dataset = local_ctx.dataset

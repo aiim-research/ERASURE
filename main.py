@@ -1,12 +1,13 @@
 import copy
 import os
 import argparse
+from erasure.utils.logger import GLogger
 import torch
 import numpy as np
 import random
-from erasure.utils.config.global_ctx import set_seed 
+#from erasure.utils.config.global_ctx import set_seed 
 
-set_seed(1)
+#set_seed(1)
 
 
 from erasure.utils.config.local_ctx import Local
@@ -25,13 +26,14 @@ config_file = args.config_file
 if __name__ == "__main__":
     global_ctx = Global(config_file)
     global_ctx.factory = ConfigurableFactory(global_ctx)
+    global_ctx.cached= False
 
     global_ctx.logger.info(f"Current PyTorch seed: {torch.initial_seed()}")
 
     #Create Dataset
     print("CONFIG DATA ", global_ctx.config.data)
     data_manager = global_ctx.factory.get_object( Local( global_ctx.config.data ))
-    print("DATA MANAGER ", data_manager)
+    #print("DATA MANAGER ", data_manager)
     #Create Predictor
     current = Local(global_ctx.config.predictor)
     current.dataset = data_manager
