@@ -52,7 +52,7 @@ class TVDataSource(DataSource):
 
 
         concat =  ConcatDataset([train, test])
-        concat.classes = torch.unique(torch.tensor(train.targets))
+        concat.classes = torch.unique(train.targets.clone().detach()) #torch.tensor(train.targets)) 
         dataset = self.get_wrapper(concat)
 
         return dataset

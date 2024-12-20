@@ -36,6 +36,7 @@ class Trainable(Saveable, metaclass=ABCMeta):
     def create(self):
         self.fit()
 
+    '''
     def write(self):
         filepath = self.global_ctx.get_path(self)
         dump = {
@@ -52,6 +53,7 @@ class Trainable(Saveable, metaclass=ABCMeta):
                 dump = pickle.load(f)
                 self.model = dump['model']
                 #self.local_config = dump['config']
+    '''
 
     @abstractmethod
     def real_fit(self):
@@ -60,7 +62,11 @@ class Trainable(Saveable, metaclass=ABCMeta):
     def check_configuration(self):
         super().check_configuration()
         self.local_config['parameters']['fold_id'] =  self.local_config['parameters'].get('fold_id', -1)
-        self.fold_id = self.local_config['parameters']['fold_id'] 
+        self.local.config['parameters']['training_set'] = self.local.config['parameters'].get("training_set", "train")
+
+        # The following parameteres must be setted typically init(); here for simplicity since they are simple datatypes (i.e, string, number)
+        self.fold_id = self.local_config['parameters']['fold_id']
+        self.training_set = self.local.config['parameters']['training_set']
     
 
     

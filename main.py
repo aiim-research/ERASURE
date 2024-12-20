@@ -31,9 +31,8 @@ if __name__ == "__main__":
     global_ctx.logger.info(f"Current PyTorch seed: {torch.initial_seed()}")
 
     #Create Dataset
-    print("CONFIG DATA ", global_ctx.config.data)
     data_manager = global_ctx.factory.get_object( Local( global_ctx.config.data ))
-    #print("DATA MANAGER ", data_manager)
+
     #Create Predictor
     current = Local(global_ctx.config.predictor)
     current.dataset = data_manager
@@ -49,7 +48,6 @@ if __name__ == "__main__":
         current.predictor = copy.deepcopy(predictor)
         unlearners.append( global_ctx.factory.get_object(current) )
 
-    
     #Evaluator
     current = Local(global_ctx.config.evaluator)
     current.unlearners = unlearners

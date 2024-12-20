@@ -52,7 +52,7 @@ class Saveable(Configurable):
         if not self.global_ctx.cached:
             return False
 
-        file_name = self.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()
+        file_name = Saveable.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()
         
         if Path(file_name).exists():
             try :
@@ -70,7 +70,7 @@ class Saveable(Configurable):
         if not self.global_ctx.cached:
             return False
 
-        file_name = self.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()
+        file_name = Saveable.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()
         self.info("Dumped Instance to:"+ file_name)
 
         with open (file_name, "wb") as file_handle :

@@ -140,7 +140,7 @@ class TorchModel(Trainable):
     def accuracy(self, testy, probs):
         acc = accuracy_score(testy, np.argmax(probs, axis=1))
         return acc
-
+'''
     def read(self):
         super().read()
         if isinstance(self.model, list):
@@ -156,6 +156,7 @@ class TorchModel(Trainable):
             for model in self.model:
                 if isinstance(model, torch.nn.Module):
                     model.to(self.device)
+                    '''
 
 def init_weights(m):
     if isinstance(m, nn.Linear):
