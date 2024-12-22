@@ -11,7 +11,7 @@ import random
 
 
 from erasure.utils.config.local_ctx import Local
-from erasure.utils.config.global_ctx import Global 
+from erasure.utils.config.global_ctx import Global, bcolors 
 from erasure.core.factory_base import ConfigurableFactory
 from erasure.data.datasets.DatasetManager import DatasetManager
 
@@ -26,9 +26,6 @@ config_file = args.config_file
 if __name__ == "__main__":
     global_ctx = Global(config_file)
     global_ctx.factory = ConfigurableFactory(global_ctx)
-    global_ctx.cached= False
-
-    global_ctx.logger.info(f"Current PyTorch seed: {torch.initial_seed()}")
 
     #Create Dataset
     data_manager = global_ctx.factory.get_object( Local( global_ctx.config.data ))
@@ -55,7 +52,7 @@ if __name__ == "__main__":
 
     # Evaluations
     for unlearner in unlearners:
-        global_ctx.logger.info('####\t\t Evaluating: '+unlearner.__class__.__name__ +'\t\t####')
+        global_ctx.logger.info(f'''{bcolors.OKGREEN}####\t\t Evaluating Unlearner {unlearner.__class__.__name__} \t\t####{bcolors.ENDC}''')
         evaluator.evaluate(unlearner,predictor)
 
  

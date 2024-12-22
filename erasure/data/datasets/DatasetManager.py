@@ -14,9 +14,11 @@ class DatasetManager(Configurable):
     def __init__(self, global_ctx, local_ctx):
         super().__init__(global_ctx, local_ctx)
         self.partitions = {}
-        self.info(self.params['DataSource'])
+
         self.__init_preprocess__(global_ctx)
         self.datasource = global_ctx.factory.get_object( Local (self.params['DataSource']) )
+        self.info(self.params['DataSource'])
+        
         self.datasource.set_preprocess(self.preprocess)
         self.partitions['all'] = self.datasource.create_and_validate_data()
         self.parts_cfgs = self.params['partitions']

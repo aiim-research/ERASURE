@@ -2,7 +2,7 @@
 import hashlib
 from pathlib import Path
 import pickle
-from erasure.utils.config.global_ctx import Global
+from erasure.utils.config.global_ctx import Global, bcolors
 from abc import abstractmethod
 
 from erasure.utils.logger import GLogger
@@ -13,7 +13,6 @@ class Base:
     
     def __init__(self, global_ctx: Global):
         self.global_ctx = global_ctx
-        #GLogger.getLogger().info = GLogger.getLogger().info
         
 class Configurable(Base):   
 
@@ -24,9 +23,11 @@ class Configurable(Base):
         self.params = self.local.config['parameters']
 
         self.check_configuration()
+        
         if not self.__pre_init__():
             self.init()
-            self.__post_init__()     
+            self.__post_init__()   
+              
         
     def check_configuration(self):
         self.local.config['parameters'] = self.local.config.get('parameters',{})
@@ -48,7 +49,6 @@ class Saveable(Configurable):
     CACHE_DIR = 'resources/cached'
 
     def __pre_init__(self):
-
         if not self.global_ctx.cached:
             return False
 
@@ -58,10 +58,10 @@ class Saveable(Configurable):
             try :
                 with open (file_name, "rb") as file_handle :
                     self.__dict__ = pickle.load (file_handle)
-                self.info("Loaded Instance from:"+ file_name)
+                self.info(f'''{bcolors.FAIL}Loaded Instance from: {bcolors.UNDERLINE}{file_name}{bcolors.ENDC}''')
                 return True
             except EOFError as eof_error :
-                # print (eof_error)
+                self.info(eof_error)
                 pass
         return False
 
@@ -71,7 +71,7 @@ class Saveable(Configurable):
             return False
 
         file_name = Saveable.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()
-        self.info("Dumped Instance to:"+ file_name)
+        self.info(f'''{bcolors.FAIL}Dumped Instance to: {bcolors.UNDERLINE}{file_name}{bcolors.ENDC}''')
 
         with open (file_name, "wb") as file_handle :
             pickle.dump (self.__dict__, file_handle)
@@ -100,7 +100,8 @@ class Saveable(Configurable):
             return cls
 
 def __resolve_cfg_with_context__(inst):
-    dictionary = {}
+    dictionary = {'globals':inst.global_ctx.config.globals}
+
     for k, v in inst.local.__dict__.items():
         if isinstance (v, Configurable):
             dictionary[k]=__resolve_cfg_with_context__(v)

@@ -69,6 +69,10 @@
       {"compose_idt" : "configs/snippets/u_id.json"},
       {"compose_idt" : "configs/snippets/u_id.json"}
     ],
-    "compose_eval":"configs/snippets/default_evaluation.json"
+    "compose_eval":"configs/snippets/default_evaluation.json",
+    "globals":{
+        "seed": 1,
+        "cached": "true"
+    }
   }
   
