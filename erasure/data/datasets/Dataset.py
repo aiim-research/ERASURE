@@ -6,9 +6,6 @@ class DatasetWrapper:
         self.preprocess = preprocess
 
     def get_n_classes(self):
-        ##access data from Dataset
-        ##access datasets[0] because Dataset contains a ConcatDataset and the first one is the Training set
-        ##so we get the number of classes from the training set
         n_classes = len(self.data.classes)
 
         return n_classes
@@ -17,16 +14,43 @@ class DatasetWrapper:
         return len(self.data)
 
     def __getitem__(self, index: int):
+        X,y = self.__realgetitem__(index)
+        X,y,Z = self.apply_preprocessing(X, y, None)
+        return X,y
+
+    def __realgetitem__(self, index: int):
         sample = self.data[index]
         X,y = sample
-        sample = self.apply_preprocessing(X,y)
-        return sample
+        return X,y
 
 
-    def apply_preprocessing(self, X, y):
+    def apply_preprocessing(self, X, y,Z):
         """
         Apply each preprocessing step to the data (X, y).
         """
         for preprocess in self.preprocess:
-            X, y = preprocess.process(X, y)
-        return X, y
+            X, y,Z = preprocess.process(X, y,Z)
+        return X, y, Z
+
+class DatasetExtendedWrapper:
+    def __init__(self, inst):
+        self.inst = inst
+        self.data = self.inst.data #TODO Migliorare il forwarding
+        self.preprocess = self.inst.preprocess
+
+    def get_n_classes(self):        
+        return self.inst.get_n_classes()
+
+    def __len__(self):
+        return self.inst.__len__()
+
+    def __getitem__(self, index: int):
+        X,y = self.inst.__realgetitem__(index)
+        X,y,Z = self.apply_preprocessing(X, y, None)
+        return X,y,Z
+
+    def apply_preprocessing(self, X, y,Z):
+        return self.inst.apply_preprocessing(X, y,Z)
+
+
+        

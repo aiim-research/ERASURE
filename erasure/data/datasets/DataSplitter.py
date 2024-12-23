@@ -3,7 +3,7 @@ import random
 from torch.utils.data import Subset
 from erasure.core.base import Configurable
 from .Dataset import DatasetWrapper
-from erasure.data.data_sources.datasource import DataSource
+
 
 
 class DataSplitter(ABC):
@@ -15,7 +15,7 @@ class DataSplitter(ABC):
     def split_data(self, data):
         pass
 
-    def set_source(self, datasource : DataSource):
+    def set_source(self, datasource):
         self.source = datasource
 
     
@@ -49,13 +49,12 @@ class DataSplitterClass(DataSplitter):
     def split_data(self,partitions):
 
         ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
-
-        ##TODO fix this for UCI
-
+        
         filtered_indices = [
             idx for idx in range(len(ref_data))  
             if ref_data[idx][1] == self.label  
         ]
+        
 
         other_indices = [
             idx for idx in range(len(ref_data)) 

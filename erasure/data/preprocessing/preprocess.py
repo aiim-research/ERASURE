@@ -20,7 +20,7 @@ class CategoricalEncode(Preprocess):
         self.encoder = get_instance_kvargs(self.local_config['parameters']['encoder']['class'],
                                            self.local_config['parameters']['encoder']['parameters'])
 
-    def process(self, X, y):
+    def process(self, X, y, Z):
         X_encoded = X.copy()
 
         if self.process_X:
@@ -34,14 +34,14 @@ class CategoricalEncode(Preprocess):
                 y = np.array([str(item).strip() for item in y], dtype=object)
             y = self.encoder.fit_transform(y).astype(int)
 
-        return X_encoded, y
+        return X_encoded, y, Z
 
 class RemoveCharacter(Preprocess):
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
         self.character_to_remove = self.local_config['parameters']['character']
 
-    def process(self, X, y):
+    def process(self, X, y, Z):
         
         def clean_string(value):
             return str(value).strip().replace(self.character_to_remove, "")
@@ -52,7 +52,7 @@ class RemoveCharacter(Preprocess):
         if self.process_y:
             y = clean_string(y)
         
-        return X, y
+        return X, y, Z
     
 class Add(Preprocess):    
     
@@ -60,7 +60,7 @@ class Add(Preprocess):
         super().__init__(global_ctx, local_ctx)
         self.to_add = self.local_config['parameters']['add']
 
-    def process(self, X, y):
+    def process(self, X, y, Z):
         
         if self.process_X: 
             X = X + self.to_add
@@ -68,4 +68,4 @@ class Add(Preprocess):
         if self.process_y:
             y = y + self.to_add
         
-        return X, y
+        return X, y, Z

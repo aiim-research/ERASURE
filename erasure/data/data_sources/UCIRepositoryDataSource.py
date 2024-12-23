@@ -14,14 +14,12 @@ class UCIWrapper(DatasetWrapper):
         super().__init__(data,preprocess)
         self.label = label
 
-    def __getitem__(self, index: int):
+    def __realgetitem__(self, index: int):
         sample = self.data[index]
 
         X = {key:value for key,value in sample.items() if key!=self.label}
         y = sample[self.label]
-        
-        X,y = self.apply_preprocessing(X,y)
-        
+     
         return X,y
 
 
@@ -53,7 +51,7 @@ class UCIRepositoryDataSource(DataSource):
         return UCIWrapper(self.dataset, self.preprocess, self.label)
 
     
-    def get_wrapper(self, data):
+    def get_simple_wrapper(self, data):
         ##data is a Subset wrapping the data
         ##data.indices contains the indices of the subset
         ##slice the dataset with these indices and wrap it around

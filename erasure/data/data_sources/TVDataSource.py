@@ -16,6 +16,9 @@ class TVDataSource(DataSource):
         self.path = self.local_config['parameters']['path']
         self.transform = self.local_config['parameters'].get('transform',[])
         self.root_path = self.local_config.get('root_path','resources/data')
+        self.label_column =  self.local_config['parameters']['label_column'] = self.local_config['parameters'].get('label_column', 'targets')
+        #TODO: Change this for everything
+        #TODO: and move to check config
     
     def get_name(self):
         return self.path.split(".")[-1] 
@@ -52,14 +55,20 @@ class TVDataSource(DataSource):
 
 
         concat =  ConcatDataset([train, test])
-        concat.classes = torch.unique(train.targets.clone().detach()) #torch.tensor(train.targets)) 
+
+        concat.classes = torch.unique(getattr(train, self.label_column).clone().detach())
+        #TODO: manage if classes is a one-hot encoded vector multilabeled
+
         dataset = self.get_wrapper(concat)
 
         return dataset
     
 
-    def get_wrapper(self, data):
+    def get_simple_wrapper(self, data):
         return DatasetWrapper(data, self.preprocess)
+
+
+        
     
 def parse_transform(lib, transform_string):
     """
