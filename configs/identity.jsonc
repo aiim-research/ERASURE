@@ -10,7 +10,7 @@
                     "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                     "parameters": {
                         "parts_names": ["all_reduced", "-"],
-                        "percentage": 0.001
+                        "percentage": 0.02
                     }
                 },
                 {
@@ -45,7 +45,7 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-            "epochs": 15,
+            "epochs": 50,
             "optimizer": {
                 "class": "torch.optim.Adam",
                 "parameters": {
@@ -71,7 +71,7 @@
     ],
     "compose_eval":"configs/snippets/default_evaluation.json",
     "globals":{
-        "seed": 1,
+        "seed": 1046534644,
         "cached": "true"
     }
   }

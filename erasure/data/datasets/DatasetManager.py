@@ -21,6 +21,7 @@ class DatasetManager(Configurable):
         
         self.datasource.set_preprocess(self.preprocess)
         self.partitions['all'] = self.datasource.create_and_validate_data()
+        
         self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)
         self.batch_size=self.params['batch_size']

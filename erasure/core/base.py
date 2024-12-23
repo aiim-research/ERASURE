@@ -100,13 +100,13 @@ class Saveable(Configurable):
             return cls
 
 def __resolve_cfg_with_context__(inst):
-    dictionary = {'globals':inst.global_ctx.config.globals}
+    dictionary = {'globals':dict(sorted(inst.global_ctx.config.globals.items()))}
 
-    for k, v in inst.local.__dict__.items():
+    for k, v in sorted(inst.local.__dict__.items()):
         if isinstance (v, Configurable):
             dictionary[k]=__resolve_cfg_with_context__(v)
         elif(isinstance (v, dict)):
-            dictionary[k]=v
+            dictionary[k]=dict(sorted(v.items())) #TODO: Ordinerare ricorsivamente anche i sotto-dizionari
 
     return dictionary
 

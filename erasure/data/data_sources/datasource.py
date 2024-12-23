@@ -46,6 +46,8 @@ class DataSource(Configurable):
         """
         data = self.create_data()
 
+        
+
         if not self.check_integrity(data):
             raise ValueError(f"Integrity check failed for data source: {self.get_name()}")
 
