@@ -38,9 +38,6 @@ class DataSource(Configurable):
             return self.get_extended_wrapper(data)
         else:
             return self.get_simple_wrapper(data)
-    
-    def get_extended_wrapper(self, data):
-        return self.get_extended_wrapper(data)
 
     def check_integrity(self, dataset: DatasetWrapper) -> bool:
         """
