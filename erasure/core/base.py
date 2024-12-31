@@ -1,5 +1,6 @@
 
 import hashlib
+import os
 from pathlib import Path
 import pickle
 from erasure.utils.config.global_ctx import Global, bcolors
@@ -47,6 +48,7 @@ class Configurable(Base):
 class Saveable(Configurable):
 
     CACHE_DIR = 'resources/cached'
+    os.makedirs(CACHE_DIR, exist_ok=True)
 
     def __pre_init__(self):
         if not self.global_ctx.cached:
