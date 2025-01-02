@@ -39,6 +39,7 @@ class Attack(MembershipInference):
         fr = (target_forget[0] - original_forget[0]) / original_forget[1]
         self.info(f"Forgetting Rate: {fr}")
         e.add_value("Forgetting Rate", fr)
+        #TODO: Be more compliant with the litterature (possible removing forgetting rate)
 
         return e
 

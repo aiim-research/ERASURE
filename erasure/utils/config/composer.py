@@ -17,6 +17,14 @@ def compose(config):
         print("Incomplete/error configuration in:"+json.dumps(config, indent=2))
         raise
 
+'''def sort_cfg(config):
+    for item in config:
+        inner_sort(item)
+    return config
+
+def inner_sort(node):
+    dict(sorted'''
+
 
 def _process_array(conf):
     try:

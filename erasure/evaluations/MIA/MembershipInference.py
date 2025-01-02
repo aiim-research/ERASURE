@@ -11,21 +11,29 @@ class MembershipInference(Measure):
         abstract class that creates shadow models
     """
 
-    def __init__(self, global_ctx: Global, local_ctx):
-        super().__init__(global_ctx, local_ctx)
-
+    '''def __init__(self, global_ctx: Global, local_ctx):
+        super().__init__(global_ctx, local_ctx)'''
+    def init(self):
         self.n_shadows = self.local.config['parameters']['shadows']['n_shadows']
-        self.data_out_path = self.local.config['parameters']['shadows']['data_out_path']
+        self.data_out_path = self.local.config['parameters']['shadows']['data_out_path']+'_'+str(self.global_ctx.config.globals['seed'])
         self.train_part_plh = self.local.config['parameters']['shadows']['train_part_plh']
         self.test_part_plh = self.local.config['parameters']['shadows']['test_part_plh']
         self.base_model_cfg = self.params["shadows"]["base_model"]
-        self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]
+
+        self.local_config["parameters"]["attack_in_data"]["parameters"]['DataSource']["parameters"]['path'] += '_'+str(self.global_ctx.config.globals['seed'])
+
+        self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]        
 
         self.forget_part = 'forget'
         #self.test_part = 'test'
 
-        self.dataset = global_ctx.factory.get_object(Local(self.local.config['parameters']['shadows']['shadow_in_data']))
-        self.dataset.add_partitions(self.local.config['parameters']['shadows']['dataset_preproc'])
+
+        data_cfg = self.local.config['parameters']['shadows']['shadow_in_data']
+        data_cfg['parameters']['partitions'] += self.local.config['parameters']['shadows']['dataset_preproc']
+        self.attack_in_data_cfg['generated_from']=data_cfg
+
+        self.dataset = self.global_ctx.factory.get_object(Local(data_cfg))
+        #self.dataset.add_partitions(self.local.config['parameters']['shadows']['dataset_preproc']) #TODO: add_partition can be removed
 
         # Shadow Models
         shadow_models = []
@@ -47,6 +55,18 @@ class MembershipInference(Measure):
 
     def check_configuration(self):
         super().check_configuration()
+
+        if "base_model" not in self.params["shadows"]:
+            self.params["shadows"]["base_model"] = self.global_ctx.config.predictor #TODO: cache not fully work if copyed orgiinal
+
+        if "shadow_in_data" not in self.params["shadows"]:
+            self.local.config['parameters']['shadows']['shadow_in_data']=self.global_ctx.config.data
+
+
+
+
+
+
         #init_dflts_to_of(self.local.config, 'function', 'sklearn.metrics.accuracy_score') # Default empty node for: sklearn.metrics.accuracy_score
         #self.local.config['parameters']['partition'] = self.local.config['parameters'].get('partition', 'test')  # Default partition: test
         #self.local.config['parameters']['name'] = self.local.config['parameters'].get('name', self.local.config['parameters']['function']['class'])  # Default name as metric name

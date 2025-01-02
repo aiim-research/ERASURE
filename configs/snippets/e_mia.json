@@ -42,9 +42,7 @@
             "parameters": {}
           }
         }
-      },
-     
-      
+      },   
       "shadows": {
         "n_shadows": 5,
         "data_out_path": "resources/data/mia/mia.pt",
@@ -60,63 +58,6 @@
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
             "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.8, "ref_data": "shadow_data"}
-          }
-        ,
-        "shadow_in_data": {
-          "class": "erasure.data.datasets.DatasetManager.DatasetManager",
-          "parameters": {
-            "DataSource": {
-              "class": "erasure.data.data_sources.TVDataSource.TVDataSource",
-              "parameters": {
-                "path": "torchvision.datasets.FashionMNIST", "transform":["ToTensor"]
-              }
-            },
-            "partitions": [
-              { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                "parameters": {"parts_names": ["all_reduced", "-"], "percentage": 0.0125}
-              },
-              { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-                "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
-              },
-              { "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
-                "parameters": {"parts_names": ["forget", "retain"], "label": 1, "ref_data": "train"}
-              },
-              { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
-                "parameters": {"parts_names": ["example", "-"], "n_samples": 100, "ref_data": "forget"}
-              }
-            ],
-            "batch_size": 128,
-            "split_seed": 16
-          }
-        },
-        "base_model": {
-          "class": "erasure.model.TorchModel.TorchModel",
-          "parameters": {
-            "epochs": 50,
-            "optimizer": {
-              "class": "torch.optim.RMSprop",
-              "parameters": {
-                "lr": 0.01
-              }
-            },
-            "loss_fn": {
-              "class": "torch.nn.CrossEntropyLoss",
-              "parameters": {
-                "reduction": "mean"
-              }
-            },
-            "model": {
-              "class": "erasure.model.cnns.standardCNN.FashionCNN",
-              "parameters": {}
-            }
-          }
-        }                
-      },
-      "gold_model": {
-          "class": "erasure.unlearners.GoldModel.GoldModel",
-          "parameters": {
-            "ref_data": "forget",
-            "train_data": "train"
           }
       }
     }

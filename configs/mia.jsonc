@@ -49,6 +49,8 @@
     }
   },
   "unlearners": [
+    {"compose_idt" : "configs/snippets/u_id.json"},
+    {"compose_idt" : "configs/snippets/u_id.json"},
     {"compose_idt" : "configs/snippets/u_id.json"}
   ],
   "evaluator": {
@@ -58,5 +60,9 @@
         {"compose_mia" : "configs/snippets/e_mia.json"}
       ]
     }
-  }
+  },
+  "globals":{
+        "seed": 1046534644,
+        "cached": "true"
+    }
 }

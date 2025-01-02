@@ -1,13 +1,13 @@
 {
-    "class": "erasure.evaluations.MIA.lira.Attack",
+    "class": "erasure.evaluations.MIA.umia.Attack",
     "parameters": {
-      "attack_in_data": {
+      "data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
         "parameters": {
           "DataSource": {
             "class": "erasure.data.data_sources.TorchFileDataSource.TorchFileDataSource",
             "parameters": {
-              "path": "resources/data/lira/lira.pt"
+              "path": "resources/data/umia/umia.pt"
             }
           },
           "partitions": [
@@ -19,11 +19,10 @@
           "split_seed": 16
         }
       },
-
-      "attack_model": {
+      "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 50,
+          "epochs": 5,
           "optimizer": {
             "class": "torch.optim.RMSprop",
             "parameters": {
@@ -41,25 +40,6 @@
             "parameters": {}
           }
         }
-      },
-     
-      
-      "shadows": {
-        "n_shadows": 10,
-        "data_out_path": "resources/data/lira/lira.pt",
-        "train_part_plh":"shw_train",
-        "test_part_plh":"shw_test",
-        "dataset_preproc":[
-          {
-            "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 0.5, "ref_data": "forget"}
-          }
-        ],
-        "per_shadows_partition":      
-          {
-            "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.8, "ref_data": "shadow_data"}
-          }              
       }
     }
-}
+  }

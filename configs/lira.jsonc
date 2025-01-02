@@ -49,14 +49,7 @@
     }
   },
   "unlearners": [
-    {"compose_idt" : "configs/snippets/u_id.json"},
-    {
-        "class": "erasure.unlearners.GoldModel.GoldModel",
-        "parameters": {
-          "ref_data": "forget",
-          "train_data": "train"
-        }
-    }
+    {"compose_idt" : "configs/snippets/u_id.json"}
   ],
   "evaluator": {
     "class": "erasure.evaluations.manager.Evaluator",
@@ -65,5 +58,9 @@
         {"compose_lira" : "configs/snippets/e_lira.json"}
       ]
     }
-  }
+  },
+  "globals":{
+        "seed": 1046534644,
+        "cached": "true"
+    }
 }
