@@ -16,10 +16,10 @@ class IRISpreprocess(Preprocess):
         self.label_mapping = {label: idx for idx, label in enumerate(set(self.string_labels))}
 
 
-    def process(self, X, y):
+    def process(self, X, y, Z):
         
         X = torch.tensor(list(X.values()), dtype=torch.float32).unsqueeze(0)
         
         y = torch.tensor(self.label_mapping[y], dtype=torch.long)
 
-        return X, y
+        return X, y , Z

@@ -1,8 +1,7 @@
 from abc import ABCMeta
 import re
-from erasure.utils.config.global_ctx import set_seed 
+#from erasure.utils.config.global_ctx import set_seed 
 
-set_seed(1)
 from erasure.core.base import Base
 from erasure.utils.logger import GLogger
       
@@ -11,7 +10,7 @@ class ConfigurableFactory(Base,metaclass=ABCMeta):
         super().__init__(global_ctx)
 
     def get_object(self, local_ctx):
-        set_seed(1)
+        self.global_ctx.set_seed(1)
         base_obj = get_class(local_ctx.config['class'])(self.global_ctx, local_ctx)
         self.info("Created Configurable: "+ str(local_ctx.config['class']))
         return base_obj
@@ -26,7 +25,7 @@ def get_instance_kvargs(kls, param):
 
 def get_function(func):    
     func = get_class( func )
-    GLogger.getLogger().info("Loaded: "+str(func))
+    GLogger.getLogger().info("Function: "+str(func))
     return  func
 
 def get_instance_config(config):

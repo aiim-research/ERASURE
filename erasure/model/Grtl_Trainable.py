@@ -7,7 +7,7 @@ from erasure.core.base import Configurable
 from erasure.utils.config.global_ctx import Global, clean_cfg
 
 # TODO: REMOVE
-class GRTL_Trainable(Configurable, metaclass=ABCMeta):
+class GGRTL_Trainable(Configurable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx, local_ctx):
         super().__init__(global_ctx, local_ctx)

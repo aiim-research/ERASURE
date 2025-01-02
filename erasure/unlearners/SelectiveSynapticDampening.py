@@ -40,7 +40,9 @@ class SelectiveSynapticDampening(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Selective Synaptic Dampening unlearning algorithm proposed by https://arxiv.org/abs/2308.07707. 
+        An implementation of the Selective Synaptic Dampening unlearning algorithm proposed in the following paper:
+        "Foster, J., Schoepf, S. and Brintrup, A., 2024, March. Fast machine unlearning without retraining through selective synaptic dampening. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 38, No. 11, pp. 12043-12051)."
+        
         Codebase taken from the original implementation: https://github.com/if-loops/selective-synaptic-dampening/tree/main
         """
 

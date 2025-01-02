@@ -4,6 +4,8 @@ matplotlib
 torch
 torchvision
 torch_geometric
-picologging
+picologging==0.9.2
 jsonc_parser
 jsonpickle
+pandas
+PyYAML

@@ -11,13 +11,11 @@ class HFDatasetWrapper(DatasetWrapper):
         super().__init__(data,preprocess)
         self.label = label
 
-    def __getitem__(self, index: int):
+    def __realgetitem__(self, index: int):
         sample = self.data[index]
 
         X = {key:value for key,value in sample.items() if key != self.label}
         y = sample[self.label]
-
-        X,y = self.apply_preprocessing(X,y)
         return X,y
 
 class HFDataSource(DataSource):
@@ -45,5 +43,5 @@ class HFDataSource(DataSource):
 
         return dataset
     
-    def get_wrapper(self, data):
+    def get_simple_wrapper(self, data):
         return HFDatasetWrapper(data, self.preprocess, self.label)

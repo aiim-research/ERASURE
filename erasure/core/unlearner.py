@@ -16,7 +16,7 @@ class Unlearner(Configurable, metaclass=ABCMeta):
 
     def unlearn(self):
         self.__preprocess__()
-        self.info('Unlearning on predictor: '+str(self.predictor))
+        self.info('Unlearning copyed predictor: '+str(self.predictor))
         new_model = self.__unlearn__()
         self.__postprocess__()
         return new_model

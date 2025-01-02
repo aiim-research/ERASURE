@@ -1,11 +1,11 @@
 import pickle
 import time
 from abc import ABCMeta, abstractmethod
-from erasure.core.base import Configurable
+from erasure.core.base import Configurable, Saveable
 from erasure.data.datasets.Dataset import DatasetWrapper
 from erasure.utils.config.global_ctx import Global
 
-class Trainable(Configurable, metaclass=ABCMeta):
+class Trainable(Saveable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx: Global, local_ctx):
         self.dataset = local_ctx.dataset
@@ -36,6 +36,7 @@ class Trainable(Configurable, metaclass=ABCMeta):
     def create(self):
         self.fit()
 
+    '''
     def write(self):
         filepath = self.global_ctx.get_path(self)
         dump = {
@@ -52,6 +53,7 @@ class Trainable(Configurable, metaclass=ABCMeta):
                 dump = pickle.load(f)
                 self.model = dump['model']
                 #self.local_config = dump['config']
+    '''
 
     @abstractmethod
     def real_fit(self):
@@ -60,7 +62,11 @@ class Trainable(Configurable, metaclass=ABCMeta):
     def check_configuration(self):
         super().check_configuration()
         self.local_config['parameters']['fold_id'] =  self.local_config['parameters'].get('fold_id', -1)
-        self.fold_id = self.local_config['parameters']['fold_id'] 
+        self.local.config['parameters']['training_set'] = self.local.config['parameters'].get("training_set", "train")
+
+        # The following parameteres must be setted typically init(); here for simplicity since they are simple datatypes (i.e, string, number)
+        self.fold_id = self.local_config['parameters']['fold_id']
+        self.training_set = self.local.config['parameters']['training_set']
     
 
     

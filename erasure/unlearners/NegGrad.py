@@ -20,10 +20,10 @@ class NegGrad(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Negative Gradient (NegGrad) unlearning algorithm for selective forgetting as proposed by https://arxiv.org/abs/1911.04933. This method fine-tunes the model to forget specific data points by reversing the gradient direction on the forget data, encouraging the model to minimize the influence of these samples.
+        An implementation of the Negative Gradient unlearning algorithm proposed in the following paper:
+        "Golatkar, A., Achille, A. and Soatto, S., 2019. Eternal sunshine of the spotless net: Selective forgetting in deep networks. In 2020 IEEE. In CVF Conference on Computer Vision and Pattern Recognition (CVPR) (pp. 9301-9309)."
         
-        For each sample in the forget data (forget_set), the stochastic gradient ascent is applied, effectively pushing the model to unlearn the patterns associated with these specific samples.
-
+        Codebase taken from this implementation: https://github.com/ndb796/MachineUnlearning
         """
 
         self.global_ctx.logger.info(f'Starting NegGrad with {self.epochs} epochs')

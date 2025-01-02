@@ -14,11 +14,12 @@ class DatasetManager(Configurable):
     def __init__(self, global_ctx, local_ctx):
         super().__init__(global_ctx, local_ctx)
         self.partitions = {}
-        self.info(self.params['DataSource'])
-        self.__init_preprocess__(global_ctx)
+
         self.datasource = global_ctx.factory.get_object( Local (self.params['DataSource']) )
-        self.datasource.set_preprocess(self.preprocess)
+        self.info(self.params['DataSource'])
+        
         self.partitions['all'] = self.datasource.create_and_validate_data()
+        
         self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)
         self.batch_size=self.params['batch_size']
@@ -29,13 +30,6 @@ class DatasetManager(Configurable):
 
         self.__prepare_partitions()
 
-    def __init_preprocess__(self, global_ctx):
-        self.preprocess = []
-        preprocesses =  self.params.get('preprocess',[])
-
-        for preprocess in preprocesses:
-            current = Local(preprocess)
-            self.preprocess.append( global_ctx.factory.get_object( current ) )
 
     def __prepare_partitions(self):
         self.add_partitions(self.parts_cfgs)

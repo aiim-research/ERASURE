@@ -3,7 +3,7 @@ import random
 from torch.utils.data import Subset
 from erasure.core.base import Configurable
 from .Dataset import DatasetWrapper
-from erasure.data.data_sources.datasource import DataSource
+
 
 
 class DataSplitter(ABC):
@@ -15,7 +15,7 @@ class DataSplitter(ABC):
     def split_data(self, data):
         pass
 
-    def set_source(self, datasource : DataSource):
+    def set_source(self, datasource):
         self.source = datasource
 
     
@@ -25,7 +25,7 @@ class DataSplitterPercentage(DataSplitter):
         self.percentage = percentage
 
     def split_data(self,partitions):
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
 
         total_size = len(ref_data.data)
         split_point = int(total_size * self.percentage)
@@ -48,14 +48,13 @@ class DataSplitterClass(DataSplitter):
 
     def split_data(self,partitions):
 
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
-
-        ##TODO fix this for UCI
-
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        
         filtered_indices = [
             idx for idx in range(len(ref_data))  
             if ref_data[idx][1] == self.label  
         ]
+        
 
         other_indices = [
             idx for idx in range(len(ref_data)) 
@@ -75,7 +74,7 @@ class DataSplitterNSamples(DataSplitter):
 
     def split_data(self,partitions):
         
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
         
         split_point = self.n_samples if self.n_samples is not None else 0
 
@@ -96,7 +95,7 @@ class DataSplitterList(DataSplitter):
 
     def split_data(self,partitions):
         
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
 
                 
         indices = ref_data.data.indices
