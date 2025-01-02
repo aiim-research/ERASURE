@@ -1,6 +1,6 @@
 {
 
-    "class": "erasure.evaluations.mia.MembershipInference",
+    "class": "erasure.evaluations.MIA.mia.Attack",
     "parameters": {
       "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",

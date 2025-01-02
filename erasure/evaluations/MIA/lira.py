@@ -1,4 +1,3 @@
-import copy
 from copy import deepcopy
 import os
 
@@ -6,14 +5,12 @@ import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
 
-from erasure.core.measure import Measure
+from erasure.evaluations.MIA.MembershipInference import MembershipInference
 from erasure.evaluations.evaluation import Evaluation
-from erasure.evaluations.mia import MembershipInference
-from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 
 
-class LikelihoodRatio(MembershipInference):
+class Attack(MembershipInference):
     """ Likelihood Ratio membership inference Attack (LiRA)
         (https://doi.org/10.48550/arXiv.2403.01218)
         the Carlini way
