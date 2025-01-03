@@ -3,6 +3,7 @@ import hashlib
 import os
 from pathlib import Path
 import pickle
+from erasure.utils.config.composer import sort_json
 from erasure.utils.config.global_ctx import Global, bcolors
 from abc import abstractmethod
 
@@ -103,14 +104,22 @@ class Saveable(Configurable):
 
 def __resolve_cfg_with_context__(inst):
     dictionary = {'globals':dict(sorted(inst.global_ctx.config.globals.items()))}
+    
 
     for k, v in sorted(inst.local.__dict__.items()):
         if isinstance (v, Configurable):
             dictionary[k]=__resolve_cfg_with_context__(v)
         elif(isinstance (v, dict)):
-            dictionary[k]=dict(sorted(v.items())) #TODO: Ordinerare ricorsivamente anche i sotto-dizionari
-
+            __nested_sort(v)
+            dictionary[k]=dict(sorted(v.items())) #TODO: Ordinare ricorsivamente anche i sotto-dizionari
+    
     return dictionary
+
+def __nested_sort(node):
+    for k, v in sorted(node.items()):
+        if(isinstance (v, dict)):
+            __nested_sort(v)
+            node[k]=dict(sorted(v.items()))
 
     
 

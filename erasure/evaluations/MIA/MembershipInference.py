@@ -57,10 +57,10 @@ class MembershipInference(Measure):
         super().check_configuration()
 
         if "base_model" not in self.params["shadows"]:
-            self.params["shadows"]["base_model"] = self.global_ctx.config.predictor #TODO: cache not fully work if copyed orgiinal
+            self.params["shadows"]["base_model"] = copy.deepcopy(self.global_ctx.config.predictor) #TODO: cache not fully work if copyed orgiinal
 
         if "shadow_in_data" not in self.params["shadows"]:
-            self.local.config['parameters']['shadows']['shadow_in_data']=self.global_ctx.config.data
+            self.local.config['parameters']['shadows']['shadow_in_data']=copy.deepcopy(self.global_ctx.config.data)
 
 
 

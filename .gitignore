@@ -1,6 +1,7 @@
 __pycache__/
 output/logs
 .idea/
+.DS_Store
 train_loader/*
 configs/example_hf.jsonc
 configs/example_uci.jsonc
