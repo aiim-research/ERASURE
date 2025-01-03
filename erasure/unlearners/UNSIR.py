@@ -18,15 +18,11 @@ class Noise(nn.Module):
         return self.noise
 
 class UNSIR(TorchUnlearner):
-    def __init__(self, global_ctx: Global, local_ctx):
+    def init(self):
         """
         Initializes the UNSIR class with global and local contexts.
-
-        Args:
-            global_ctx (Global): The global context containing configurations and shared resources.
-            local_ctx (Local): The local context containing specific configurations for this instance.
         """
-        super().__init__(global_ctx, local_ctx)
+        super().init()
 
         self.epochs = self.local.config['parameters']['epochs'] 
         self.ref_data_retain = self.local.config['parameters']['ref_data_retain']

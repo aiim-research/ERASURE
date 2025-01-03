@@ -3,9 +3,9 @@ from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 
 class Cascade(Unlearner):
-    def __init__(self, global_ctx: Global, local_ctx):
+    def init(self):
        
-        super().__init__(global_ctx, local_ctx)
+        super().init()
 
         sub_unlearner_cfg = self.local.config['parameters']['sub_unlearner']
 
@@ -15,7 +15,7 @@ class Cascade(Unlearner):
             current = Local(sub_un)
             current.dataset = self.dataset
             current.predictor = self.predictor
-            self.sub_unlearners.append( global_ctx.factory.get_object(current))
+            self.sub_unlearners.append(self.global_ctx.factory.get_object(current))
 
     
     def unlearn(self):

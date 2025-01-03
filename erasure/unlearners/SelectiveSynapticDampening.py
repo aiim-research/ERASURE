@@ -10,16 +10,12 @@ from torch.utils.data import DataLoader
 from typing import Dict, List
 
 class SelectiveSynapticDampening(TorchUnlearner):
-    def __init__(self, global_ctx: Global, local_ctx):
+    def init(self):
         """
         Initializes the AdvancedNegGrad class with global and local contexts.
-
-        Args:
-            global_ctx (Global): The global context containing configurations and shared resources.
-            local_ctx (Local): The local context containing specific configurations for this instance.
         """
 
-        super().__init__(global_ctx, local_ctx)
+        super().init()
 
         self.ref_data_train = self.local.config['parameters']['ref_data_train']
         self.ref_data_forget = self.local.config['parameters']['ref_data_forget']
@@ -46,7 +42,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
         Codebase taken from the original implementation: https://github.com/if-loops/selective-synaptic-dampening/tree/main
         """
 
-        self.global_ctx.logger.info('Starting Selective Synaptic Dampening')
+        self.info('Starting Selective Synaptic Dampening')
 
         train_loader, _ = self.dataset.get_loader_for(self.ref_data_train, Fraction('0'))
 
@@ -65,7 +61,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
 
         ssd.modify_weight(original_importances, sample_importances)
 
-        self.global_ctx.logger.info(f'Selective Synaptic Dampening completed')
+        self.info(f'Selective Synaptic Dampening completed')
         
         return self.predictor
 

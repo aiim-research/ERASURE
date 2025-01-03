@@ -83,7 +83,7 @@ class DatasetManager(Configurable):
 
         return main_loader, fold_loader
 
-    def revise_split(self, split_id, ids_list, additive=False):
+    '''def revise_split(self, split_id, ids_list, additive=False):
         #TODO This method must be removed or updated ask to Andrea + Claudio
         #print(f"REVISING SPLIT {split_id} with {len(ids_list)} samples")
         #print(f"ids_list: {ids_list}")
@@ -92,7 +92,7 @@ class DatasetManager(Configurable):
             #print(ids_list)
             self.partitions[split_id] = [sample for sample in self.partitions[split_id] if sample not in ids_list]
         else:
-            self.partitions[split_id] = list(set(self.partitions[split_id] + ids_list))
+            self.partitions[split_id] = list(set(self.partitions[split_id] + ids_list))'''
 
         
     def get_dataset_from_partition(self, split_id):

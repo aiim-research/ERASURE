@@ -15,22 +15,18 @@ from erasure.utils.config.local_ctx import Local
 from erasure.utils.cfg_utils import init_dflts_to_of
 
 class BadTeaching(TorchUnlearner):
-    def __init__(self, global_ctx: Global, local_ctx):
+    def init(self):
         """
         Initializes the Bad Teaching class with global and local contexts.
-
-        Args:
-            global_ctx (Global): The global context containing configurations and shared resources.
-            local_ctx (Local): The local context containing specific configurations for this instance.
         """
 
-        super().__init__(global_ctx, local_ctx)
+        super().init()
 
         self.epochs = self.local.config['parameters']['epochs']
         self.ref_data_retain = self.local.config['parameters']['ref_data_retain']
         self.ref_data_forget = self.local.config['parameters']['ref_data_forget']
         self.transform = self.local.config['parameters']['transform']
-        self.batch_size = self.local.config['parameters']['batch_size']
+        self.batch_size = self.dataset.batch_size
         self.KL_temperature = self.local.config['parameters']['KL_temperature']
 
         self.optimizer = self.local.config['parameters']['optimizer']
@@ -40,9 +36,8 @@ class BadTeaching(TorchUnlearner):
         self.optimizer = optimizer_class(self.predictor.model.parameters(), **self.optimizer["parameters"])
 
         self.cfg_bad_teacher = self.local.config['parameters']['bad_teacher']
-        current = Local(self.cfg_bad_teacher)
-        current.dataset = self.dataset
-        self.bad_teacher = self.global_ctx.factory.get_object(current)
+        self.current = Local(self.cfg_bad_teacher)
+        self.current.dataset = self.dataset
 
     def UnlearnerLoss(self, output, labels, full_teacher_logits, unlearn_teacher_logits, KL_temperature):
         labels = torch.unsqueeze(labels, dim = 1)
@@ -84,8 +79,10 @@ class BadTeaching(TorchUnlearner):
         Codebase taken from the original implementation: https://github.com/vikram2000b/bad-teaching-unlearning
         """
 
-        self.global_ctx.logger.info(f'Starting BadTeaching with {self.epochs} epochs')
+        self.info(f'Starting BadTeaching with {self.epochs} epochs')
 
+        self.bad_teacher = self.global_ctx.factory.get_object(self.current)
+        
         self.retain_set = self.dataset.get_dataset_from_partition(self.ref_data_retain)
         self.forget_set = self.dataset.get_dataset_from_partition(self.ref_data_forget)
 
@@ -95,7 +92,7 @@ class BadTeaching(TorchUnlearner):
         unlearning_data = UnLearningData(forget_data=forget_data, retain_data=retain_data, transform=self.transform)
         unlearning_loader = DataLoader(unlearning_data, batch_size = self.batch_size, shuffle=True)
 
-        print("Number of steps per epoch: ", len(unlearning_loader))
+        self.info(f'Number of steps per epoch: { len(unlearning_loader)}')
 
         good_teacher = copy.deepcopy(self.predictor.model)
 
@@ -106,7 +103,7 @@ class BadTeaching(TorchUnlearner):
             loss = self.unlearning_step(model = self.predictor.model, unlearning_teacher= good_teacher, 
                             full_trained_teacher=self.bad_teacher.model, unlearn_data_loader=unlearning_loader, 
                             optimizer=self.optimizer, device=self.device, KL_temperature=self.KL_temperature)
-            print("Epoch {} Unlearning Loss {}".format(epoch, loss))
+            self.info(f'Epoch {epoch} Unlearning Loss {loss}')
             
         return self.predictor
 
@@ -118,12 +115,19 @@ class BadTeaching(TorchUnlearner):
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
 
         self.local.config['parameters']['transform'] = self.local.config['parameters'].get("transform", None) # Default transformation applied to the data is None
-        self.local.config['parameters']['batch_size'] = self.local.config['parameters'].get("batch_size", 64) # Default batch size is 64
         self.local.config['parameters']['KL_temperature'] = self.local.config['parameters'].get("KL_temperature", 1.0) # Default KL temperature is 1.0
 
         init_dflts_to_of(self.local.config, 'optimizers', 'torch.optim.Adam') # Default optimizer is Adam
 
-        self.local.config['parameters']['bad_teacher'] = self.local.config['parameters'].get("bad_teacher", self.global_ctx.config.__dict__['predictor']) # Default bad teacher is the original predictor (this is discouraged)
+        if 'bad_teacher' not in self.local.config['parameters']: 
+            self.local.config['parameters']['bad_teacher'] = copy.deepcopy(self.global_ctx.config.predictor) # Default bad teacher is the original predictor (this is discouraged)
+            self.local.config['parameters']['bad_teacher']['parameters']['cached'] = False
+            self.local.config['parameters']['bad_teacher']['parameters']['epochs'] = 0
+            self.local.config['parameters']['bad_teacher']['parameters']['training_set'] = self.local.config['parameters']['ref_data_retain']
+        else: 
+            self.local.config['parameters']['predictor']['parameters']['training_set'] = self.local.config['parameters']['predictor']['parameters'].get('training_set',self.local.config['parameters']['ref_data_retain'])
+
+        self.local.config['parameters']['bad_teacher']['parameters']['cached'] = self.local.config['parameters']['bad_teacher']['parameters'].get('cached',False)
 
 class UnLearningData(Dataset):
     def __init__(self, forget_data, retain_data, transform):

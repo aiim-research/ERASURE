@@ -4,16 +4,12 @@ from fractions import Fraction
 
 
 class NegGrad(TorchUnlearner):
-    def __init__(self, global_ctx: Global, local_ctx):
+    def init(self):
         """
         Initializes the NegGrad class with global and local contexts.
-
-        Args:
-            global_ctx (Global): The global context containing configurations and shared resources.
-            local_ctx (Local): The local context containing specific configurations for this instance.
         """
 
-        super().__init__(global_ctx, local_ctx)
+        super().init()
 
         self.epochs = self.local.config['parameters']['epochs']  
         self.ref_data = self.local.config['parameters']['ref_data'] 
@@ -26,7 +22,7 @@ class NegGrad(TorchUnlearner):
         Codebase taken from this implementation: https://github.com/ndb796/MachineUnlearning
         """
 
-        self.global_ctx.logger.info(f'Starting NegGrad with {self.epochs} epochs')
+        self.info(f'Starting NegGrad with {self.epochs} epochs')
 
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
 
@@ -51,7 +47,7 @@ class NegGrad(TorchUnlearner):
                 self.predictor.optimizer.step()
             
             epoch_loss = sum(losses) / len(losses)
-            self.global_ctx.logger.info(f'NegGrad - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
+            self.info(f'NegGrad - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
 
             self.predictor.lr_scheduler.step()
         

@@ -3,7 +3,6 @@ import hashlib
 import os
 from pathlib import Path
 import pickle
-from erasure.utils.config.composer import sort_json
 from erasure.utils.config.global_ctx import Global, bcolors
 from abc import abstractmethod
 
@@ -34,7 +33,6 @@ class Configurable(Base):
     def check_configuration(self):
         self.local.config['parameters'] = self.local.config.get('parameters',{})
 
-
     def __pre_init__(self):
         return False
 
@@ -50,14 +48,18 @@ class Saveable(Configurable):
 
     CACHE_DIR = 'resources/cached'
     os.makedirs(CACHE_DIR, exist_ok=True)
+    
+    def check_configuration(self):
+        super().check_configuration()
+        self.local.config['parameters']['cached'] = self.local.config['parameters'].get('cached',self.global_ctx.cached)
 
     def __pre_init__(self):
-        if not self.global_ctx.cached:
+        if not self.local.config['parameters']['cached']:
             return False
 
         file_name = Saveable.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()
         
-        if Path(file_name).exists():
+        if Path(file_name).exists(): #TODO: Disable Cache for unlearners
             try :
                 with open (file_name, "rb") as file_handle :
                     self.__dict__ = pickle.load (file_handle)
@@ -70,7 +72,7 @@ class Saveable(Configurable):
 
     def __post_init__(self):
 
-        if not self.global_ctx.cached:
+        if not self.local.config['parameters']['cached']:
             return False
 
         file_name = Saveable.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()

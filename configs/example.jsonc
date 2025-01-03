@@ -6,8 +6,10 @@
                                 }, 
                     "partitions":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_reduced","-"], "percentage":0.0125}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_reduced"}},
-                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterClass", "parameters": {"parts_names":["forget","retain"], "label":1, "ref_data": "train"} },
-                                 { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"parts_names":["example","-"], "n_samples":100, "ref_data":"forget"}}
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train"}},
+
+                                  //{"class": "erasure.data.datasets.DataSplitter.DataSplitterClass", "parameters": {"parts_names":["forget","retain"], "label":1, "ref_data": "train"}},
+                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"parts_names":["example","-"], "n_samples":100, "ref_data":"forget"}}
                                 ],
                     "batch_size":128,
                     "split_seed":16}
@@ -37,10 +39,11 @@
 
     "unlearners":[{
         "class": "erasure.unlearners.GoldModel.GoldModel",
-        "parameters": {
-          "ref_data": "forget", 
-          "train_data": "train"
-        }
+        "parameters": {"cached":true}
     }],
-    "compose_eval":"configs/snippets/default_evaluation.json"
+    "compose_eval":"configs/snippets/default_evaluation.json",
+    "globals":{
+        "seed": 1046534644,
+        "cached": true
+    }
   }

@@ -41,8 +41,7 @@
                   }
               }
           ],
-          "batch_size": 256,
-          "split_seed": 16
+          "batch_size": 256
       }
   },
   "predictor": {

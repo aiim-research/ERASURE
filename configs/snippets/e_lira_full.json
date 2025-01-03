@@ -15,8 +15,7 @@
               "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
             }
           ],
-          "batch_size": 128,
-          "split_seed": 16
+          "batch_size": 128
         }
       },
 

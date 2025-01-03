@@ -34,7 +34,9 @@ class TorchModel(Trainable):
         
         self.lr_scheduler =  lr_scheduler.LinearLR(self.optimizer, start_factor=1.0, end_factor=0.5, total_iters=self.epochs)
 
-        self.training_set = self.local.config['parameters'].get("training_set", "train")
+        self.training_set = self.local.config['parameters']['training_set']
+
+
 
         self.device = (
             "cuda"
@@ -132,9 +134,10 @@ class TorchModel(Trainable):
         init_dflts_to_of(local_config, 'optimizer', 'torch.optim.Adam',lr=0.001)
         init_dflts_to_of(local_config, 'loss_fn', 'torch.nn.BCELoss')
 
-        self.local_config['parameters']['model']['parameters']['n_classes'] = self.dataset.n_classes
+        local_config['parameters']['model']['parameters']['n_classes'] = self.dataset.n_classes
 
         local_config['parameters']['alias'] = local_config['parameters']['model']['class']
+        local_config['parameters']['training_set'] = local_config['parameters'].get("training_set", "train")
 
         
     def accuracy(self, testy, probs):

@@ -39,8 +39,7 @@
                   }
               }
           ],
-          "batch_size": 128,
-          "split_seed": 16
+          "batch_size": 128
       }
   },
   "predictor": {
@@ -78,33 +77,13 @@
                       "lr": 0.01
                   }
               },
-              "batch_size": 64,
-              "KL_temperature": 1.0,
-              "bad_teacher": {
-                    "class": "erasure.model.TorchModel.TorchModel",
-                    "parameters": {
-                        "epochs": 0,
-                        "training_set": "retain",
-                        "optimizer": {
-                            "class": "torch.optim.Adam",
-                            "parameters": {
-                                "lr": 0.01
-                            }
-                        },
-                        "loss_fn": {
-                            "class": "torch.nn.CrossEntropyLoss",
-                            "parameters": {
-                                "reduction": "mean"
-                            }
-                        },
-                        "model": {
-                            "class": "erasure.model.cnns.standardCNN.FashionCNN",
-                            "parameters": {}
-                        }
-                    }
-                }
+              "KL_temperature": 1.0
           }
       }
   ],
-  "compose_eval":"configs/snippets/default_evaluation.json"
+  "compose_eval":"configs/snippets/default_evaluation.json",
+  "globals":{
+        "seed": 1046534644,
+        "cached": "true"
+    }
 }

@@ -4,16 +4,12 @@ from fractions import Fraction
 
 
 class Finetuning(TorchUnlearner):
-    def __init__(self, global_ctx: Global, local_ctx):
+    def init(self):
         """
         Initializes the Finetuning class with global and local contexts.
-
-        Args:
-            global_ctx (Global): The global context containing configurations and shared resources.
-            local_ctx (Local): The local context containing specific configurations for this instance.
         """
 
-        super().__init__(global_ctx, local_ctx)
+        super().init()
 
         self.epochs = self.local.config['parameters']['epochs'] 
         self.ref_data = self.local.config['parameters']['ref_data'] 
@@ -23,7 +19,7 @@ class Finetuning(TorchUnlearner):
         Fine-tunes the model with a specific (sub)set of the full dataset (usually retain set)
         """
 
-        self.global_ctx.logger.info(f'Starting Finetuning with {self.epochs} epochs')
+        self.info(f'Starting Finetuning with {self.epochs} epochs')
 
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
         
@@ -45,7 +41,7 @@ class Finetuning(TorchUnlearner):
                 self.predictor.optimizer.step()
             
             epoch_loss = sum(losses) / len(losses)
-            self.global_ctx.logger.info(f'Finetuning - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
+            self.info(f'Finetuning - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
 
             self.predictor.lr_scheduler.step()
         

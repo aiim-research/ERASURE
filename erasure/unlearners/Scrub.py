@@ -21,15 +21,11 @@ class DistillKL(nn.Module):
 
 class Scrub(TorchUnlearner):
 
-    def __init__(self, global_ctx: Global, local_ctx):
+    def init(self):
         """
         Initializes the scrub class with global and local contexts.
-
-        Args:
-            global_ctx (Global): The global context containing configurations and shared resources.
-            local_ctx (Local): The local context containing specific configurations for this instance.
         """
-        super().__init__(global_ctx, local_ctx)
+        super().init()
         
         self.epochs = self.local.config['parameters']['epochs']  
         self.ref_data_retain = self.local.config['parameters']['ref_data_retain'] 
@@ -47,7 +43,7 @@ class Scrub(TorchUnlearner):
         """
 
 
-        self.global_ctx.logger.info(f'Starting scrub with {self.epochs} epochs')
+        self.info(f'Starting scrub with {self.epochs} epochs')
 
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
@@ -117,7 +113,7 @@ class Scrub(TorchUnlearner):
 
             avg_loss_forget = total_loss_forget / len(forget_loader)
 
-            self.global_ctx.logger.info(f'scrub - epoch = {epoch} ---> loss_retain = {avg_loss_retain:.4f} - loss_forget = {avg_loss_forget:.4f}')
+            self.info(f'scrub - epoch = {epoch} ---> loss_retain = {avg_loss_retain:.4f} - loss_forget = {avg_loss_forget:.4f}')
 
                 
         return self.predictor
