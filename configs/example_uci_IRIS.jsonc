@@ -40,11 +40,7 @@
       },
 
     "unlearners":[{
-        "class": "erasure.unlearners.GoldModel.GoldModel",
-        "parameters": {
-          "ref_data": "forget", 
-          "train_data": "train"
-        }
+        "class": "erasure.unlearners.GoldModel.GoldModel","parameters": {}
     }],
 
     "compose_eval":"configs/snippets/default_evaluation.json"
