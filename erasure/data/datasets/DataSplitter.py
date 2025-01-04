@@ -3,8 +3,8 @@ import random
 from torch.utils.data import Subset
 from erasure.core.base import Configurable
 from .Dataset import DatasetWrapper
-
-
+from tqdm import tqdm
+from torch.utils.data import DataLoader
 
 class DataSplitter(ABC):
     def __init__(self, ref_data,parts_names):
@@ -110,3 +110,42 @@ class DataSplitterList(DataSplitter):
 
         return partitions
     
+class DataSplitterByZ(DataSplitter):
+    def __init__(self, z_label, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
+        self.z_label = z_label
+
+
+    def split_data(self,partitions):
+
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        
+        dataloader = DataLoader(ref_data, batch_size=5000)
+
+        filtered_indices = []
+        current_index = 0  # To track the global index of each batch
+        import torch
+        for batch in tqdm(dataloader, desc="Filtering Data"):
+            _, _, Z = batch  # Assuming Z is the third element in the batch
+            
+            # Apply a boolean mask to find matching Z values
+            mask = (Z == self.z_label)
+            matching_indices = torch.nonzero(mask, as_tuple=True)[0]  # Indices within the batch
+            
+            # Convert batch indices to global indices and store them
+            filtered_indices.extend((current_index + matching_indices).tolist())
+            
+            # Update the global index for the next batch
+            current_index += len(Z)
+
+        other_indices = [
+            idx for idx in range(len(ref_data)) 
+            if idx not in filtered_indices
+        ]
+
+        print(len(filtered_indices))
+
+        partitions[self.parts_names[0]] = filtered_indices 
+        partitions[self.parts_names[1]] = other_indices
+
+        return partitions

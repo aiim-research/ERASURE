@@ -45,3 +45,9 @@ class HFDataSource(DataSource):
     
     def get_simple_wrapper(self, data):
         return HFDatasetWrapper(data, self.preprocess, self.label)
+    
+    def check_configuration(self):
+        super().check_configuration()
+        self.local_config['parameters']['path'] = self.local_config['parameters']['path']
+        self.local_config['parameters']['configuration'] = self.local_config.get("configuration","")
+        self.local_config['parameters']['label'] = self.local_config['parameters'].get('label',"")

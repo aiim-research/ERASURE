@@ -14,11 +14,11 @@ class TVDataSource(DataSource):
         super().__init__(global_ctx, local_ctx)
         self.dataset = None
         self.path = self.local_config['parameters']['path']
-        self.transform = self.local_config['parameters'].get('transform',[])
+        self.transform = self.local_config['parameters']['transform']
         self.root_path = self.local_config.get('root_path','resources/data')
-        self.label_column =  self.local_config['parameters']['label_column'] = self.local_config['parameters'].get('label_column', 'targets')
-        #TODO: Change this for everything
-        #TODO: and move to check config
+        self.label_column  = self.local_config['parameters']['label_column']
+
+
     
     def get_name(self):
         return self.path.split(".")[-1] 
@@ -66,6 +66,57 @@ class TVDataSource(DataSource):
 
     def get_simple_wrapper(self, data):
         return DatasetWrapper(data, self.preprocess)
+    
+    def check_configuration(self):
+        super().check_configuration()
+        self.local_config['parameters']['transform'] = self.local_config['parameters'].get('transform',[])
+        self.local_config['parameters']['root_path'] = self.local_config.get('root_path','resources/data')
+        self.local_config['parameters']['label_column'] = self.local_config['parameters'].get('label_column', 'targets')
+    
+
+
+
+class TVDataSourceCelebA(TVDataSource):
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+        self.target_type = self.local_config['parameters']['target_type']
+
+
+    def create_data(self):
+
+        parts = self.path.split('.')
+
+        lib = __import__( parts[0] )
+        m = lib
+        for part in parts[1:-1]:
+            m = getattr(m, part)
+        
+        dataset_class = getattr(m, parts[-1])
+
+        self.transform = [
+            parse_transform(lib.transforms,t) if isinstance(t, str) else t
+            for t in self.transform
+        ]
+
+        self.transform = Compose(self.transform)
+
+
+        train = dataset_class(split='train', root=self.root_path, download=True, transform=self.transform, target_type=self.target_type)
+        test = dataset_class(split='test', root=self.root_path, download=True, transform=self.transform, target_type=self.target_type)
+
+
+        concat =  ConcatDataset([train, test])
+
+        concat.classes = torch.unique(getattr(train, self.label_column).clone().detach())
+
+        dataset = self.get_wrapper(concat)
+
+        return dataset
+    
+    def check_configuration(self):
+        super().check_configuration()
+        self.local_config['parameters']['target_type'] = self.local_config['parameters'].get('target_type',[])
+    
 
 
         
@@ -96,3 +147,5 @@ def parse_transform(lib, transform_string):
             return transform_class()  # Instantiate without arguments
     except Exception as e:
         raise ValueError(f"Failed to parse transform: {transform_string}. Error: {e}")
+
+    

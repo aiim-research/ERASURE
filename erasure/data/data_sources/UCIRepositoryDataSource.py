@@ -52,7 +52,9 @@ class UCIRepositoryDataSource(DataSource):
 
     
     def get_simple_wrapper(self, data):
-        ##data is a Subset wrapping the data
-        ##data.indices contains the indices of the subset
-        ##slice the dataset with these indices and wrap it around
         return UCIWrapper(data, self.preprocess, self.label)
+    
+
+    def check_configuration(self):
+        super().check_configuration()
+        self.local_config['parameters']['label'] = self.local_config['parameters'].get('label','')

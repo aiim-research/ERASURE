@@ -32,12 +32,7 @@ class DataSource(Configurable):
         return DatasetExtendedWrapper(self.get_simple_wrapper(data))
     
     def get_wrapper(self, data):
-        caller =  inspect.currentframe().f_back.f_locals['self']
-
-        if isinstance(caller,DataSplitter):
-            return self.get_extended_wrapper(data)
-        else:
-            return self.get_simple_wrapper(data)
+        return self.get_simple_wrapper(data)
 
     def check_integrity(self, dataset: DatasetWrapper) -> bool:
         """
@@ -60,13 +55,23 @@ class DataSource(Configurable):
         """
         data = self.create_data()
 
-        
-
         if not self.check_integrity(data):
             raise ValueError(f"Integrity check failed for data source: {self.get_name()}")
+        
+
+        #data = self.shuffle_data(data, 0) ##add seed
 
         return data
-    
+
+    ##needs to be fixed because classes isn't preserved
+    def shuffle_data(self,data, seed):
+        if hasattr(data, 'data') and isinstance(data.data, ConcatDataset):
+            torch.manual_seed(seed)  
+            indices = torch.randperm(len(data.data)).tolist()
+            shuffled_data = torch.utils.data.Subset(data.data, indices)
+            data.data = shuffled_data  
+
+        return data
 
     def __init_preprocess__(self):
         self.preprocess = []

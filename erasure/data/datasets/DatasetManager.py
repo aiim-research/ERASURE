@@ -18,7 +18,7 @@ class DatasetManager(Configurable):
         self.datasource = global_ctx.factory.get_object( Local (self.params['DataSource']) )
         self.info(self.params['DataSource'])
         
-        self.partitions['all'] = self.datasource.create_and_validate_data()
+        self.partitions['all'] = self.datasource.create_and_validate_data()        
         
         self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)
