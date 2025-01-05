@@ -28,12 +28,7 @@ class DatasetManager(Configurable):
         #count number of classes in the dataset
         self.n_classes = self.partitions['all'].get_n_classes()
 
-        self.__prepare_partitions()
-
-
-    def __prepare_partitions(self):
         self.add_partitions(self.parts_cfgs)
-
 
     def add_partitions(self, splits, postfix=""):
         for split in splits:

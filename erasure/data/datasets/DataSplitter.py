@@ -7,6 +7,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 import torch
 
+
 class DataSplitter(ABC):
     def __init__(self, ref_data,parts_names):
         self.ref_data = ref_data
@@ -29,10 +30,11 @@ class DataSplitterPercentage(DataSplitter):
     def split_data(self,partitions):
         ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
 
-        total_size = len(ref_data.data)
-        split_point = int(total_size * self.percentage)
 
-        indices = list(range(total_size)) if not self.shuffle else torch.randperm(total_size)
+        self.total_size = len(ref_data.data)
+        split_point = int(self.total_size * self.percentage)
+
+        indices = self.get_indices()
 
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
@@ -42,6 +44,35 @@ class DataSplitterPercentage(DataSplitter):
 
         return partitions
     
+    def get_indices(self):
+        seedlist = self.create_seed_list()
+
+        seed = self.get_seed_from_name(self.parts_names[0], seedlist)
+
+        current_state = torch.get_rng_state()
+
+        torch.manual_seed(seed)
+
+        indices = list(range(self.total_size)) if not self.shuffle else torch.randperm(self.total_size)
+
+        torch.set_rng_state(current_state)
+
+        return indices
+
+    
+    def create_seed_list(self):
+        generator = torch.Generator()
+        
+        # Generate a list of seeds
+        seeds = [torch.randint(0, 2**32 - 1, (1,), generator=generator).item() for _ in range(10000)]
+        return seeds
+    
+    def get_seed_from_name(self,name, seed_list):
+        hashed_value = hash(name)
+        
+        position = hashed_value % len(seed_list)
+        
+        return seed_list[position]
     
 class DataSplitterConcat(DataSplitter):
     def __init__(self, concat_splits, parts_names, ref_data = 'all'):

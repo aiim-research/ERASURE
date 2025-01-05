@@ -7,7 +7,8 @@
                                   }
                                 }, 
                     "partitions":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
-                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":true}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train2","test2"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":true}},
                                   {"class": "erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters": {"parts_names":["forget","-"], "z_label":2880, "ref_data": "all_shuffled"} },
                                   {"class": "erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters": {"parts_names":["-","retain"], "z_label":2880, "ref_data": "train"} },
                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["train","forget"]}}
