@@ -34,8 +34,6 @@ class DataSplitterPercentage(DataSplitter):
 
         indices = list(range(total_size)) if not self.shuffle else torch.randperm(total_size)
 
-        print(indices)
-
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
 
