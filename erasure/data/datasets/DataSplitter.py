@@ -6,7 +6,7 @@ from .Dataset import DatasetWrapper
 from tqdm import tqdm
 from torch.utils.data import DataLoader
 import torch
-
+import hashlib
 
 class DataSplitter(ABC):
     def __init__(self, ref_data,parts_names):
@@ -30,11 +30,12 @@ class DataSplitterPercentage(DataSplitter):
     def split_data(self,partitions):
         ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
 
-
         self.total_size = len(ref_data.data)
         split_point = int(self.total_size * self.percentage)
 
         indices = self.get_indices()
+
+        print("indices:" , indices)
 
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
@@ -47,7 +48,11 @@ class DataSplitterPercentage(DataSplitter):
     def get_indices(self):
         seedlist = self.create_seed_list()
 
+        print("seedlist:", seedlist)
+
         seed = self.get_seed_from_name(self.parts_names[0], seedlist)
+
+        print("seed:", seed)
 
         current_state = torch.get_rng_state()
 
@@ -68,7 +73,7 @@ class DataSplitterPercentage(DataSplitter):
         return seeds
     
     def get_seed_from_name(self,name, seed_list):
-        hashed_value = hash(name)
+        hashed_value = int(hashlib.sha256(name.encode()).hexdigest(), 16)
         
         position = hashed_value % len(seed_list)
         
@@ -196,8 +201,6 @@ class DataSplitterByZ(DataSplitter):
             idx for idx in range(len(ref_data)) 
             if idx not in filtered_indices
         ]
-
-        print(len(filtered_indices))
 
         partitions[self.parts_names[0]] = filtered_indices 
         partitions[self.parts_names[1]] = other_indices
