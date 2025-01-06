@@ -1,6 +1,18 @@
 import torch
 import torch.nn as nn
 
+class LogisticRegression(nn.Module):
+    # Non funziona.
+    # Si rompe la fase di fitting. Da lavorarci se serve
+    def __init__(self, n_classes):
+        super().__init__()
+        self.linear = nn.Linear(n_classes, 1)
+
+    def forward(self, x):
+        x = self.linear(x)
+        intermediate_output = x
+        return intermediate_output, x
+
 
 class MIAAttack(nn.Module):
 

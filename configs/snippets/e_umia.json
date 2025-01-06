@@ -1,7 +1,8 @@
 {
     "class": "erasure.evaluations.MIA.umia.Attack",
+
     "parameters": {
-      "data": {
+      "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
         "parameters": {
           "DataSource": {
@@ -12,32 +13,10 @@
           },
           "partitions": [
             { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-              "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
+              "parameters": {"parts_names": ["train", "test"], "percentage": 0.5, "ref_data": "all"}
             }
           ],
           "batch_size": 128
-        }
-      },
-      "predictor": {
-        "class": "erasure.model.TorchModel.TorchModel",
-        "parameters": {
-          "epochs": 5,
-          "optimizer": {
-            "class": "torch.optim.RMSprop",
-            "parameters": {
-              "lr": 0.01
-            }
-          },
-          "loss_fn": {
-            "class": "torch.nn.CrossEntropyLoss",
-            "parameters": {
-              "reduction": "mean"
-            }
-          },
-          "model": {
-            "class": "erasure.model.FF.MIAAttack",
-            "parameters": {}
-          }
         }
       }
     }

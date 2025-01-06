@@ -150,6 +150,7 @@ class SaveValues(Measure):
         return e
     
     def process_json(self, e):
+        os.makedirs(os.path.dirname(self.path), exist_ok=True)
         with open(self.path, 'a') as json_file:
             json.dump(e.data_info, json_file, indent=4)
             json_file.write(',')
