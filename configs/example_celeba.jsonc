@@ -6,9 +6,11 @@
                                     "preprocess": [{"class":"erasure.data.preprocessing.reshape_y_z.reshape_y_z", "parameters":{"keep_as_y":[0,15], "move_to_z":[1]}}]
                                   }
                                 }, 
-                    "partitions":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
+                    "partitions":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":false}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":true}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train2","test2"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":true}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train3","test3"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":true}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train4","test4"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":true}},
                                   {"class": "erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters": {"parts_names":["forget","-"], "z_label":2880, "ref_data": "all_shuffled"} },
                                   {"class": "erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters": {"parts_names":["-","retain"], "z_label":2880, "ref_data": "train"} },
                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["train","forget"]}}
@@ -127,5 +129,9 @@
         }
     }
       ],
-    "compose_eval":"configs/snippets/default_evaluation.json"
+    "compose_eval":"configs/snippets/default_evaluation.json",
+    "globals":{
+      "seed": 1046534644,
+      "cached": true
+  }
   }

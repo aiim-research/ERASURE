@@ -57,9 +57,9 @@ class Attack(MembershipInference):
         attack_labels = torch.cat(attack_labels)
 
         # shuffle samples
-        perm_idxs = torch.randperm(len(attack_samples))
-        attack_samples = attack_samples[perm_idxs]
-        attack_labels = attack_labels[perm_idxs]
+        #perm_idxs = torch.randperm(len(attack_samples))
+        #attack_samples = attack_samples[perm_idxs]
+        #attack_labels = attack_labels[perm_idxs]
 
         # create Datasets based on true original label
         attack_datasets = {}
