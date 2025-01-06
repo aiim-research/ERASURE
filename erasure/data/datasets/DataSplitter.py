@@ -28,14 +28,14 @@ class DataSplitterPercentage(DataSplitter):
         self.shuffle = shuffle
 
     def split_data(self,partitions):
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        indices = partitions[self.ref_data] if self.ref_data != 'all' else list(range(len(partitions[self.ref_data].data)))
 
-        self.total_size = len(ref_data.data)
+        self.total_size = len(indices)
         split_point = int(self.total_size * self.percentage)
 
-        indices = self.get_indices()
+        indices = self.get_indices(indices) if self.shuffle else indices
 
-        print("indices:" , indices)
+        print(indices[:5])
 
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
@@ -45,25 +45,24 @@ class DataSplitterPercentage(DataSplitter):
 
         return partitions
     
-    def get_indices(self):
+    def get_indices(self, indices):
         seedlist = self.create_seed_list()
-
-        print("seedlist:", seedlist)
 
         seed = self.get_seed_from_name(self.parts_names[0], seedlist)
 
-        print("seed:", seed)
-
-        current_state = torch.get_rng_state()
-
-        torch.manual_seed(seed)
-
-        indices = list(range(self.total_size)) if not self.shuffle else torch.randperm(self.total_size)
-
-        torch.set_rng_state(current_state)
+        indices = self.shuffle_with_seed(indices, seed)
 
         return indices
+    
+    def shuffle_with_seed(self, indices, seed):
+        generator = torch.Generator()
+        generator.manual_seed(seed)
+        
+        permuted_order = torch.randperm(len(indices), generator=generator).tolist()
+        
+        shuffled_indices = [indices[i] for i in permuted_order]
 
+        return shuffled_indices
     
     def create_seed_list(self):
         generator = torch.Generator()
@@ -133,11 +132,9 @@ class DataSplitterNSamples(DataSplitter):
 
     def split_data(self,partitions):
         
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        indices = partitions[self.ref_data] if self.ref_data != 'all' else list(range(len(partitions[self.ref_data].data)))
         
         split_point = self.n_samples if self.n_samples is not None else 0
-
-        indices = [ idx for idx in range(len(ref_data)) ]
         
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
