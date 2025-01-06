@@ -50,8 +50,7 @@
   },
   "unlearners": [
     {"compose_idt" : "configs/snippets/u_id.json"},
-    {"compose_idt" : "configs/snippets/u_id.json"},
-    {"compose_idt" : "configs/snippets/u_id.json"}
+    {"compose_gold" : "configs/snippets/u_gold.json"}
   ],
   "evaluator": {
     "class": "erasure.evaluations.manager.Evaluator",
