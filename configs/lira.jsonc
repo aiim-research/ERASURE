@@ -49,13 +49,15 @@
     }
   },
   "unlearners": [
-    {"compose_idt" : "configs/snippets/u_id.json"}
+    {"compose_idt" : "configs/snippets/u_id.json"},
+    {"compose_gold" : "configs/snippets/u_gold.json"}
   ],
   "evaluator": {
     "class": "erasure.evaluations.manager.Evaluator",
     "parameters": {
       "measures": [
-        {"compose_lira" : "configs/snippets/e_lira.json"}
+        {"compose_lira" : "configs/snippets/e_lira.json"},
+        {"compose_lira" : "configs/snippets/e_lira_full.json"}
       ]
     }
   },

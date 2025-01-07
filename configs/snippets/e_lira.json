@@ -1,6 +1,7 @@
 {
     "class": "erasure.evaluations.MIA.lira.Attack",
     "parameters": {
+
       "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
         "parameters": {
@@ -20,45 +21,26 @@
       },
 
       "attack_model": {
-        "class": "erasure.model.TorchModel.TorchModel",
-        "parameters": {
-          "epochs": 50,
-          "optimizer": {
-            "class": "torch.optim.RMSprop",
-            "parameters": {
-              "lr": 0.01
-            }
-          },
-          "loss_fn": {
-            "class": "torch.nn.CrossEntropyLoss",
-            "parameters": {
-              "reduction": "mean"
-            }
-          },
-          "model": {
-            "class": "erasure.model.FF.MIAAttack",
-            "parameters": {}
-          }
-        }
+        "class": "erasure.evaluations.MIA.Distribution.Distribution",
+        "parameters": {}
       },
-     
-      
+
       "shadows": {
-        "n_shadows": 10,
+        "n_shadows": 20,
         "data_out_path": "resources/data/lira/lira.pt",
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 0.5, "ref_data": "forget"}
+            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 1.0, "ref_data": "forget"}
           }
         ],
         "per_shadows_partition":      
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.8, "ref_data": "shadow_data"}
-          }              
+            "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.8, "ref_data": "shadow_data", "shuffle": true}
+          }
       }
     }
 }

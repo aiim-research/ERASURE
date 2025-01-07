@@ -1,5 +1,6 @@
 from copy import deepcopy
 import os
+import numpy as np
 
 import torch
 from torch.utils.data import DataLoader
@@ -25,21 +26,17 @@ class Attack(MembershipInference):
 
         forget_dataloader, _ = original.dataset.get_loader_for(self.forget_part)
         forget_ids = original.dataset.partitions[self.forget_part]
-        # forget_ids = self.dataset.partitions[self.forget_part]
 
         original_forget = self.test_dataset(self.attack_models, original, forget_dataloader, forget_ids)
         target_forget = self.test_dataset(self.attack_models, unlearned, forget_dataloader, forget_ids)
-        # target_test = self.__test_dataset(self.attack_models, unlearned, "test")
 
-        self.info(f"Original Forget: {original_forget / original_forget.sum()}")
-        self.info(f"Target Forget: {target_forget / target_forget.sum()}")
+        self.info(f"Original Forget: {original_forget}")
+        self.info(f"Target Forget: {target_forget}")
         #self.info(f"Target Test: {target_test/target_test.sum()}")
 
         # Forgetting Rate (doi: 10.1109/TDSC.2022.3194884)
-        fr = (target_forget[0] - original_forget[0]) / original_forget[1]
-        self.info(f"Forgetting Rate: {fr}")
-        e.add_value("Forgetting Rate", fr)
-        #TODO: Be more compliant with the litterature (possible removing forgetting rate)
+        self.info(f"LiRA: {target_forget}")
+        e.add_value("LiRA", target_forget)
 
         return e
 
@@ -69,7 +66,7 @@ class Attack(MembershipInference):
         for f_id in self.dataset.partitions[self.forget_part]:
             f_idxs = (attack_samples[:, 0] == f_id).nonzero(as_tuple=True)[0]
             attack_datasets[f_id] = torch.utils.data.TensorDataset(attack_samples[f_idxs, 1:], attack_labels[f_idxs])
-            attack_datasets[f_id].n_classes = self.dataset.n_classes
+            attack_datasets[f_id].n_classes = 1
 
         # create DataManagers for the Attack model
         attack_datamanagers = {}
@@ -112,10 +109,15 @@ class Attack(MembershipInference):
             for X, labels in loader:
                 original_labels = labels.view(len(labels), -1)
                 X = X.to(model.device)
-                _, predictions = model.model(X)  # shadow model prediction #TODO check model to decide if applying the Softmax or not torch.nn.functional.softmax(model.model(X))
-                predictions = predictions.to('cpu')
+                _, predictions = model.model(X)  # shadow model prediction
 
-                attack_samples.append(predictions)
+                losses = torch.tensor([self.loss_fn(predictions[i], labels[i]) for i in range(len(predictions))])
+
+                predictions = predictions.to('cpu')
+                losses = losses.to('cpu')
+
+                # attack_samples.append(predictions)
+                attack_samples.append(losses.unsqueeze(1))
 
         attack_samples = torch.cat(attack_samples)
 
@@ -136,13 +138,10 @@ class Attack(MembershipInference):
                     curr_id = batch*dataloader.batch_size + i
                     curr_f_id = data_ids[curr_id]
                     if curr_f_id in attack_models:
-                        _, prediction = attack_models[curr_f_id].model(target_predictions[i])
-                        softmax = nn.Softmax(dim=0)
-                        prediction = softmax(prediction)
-                        attack_predictions.append(prediction)
+                        loss = self.loss_fn(target_predictions[i], labels[i])
+                        evaluation = attack_models[curr_f_id].evaluate(loss)
+                        if evaluation is not None and evaluation[0]>0.000001:
+                            attack_predictions.append(evaluation[1]/evaluation[0])
 
-        attack_predictions = torch.stack(attack_predictions)  # convert into a Tensor
-        predicted_labels = torch.argmax(attack_predictions, dim=1)  # get the predicted label
-
-        return torch.bincount(predicted_labels)
+        return np.mean(attack_predictions)
 
