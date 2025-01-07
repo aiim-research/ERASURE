@@ -69,7 +69,8 @@
           "class": "erasure.unlearners.NegGrad.NegGrad",
           "parameters": {
               "epochs": 5,
-              "ref_data": "forget"
+              "ref_data": "forget",
+              "lr": 0.001
           }
       }
   ],

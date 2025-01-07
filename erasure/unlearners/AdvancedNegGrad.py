@@ -1,6 +1,7 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
 from erasure.utils.config.global_ctx import Global
 from fractions import Fraction
+import copy
 
 class AdvancedNegGrad(TorchUnlearner):
     def init(self):
@@ -14,6 +15,8 @@ class AdvancedNegGrad(TorchUnlearner):
         self.ref_data_retain = self.local.config['parameters']['ref_data_retain']  
         self.ref_data_forget = self.local.config['parameters']['ref_data_forget'] 
 
+        if self.local.config['parameters']['lr'] is not None:
+            self.predictor.optimizer.param_groups[0]['lr'] = self.local.config['parameters']['lr']
 
     def __unlearn__(self):
         """
@@ -76,3 +79,5 @@ class AdvancedNegGrad(TorchUnlearner):
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain')  # Default reference data is retain
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
+
+        self.local.config['parameters']['lr'] = self.local.config['parameters'].get("lr", None) # Default learning rate is the same as the predictor

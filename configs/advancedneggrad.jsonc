@@ -69,7 +69,8 @@
           "parameters": {
               "epochs": 1, 
               "ref_data_retain": "retain", 
-              "ref_data_forget": "forget"
+              "ref_data_forget": "forget",
+              "lr": 0.001
           }
       }
   ],
