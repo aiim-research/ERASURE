@@ -74,7 +74,7 @@
               "optimizer": {
                   "class": "torch.optim.Adam",
                   "parameters": {
-                      "lr": 0.01
+                      "lr": 0.001
                   }
               }
           }

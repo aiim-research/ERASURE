@@ -27,11 +27,11 @@ class BadTeaching(TorchUnlearner):
         self.batch_size = self.dataset.batch_size
         self.KL_temperature = self.local.config['parameters']['KL_temperature']
 
-        self.optimizer = self.local.config['parameters']['optimizer']
-        module_name, class_name = self.optimizer["class"].rsplit(".", 1)
+        self.predictor.optimizer = self.local.config['parameters']['optimizer']
+        module_name, class_name = self.predictor.optimizer["class"].rsplit(".", 1)
         module = __import__(module_name, fromlist=[class_name])
         optimizer_class = getattr(module, class_name)
-        self.optimizer = optimizer_class(self.predictor.model.parameters(), **self.optimizer["parameters"])
+        self.predictor.optimizer = optimizer_class(self.predictor.model.parameters(), **self.predictor.optimizer["parameters"])
 
         self.cfg_bad_teacher = self.local.config['parameters']['bad_teacher']
         self.current_bt = Local(self.cfg_bad_teacher)
@@ -98,7 +98,7 @@ class BadTeaching(TorchUnlearner):
         for epoch in range(self.epochs):
             loss = self.unlearning_step(model = self.predictor.model, good_teacher= good_teacher, 
                             bad_teacher=self.bad_teacher.model, unlearn_data_loader=unlearning_loader, 
-                            optimizer=self.optimizer, device=self.device, KL_temperature=self.KL_temperature)
+                            optimizer=self.predictor.optimizer, device=self.device, KL_temperature=self.KL_temperature)
             self.info(f'Epoch {epoch} Unlearning Loss {loss}')
             
         return self.predictor
@@ -113,7 +113,7 @@ class BadTeaching(TorchUnlearner):
         self.local.config['parameters']['transform'] = self.local.config['parameters'].get("transform", None) # Default transformation applied to the data is None
         self.local.config['parameters']['KL_temperature'] = self.local.config['parameters'].get("KL_temperature", 1.0) # Default KL temperature is 1.0
 
-        init_dflts_to_of(self.local.config, 'optimizers', 'torch.optim.Adam') # Default optimizer is Adam
+        init_dflts_to_of(self.local.config, 'optimizer', 'torch.optim.Adam') # Default optimizer is Adam
     
         if 'bad_teacher' not in self.local.config['parameters']: 
             self.local.config['parameters']['bad_teacher'] = copy.deepcopy(self.global_ctx.config.predictor) # Default bad teacher has the same configuration of the original predictor trained for 0 epochs
