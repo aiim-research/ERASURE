@@ -1,5 +1,4 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
-from erasure.utils.config.global_ctx import Global
 from fractions import Fraction
 
 import torch
@@ -7,6 +6,8 @@ import torch.nn.functional as F
 from torch import nn
 
 from copy import copy
+
+from erasure.utils.cfg_utils import init_dflts_to_of
 
 class DistillKL(nn.Module):
     def __init__(self, T):
@@ -33,6 +34,13 @@ class Scrub(TorchUnlearner):
         self.T = self.local.config['parameters']['T']  
 
         self.criterion_div = DistillKL(self.T)
+
+        self.predictor.optimizer = self.local.config['parameters']['optimizer']
+        module_name, class_name = self.predictor.optimizer["class"].rsplit(".", 1)
+        module = __import__(module_name, fromlist=[class_name])
+        optimizer_class = getattr(module, class_name)
+        self.predictor.optimizer = optimizer_class(self.predictor.model.parameters(), **self.predictor.optimizer["parameters"])
+
 
     def __unlearn__(self):
         """
@@ -125,3 +133,5 @@ class Scrub(TorchUnlearner):
         self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain')  # Default reference data is retain
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.local.config['parameters']['T'] = self.local.config['parameters'].get("T", 4.0)  # Default temperature is 4.0
+
+        init_dflts_to_of(self.local.config, 'optimizers', 'torch.optim.Adam') # Default optimizer is Adam

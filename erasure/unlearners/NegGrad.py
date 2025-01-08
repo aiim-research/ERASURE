@@ -1,7 +1,7 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
-from erasure.utils.config.global_ctx import Global
 from fractions import Fraction
 
+from erasure.utils.cfg_utils import init_dflts_to_of
 
 class NegGrad(TorchUnlearner):
     def init(self):
@@ -14,8 +14,12 @@ class NegGrad(TorchUnlearner):
         self.epochs = self.local.config['parameters']['epochs']  
         self.ref_data = self.local.config['parameters']['ref_data'] 
 
-        if self.local.config['parameters']['lr'] is not None:
-            self.predictor.optimizer.param_groups[0]['lr'] = self.local.config['parameters']['lr']
+        self.predictor.optimizer = self.local.config['parameters']['optimizer']
+        module_name, class_name = self.predictor.optimizer["class"].rsplit(".", 1)
+        module = __import__(module_name, fromlist=[class_name])
+        optimizer_class = getattr(module, class_name)
+        self.predictor.optimizer = optimizer_class(self.predictor.model.parameters(), **self.predictor.optimizer["parameters"])
+
 
     def __unlearn__(self):
         """
@@ -62,4 +66,4 @@ class NegGrad(TorchUnlearner):
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'forget')  # Default reference data is forget
 
-        self.local.config['parameters']['lr'] = self.local.config['parameters'].get("lr", None) # Default learning rate is the same as the predictor
+        init_dflts_to_of(self.local.config, 'optimizers', 'torch.optim.Adam') # Default optimizer is Adam

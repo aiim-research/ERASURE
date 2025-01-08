@@ -1,6 +1,7 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
-from erasure.utils.config.global_ctx import Global
 from fractions import Fraction
+
+from erasure.utils.cfg_utils import init_dflts_to_of
 
 
 class Finetuning(TorchUnlearner):
@@ -13,6 +14,13 @@ class Finetuning(TorchUnlearner):
 
         self.epochs = self.local.config['parameters']['epochs'] 
         self.ref_data = self.local.config['parameters']['ref_data'] 
+
+        self.predictor.optimizer = self.local.config['parameters']['optimizer']
+        module_name, class_name = self.predictor.optimizer["class"].rsplit(".", 1)
+        module = __import__(module_name, fromlist=[class_name])
+        optimizer_class = getattr(module, class_name)
+        self.predictor.optimizer = optimizer_class(self.predictor.model.parameters(), **self.predictor.optimizer["parameters"])
+
 
     def __unlearn__(self):
         """
@@ -52,3 +60,5 @@ class Finetuning(TorchUnlearner):
 
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'retain')  # Default reference data is retain
+    
+        init_dflts_to_of(self.local.config, 'optimizers', 'torch.optim.Adam') # Default optimizer is Adam

@@ -1,6 +1,4 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
-from erasure.utils.config.global_ctx import Global
-from fractions import Fraction
 
 import torch
 import torch.nn.functional as F

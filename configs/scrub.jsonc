@@ -70,7 +70,13 @@
               "epochs": 1, 
               "ref_data_retain": "retain", 
               "ref_data_forget": "forget",
-              "T": 4.0
+              "T": 4.0,
+              "optimizer": {
+                  "class": "torch.optim.Adam",
+                  "parameters": {
+                      "lr": 0.01
+                  }
+              }
           }
       }
   ],

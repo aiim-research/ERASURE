@@ -70,7 +70,12 @@
           "parameters": {
               "epochs": 5,
               "ref_data": "forget",
-              "lr": 0.001
+              "optimizer": {
+                  "class": "torch.optim.Adam",
+                  "parameters": {
+                      "lr": 0.001
+                  }
+              }
           }
       }
   ],

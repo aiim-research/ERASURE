@@ -72,7 +72,7 @@
               "ref_data_retain": "retain", 
               "ref_data_forget": "forget",
               "optimizer": {
-                  "class": "torch.optim.SGD",
+                  "class": "torch.optim.Adam",
                   "parameters": {
                       "lr": 0.01
                   }
