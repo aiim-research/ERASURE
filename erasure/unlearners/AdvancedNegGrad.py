@@ -1,7 +1,7 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
 from fractions import Fraction
 
-from erasure.utils.cfg_utils import init_dflts_to_of
+from erasure.core.factory_base import get_instance_kvargs
 
 class AdvancedNegGrad(TorchUnlearner):
     def init(self):
@@ -15,11 +15,8 @@ class AdvancedNegGrad(TorchUnlearner):
         self.ref_data_retain = self.local.config['parameters']['ref_data_retain']  
         self.ref_data_forget = self.local.config['parameters']['ref_data_forget'] 
 
-        self.predictor.optimizer = self.local.config['parameters']['optimizer']
-        module_name, class_name = self.predictor.optimizer["class"].rsplit(".", 1)
-        module = __import__(module_name, fromlist=[class_name])
-        optimizer_class = getattr(module, class_name)
-        self.predictor.optimizer = optimizer_class(self.predictor.model.parameters(), **self.predictor.optimizer["parameters"])
+        self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
+                                      {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
 
     def __unlearn__(self):
         """
@@ -82,5 +79,4 @@ class AdvancedNegGrad(TorchUnlearner):
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain')  # Default reference data is retain
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
-
-        init_dflts_to_of(self.local.config, 'optimizers', 'torch.optim.Adam') # Default optimizer is Adam
+        self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam

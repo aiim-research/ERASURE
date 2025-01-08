@@ -10,7 +10,7 @@ from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
 
 from erasure.utils.config.local_ctx import Local
-from erasure.utils.cfg_utils import init_dflts_to_of
+from erasure.core.factory_base import get_instance_kvargs
 
 class BadTeaching(TorchUnlearner):
     def init(self):
@@ -27,11 +27,8 @@ class BadTeaching(TorchUnlearner):
         self.batch_size = self.dataset.batch_size
         self.KL_temperature = self.local.config['parameters']['KL_temperature']
 
-        self.predictor.optimizer = self.local.config['parameters']['optimizer']
-        module_name, class_name = self.predictor.optimizer["class"].rsplit(".", 1)
-        module = __import__(module_name, fromlist=[class_name])
-        optimizer_class = getattr(module, class_name)
-        self.predictor.optimizer = optimizer_class(self.predictor.model.parameters(), **self.predictor.optimizer["parameters"])
+        self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
+                                      {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
 
         self.cfg_bad_teacher = self.local.config['parameters']['bad_teacher']
         self.current_bt = Local(self.cfg_bad_teacher)
@@ -109,12 +106,10 @@ class BadTeaching(TorchUnlearner):
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain')  # Default reference data is retain
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
-
         self.local.config['parameters']['transform'] = self.local.config['parameters'].get("transform", None) # Default transformation applied to the data is None
         self.local.config['parameters']['KL_temperature'] = self.local.config['parameters'].get("KL_temperature", 1.0) # Default KL temperature is 1.0
+        self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
 
-        init_dflts_to_of(self.local.config, 'optimizer', 'torch.optim.Adam') # Default optimizer is Adam
-    
         if 'bad_teacher' not in self.local.config['parameters']: 
             self.local.config['parameters']['bad_teacher'] = copy.deepcopy(self.global_ctx.config.predictor) # Default bad teacher has the same configuration of the original predictor trained for 0 epochs
             self.local.config['parameters']['bad_teacher']['parameters']['cached'] = False

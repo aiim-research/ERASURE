@@ -8,7 +8,7 @@ import numpy as np
 from torch.utils.data import DataLoader
 from typing import Dict, List
 
-from erasure.utils.cfg_utils import init_dflts_to_of
+from erasure.core.factory_base import get_instance_kvargs
 
 class SelectiveSynapticDampening(TorchUnlearner):
     def init(self):
@@ -35,11 +35,8 @@ class SelectiveSynapticDampening(TorchUnlearner):
         'selection_weighting': self.selection_weighting,
         }
 
-        self.predictor.optimizer = self.local.config['parameters']['optimizer']
-        module_name, class_name = self.predictor.optimizer["class"].rsplit(".", 1)
-        module = __import__(module_name, fromlist=[class_name])
-        optimizer_class = getattr(module, class_name)
-        self.predictor.optimizer = optimizer_class(self.predictor.model.parameters(), **self.predictor.optimizer["parameters"])
+        self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
+                                      {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
 
 
     def __unlearn__(self):
@@ -79,9 +76,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
         self.local.config['parameters']['lr'] = self.local.config['parameters'].get('lr', 0.1)  # Default learning rate is 0.1
         self.local.config['parameters']['dampening_constant'] = self.local.config['parameters'].get('dampening_constant', 0.1)  # The 'lambda' parameter in the paper
         self.local.config['parameters']['selection_weighting'] = self.local.config['parameters'].get('selection_weighting', 10) # The 'alpha' parameter in the paper
-
-        init_dflts_to_of(self.local.config, 'optimizers', 'torch.optim.Adam') # Default optimizer is Adam
-
+        self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
 
 class ParameterPerturber:
     def __init__(
