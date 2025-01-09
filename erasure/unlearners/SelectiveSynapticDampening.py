@@ -47,7 +47,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
         Codebase taken from the original implementation: https://github.com/if-loops/selective-synaptic-dampening/tree/main
         """
 
-        self.info('Starting Selective Synaptic Dampening')
+        self.info('Starting SSD')
 
         train_loader, _ = self.dataset.get_loader_for(self.ref_data_train, Fraction('0'))
 
@@ -64,7 +64,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
 
         ssd.modify_weight(original_importances, sample_importances)
 
-        self.info(f'Selective Synaptic Dampening completed')
+        self.info(f'SSD completed')
         
         return self.predictor
 
