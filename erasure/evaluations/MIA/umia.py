@@ -62,7 +62,7 @@ class Attack(Measure):
             umia_accuracy = compute_accuracy(test_loader, attack_model.model)
 
         else:
-            # Hardcoded Linear Regression
+            # Hardcoded Logistic Regression
             train_loader, _ = attack_dataset.get_loader_for("train")
             X_train, y_train = train_loader.dataset[:]
 
