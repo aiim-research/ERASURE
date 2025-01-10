@@ -21,7 +21,7 @@ def compute_accuracy(test_loader, model):
 
 def compute_relearn_time(model, split_name='train', max_accuracy=0.8, max_epochs=40):
 
-    model = deepcopy(model)
+    # model = deepcopy(model)
 
     data_loader, var_loader = model.dataset.get_loader_for(split_name)
 

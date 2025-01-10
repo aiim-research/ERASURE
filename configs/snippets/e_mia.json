@@ -43,14 +43,14 @@
         }
       },   
       "shadows": {
-        "n_shadows": 5,
+        "n_shadows": 10,
         "data_out_path": "resources/data/mia/mia.pt",
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 0.5, "ref_data": "train"}
+            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 0.8, "ref_data": "train"}
           }
         ],
         "per_shadows_partition":      

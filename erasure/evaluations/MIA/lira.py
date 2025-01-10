@@ -140,7 +140,8 @@ class Attack(MembershipInference):
                     if curr_f_id in attack_models:
                         loss = self.loss_fn(target_predictions[i], labels[i])
                         evaluation = attack_models[curr_f_id].evaluate(loss)
-                        if evaluation is not None and evaluation[0]>0.000001:
+                        if evaluation is not None:
+                            evaluation += 0.0001
                             attack_predictions.append(evaluation[1]/evaluation[0])
 
         return np.mean(attack_predictions)
