@@ -191,9 +191,21 @@ class SaveValues(Measure):
 
 class RelearnTime(Measure):
 
-    def process(self, e: Evaluation):
+    def init(self):
+        self.req_accuracy = self.params["req_accuracy"]
+        self.forget_part = self.params["forget_part"]
 
-        relearn_time = compute_relearn_time(e.unlearned_model, "forget", max_accuracy=self.params['req_acc'])
+    def check_configuration(self):
+        self.params["req_accuracy"] = self.params.get("req_accuracy", None)
+        self.params["forget_part"] = self.params.get("forget_part", "forget")
+
+    def process(self, e: Evaluation):
+        if self.req_accuracy is None:
+            # take the original model accuracy
+            test_loader, _ = e.predictor.dataset.get_loader_for('test')
+            self.req_accuracy = compute_accuracy(test_loader, e.predictor.model)
+
+        relearn_time = compute_relearn_time(e.unlearned_model, self.forget_part, max_accuracy=self.req_accuracy)
 
         self.info(f'Relearning Time: {relearn_time} epochs')
         e.add_value('Relearning Time (epochs):', relearn_time)
@@ -204,40 +216,38 @@ class RelearnTime(Measure):
 class AIN(Measure):
     """ Anamnesis Index (AIN) """
 
-    def __init__(self, global_ctx, local_ctx):
-        super().__init__(global_ctx, local_ctx)
+    def init(self):
+        self.alpha = self.params["alpha"]
+        self.gold_cfg = self.params["gold_model"]
+        self.forget_part = self.params["forget_part"]
 
-        pass
+    def check_configuration(self):
+        self.params["alpha"] = self.params.get("alpha", 0.05)
+        self.params["forget_part"] = self.params.get("forget_part", "forget")
 
     def process(self, e: Evaluation):
 
         # Gold Model creation
-        current = Local(self.params["gold_model"])
+        current = Local(self.gold_cfg)
         current.dataset = e.predictor.dataset
         current.predictor = e.predictor
         gold_model_unlearner = self.global_ctx.factory.get_object(current)
         self.gold_model = gold_model_unlearner.unlearn()
 
         # orginal accuracy on forget
-        forget_loader, _ = e.unlearner.dataset.get_loader_for('forget')
+        forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part)
         original_forget_accuracy = compute_accuracy(forget_loader, e.predictor.model)
 
-        max_accuracy = (1-self.params["alpha"]) * original_forget_accuracy
+        max_accuracy = (1-self.alpha) * original_forget_accuracy
 
         # relearn time of Unleaned model on forget
-        rt_unlearned = compute_relearn_time(e.unlearned_model, "forget", max_accuracy=max_accuracy)
+        rt_unlearned = compute_relearn_time(e.unlearned_model, self.forget_part, max_accuracy=max_accuracy)
 
         # relearn time of Gold model on forget
-        rt_gold = compute_relearn_time(e.unlearned_model, "forget", max_accuracy=max_accuracy)
+        rt_gold = compute_relearn_time(e.unlearned_model, self.forget_part, max_accuracy=max_accuracy)
 
         ain = rt_unlearned / rt_gold
         self.info(f'AIN: {ain}')
         e.add_value('AIN:', ain)
 
-        return e
-
-
-
-class MisuraGold(Measure):
-    def process(self, e:Evaluation):
         return e
