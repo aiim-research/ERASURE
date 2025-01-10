@@ -2,9 +2,10 @@
   "data": {
       "class": "erasure.data.datasets.DatasetManager.DatasetManager",
       "parameters": {
-        "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSource", 
+        "DataSource": { 
+        "class":"erasure.data.data_sources.TVDataSource.TVDataSource", 
         "parameters": {"path": "torchvision.datasets.FashionMNIST", "transform":["ToTensor"]}
-    }, 
+        }, 
           "partitions": [
               {
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
@@ -65,16 +66,15 @@
   },
   "unlearners": [
       {
-          "class": "erasure.unlearners.Scrub.Scrub",
+          "class": "erasure.unlearners.eu_k.eu_k",
           "parameters": {
-              "epochs": 1, 
-              "ref_data_retain": "retain", 
-              "ref_data_forget": "forget",
-              "T": 4.0,
+              "last_trainable_layers": 2,
+              "epochs": 40, 
+              "ref_data":"retain",
               "optimizer": {
                   "class": "torch.optim.Adam",
                   "parameters": {
-                      "lr": 0.001
+                      "lr": 0.01
                   }
               }
           }

@@ -1,7 +1,7 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
-from erasure.utils.config.global_ctx import Global
 from fractions import Fraction
 
+from erasure.core.factory_base import get_instance_kvargs
 
 class NegGrad(TorchUnlearner):
     def init(self):
@@ -13,6 +13,10 @@ class NegGrad(TorchUnlearner):
 
         self.epochs = self.local.config['parameters']['epochs']  
         self.ref_data = self.local.config['parameters']['ref_data'] 
+
+        self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
+                                      {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
+
 
     def __unlearn__(self):
         """
@@ -58,3 +62,4 @@ class NegGrad(TorchUnlearner):
 
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'forget')  # Default reference data is forget
+        self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam

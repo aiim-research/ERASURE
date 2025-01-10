@@ -1,5 +1,4 @@
 from erasure.core.unlearner import Unlearner
-from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 
 class Cascade(Unlearner):
