@@ -16,7 +16,7 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 10,
+          "epochs": 40,
           "optimizer": {
             "class": "torch.optim.Adam",
             "parameters": {
@@ -53,9 +53,15 @@
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
-          {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
-          {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{}},
+          {"class": "erasure.evaluations.measures.AUS", "parameters":{
+            "forget_part": "forget",
+            "test_part": "test"
+          }},
+          {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{
+            "forget_part": "forget"
+          }},
           {"class": "erasure.evaluations.measures.AIN", "parameters":{
+            "forget_part": "forget",
             "alpha": 0.001,
             "gold_model": {
                 "class": "erasure.unlearners.GoldModel.GoldModel",
