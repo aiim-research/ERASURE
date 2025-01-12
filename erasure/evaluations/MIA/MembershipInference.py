@@ -16,9 +16,10 @@ class MembershipInference(Measure):
         super().__init__(global_ctx, local_ctx)'''
     def init(self):
         self.n_shadows = self.local.config['parameters']['shadows']['n_shadows']
-        self.data_out_path = self.local.config['parameters']['shadows']['data_out_path']+'_'+str(self.global_ctx.config.globals['seed'])
+        self.data_out_path = self.local.config['parameters']['data_out_path']+'_'+str(self.global_ctx.config.globals['seed'])
         self.train_part_plh = self.local.config['parameters']['shadows']['train_part_plh']
         self.test_part_plh = self.local.config['parameters']['shadows']['test_part_plh']
+        self.attack_test_part = self.local.config['parameters']['attack_test_part']
         self.base_model_cfg = self.params["shadows"]["base_model"]
 
         self.local_config["parameters"]["attack_in_data"]["parameters"]['DataSource']["parameters"]['path'] += '_'+str(self.global_ctx.config.globals['seed'])
@@ -66,6 +67,8 @@ class MembershipInference(Measure):
 
         if "loss_fn" not in self.params:
             self.params["loss_fn"] = copy.deepcopy(self.global_ctx.config.predictor["parameters"]["loss_fn"])
+
+        self.local.config['parameters']['attack_test_part'] = self.local.config['parameters'].get('attack_test_part','test')
 
 
 

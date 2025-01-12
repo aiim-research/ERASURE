@@ -2,6 +2,8 @@
 
     "class": "erasure.evaluations.MIA.mia.Attack",
     "parameters": {
+      "data_out_path": "resources/data/mia/mia.pt",
+      "attack_test_part":"test",
       "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
         "parameters": {
@@ -13,13 +15,12 @@
           },
           "partitions": [
             { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-              "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
+              "parameters": {"parts_names": ["train", "test"], "percentage": 1, "ref_data": "all"}
             }
           ],
           "batch_size": 128
         }
       },
-
       "attack_model": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
@@ -37,26 +38,25 @@
             }
           },
           "model": {
-            "class": "erasure.model.FF.MIAAttack",
-            "parameters": {}
+            "class": "erasure.model.FF.FlexSeqBin",
+            "parameters": {"mult":[2,0.75]}
           }
         }
       },   
       "shadows": {
         "n_shadows": 5,
-        "data_out_path": "resources/data/mia/mia.pt",
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 0.5, "ref_data": "train"}
+            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 1, "ref_data": "train"}
           }
         ],
         "per_shadows_partition":      
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.8, "ref_data": "shadow_data", "shuffle": true}
+            "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.5, "ref_data": "shadow_data", "shuffle": true}
           }
       }
     }

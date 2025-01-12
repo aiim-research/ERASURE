@@ -2,6 +2,7 @@ import copy
 from copy import deepcopy
 import os
 
+from numpy import argmax
 import torch
 from torch.utils.data import DataLoader
 import torch.nn as nn
@@ -27,6 +28,8 @@ class Attack(MembershipInference):
         forget_dataloader, _ = original.dataset.get_loader_for(self.forget_part)
 
         original_forget = self.test_dataset(self.attack_models, original, forget_dataloader)
+        '''original_forget[0] = 1e-14
+        original_forget[1] = 1.0-original_forget[0]''' #train
         target_forget = self.test_dataset(self.attack_models, unlearned, forget_dataloader)
         #target_test = self.__test_dataset(self.attack_models, unlearned, "test")
 
@@ -85,8 +88,21 @@ class Attack(MembershipInference):
     def get_attack_samples(self, shadow_model, k):
         """ From the shadow model, generate the attack samples """
 
-        train_loader, _ = self.dataset.get_loader_for(self.train_part_plh +"_"+str(k))
-        test_loader, _ = self.dataset.get_loader_for(self.test_part_plh +"_"+str(k))
+        #train_loader, _ = self.dataset.get_loader_for(self.train_part_plh +"_"+str(k))
+        #test_loader, _ = self.dataset.get_loader_for(self.test_part_plh +"_"+str(k))
+
+        split_point = min(len(self.dataset.partitions[self.train_part_plh +"_"+str(k)]),\
+        #                  len(self.dataset.partitions[self.test_part_plh +"_"+str(k)]))
+                          len(self.dataset.partitions[self.attack_test_part]))
+        
+        
+        train_indices = self.dataset.partitions[self.train_part_plh +"_"+str(k)][:split_point]
+        #test_indices = self.dataset.partitions[self.test_part_plh +"_"+str(k)][:split_point]
+        test_indices = self.dataset.partitions[self.attack_test_part][:split_point]
+
+
+        train_loader = self.dataset.get_loader_for_ids(train_indices)
+        test_loader = self.dataset.get_loader_for_ids(test_indices)
 
 
         attack_samples = []
@@ -111,7 +127,9 @@ class Attack(MembershipInference):
                 original_labels = labels.view(len(labels), -1)
                 X = X.to(model.device)
                 _, predictions = model.model(X) # shadow model prediction #TODO check model to decide if applying the Softmax or not torch.nn.functional.softmax(model.model(X))
+                
                 predictions = predictions.to('cpu')
+               
 
                 attack_samples.append(
                     torch.cat([original_labels, predictions], dim=1)

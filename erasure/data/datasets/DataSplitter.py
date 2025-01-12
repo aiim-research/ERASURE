@@ -35,7 +35,7 @@ class DataSplitterPercentage(DataSplitter):
 
         indices = self.get_indices(indices) if self.shuffle else indices
 
-        print(indices[:5])
+        #print(indices[:5])
 
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]

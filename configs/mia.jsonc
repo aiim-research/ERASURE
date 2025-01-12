@@ -10,20 +10,19 @@
       },
       "partitions": [
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"parts_names": ["all_reduced", "-"], "percentage": 0.0125}
+          "parameters": {"parts_names": ["all_reduced", "-"], "percentage": 1}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
           "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
         },
-        { "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
-          "parameters": {"parts_names": ["forget", "retain"], "label": 1, "ref_data": "train"}
+        { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
+          "parameters": {"parts_names": ["train", "-"], "percentage": 0.0125, "ref_data": "train"}
         },
-        { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
-          "parameters": {"parts_names": ["example", "-"], "n_samples": 100, "ref_data": "forget"}
+        { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
+          "parameters": {"parts_names": ["forget", "retain"], "percentage": 0.1, "ref_data": "train"}
         }
       ],
-      "batch_size": 128,
-      "split_seed": 16
+      "batch_size": 128
     }
   },
   "predictor": {
@@ -50,7 +49,48 @@
   },
   "unlearners": [
     {"compose_idt" : "configs/snippets/u_id.json"},
-    {"compose_gold" : "configs/snippets/u_gold.json"}
+    {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": { "cached": true }},
+    {
+      "class": "erasure.unlearners.Finetuning.Finetuning",
+      "parameters": {
+          "epochs": 5, 
+          "ref_data":"retain",
+          "optimizer": {
+              "class": "torch.optim.Adam",
+              "parameters": {
+                  "lr": 0.01
+              }
+          }
+      }
+    },
+    {
+      "class": "erasure.unlearners.NegGrad.NegGrad",
+      "parameters": {
+          "epochs": 1,
+          "ref_data": "forget",
+          "optimizer": {
+              "class": "torch.optim.Adam",
+              "parameters": {
+                  "lr": 0.0001
+              }
+          }
+      }
+    },
+    {
+      "class": "erasure.unlearners.Scrub.Scrub",
+      "parameters": {
+          "epochs": 1, 
+          "ref_data_retain": "retain", 
+          "ref_data_forget": "forget",
+          "T": 4.0,
+          "optimizer": {
+              "class": "torch.optim.Adam",
+              "parameters": {
+                  "lr": 0.01
+              }
+          }
+      }
+  }
   ],
   "evaluator": {
     "class": "erasure.evaluations.manager.Evaluator",
