@@ -179,19 +179,16 @@ class DataSplitterByZ(DataSplitter):
         dataloader = DataLoader(ref_data, batch_size=5000)
 
         filtered_indices = []
-        current_index = 0  # To track the global index of each batch
+        current_index = 0  
         import torch
         for batch in tqdm(dataloader, desc="Filtering Data"):
-            _, _, Z = batch  # Assuming Z is the third element in the batch
+            _, _, Z = batch
             
-            # Apply a boolean mask to find matching Z values
             mask = (Z == self.z_label)
-            matching_indices = torch.nonzero(mask, as_tuple=True)[0]  # Indices within the batch
+            matching_indices = torch.nonzero(mask, as_tuple=True)[0]  
             
-            # Convert batch indices to global indices and store them
             filtered_indices.extend((current_index + matching_indices).tolist())
             
-            # Update the global index for the next batch
             current_index += len(Z)
 
         other_indices = [
