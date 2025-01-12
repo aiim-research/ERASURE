@@ -1,5 +1,6 @@
 import copy
 
+from erasure.core.factory_base import get_instance_config
 from erasure.core.measure import Measure
 from erasure.evaluations.evaluation import Evaluation
 from erasure.utils.config.global_ctx import Global
@@ -26,6 +27,7 @@ class MembershipInference(Measure):
 
         self.forget_part = 'forget'
         #self.test_part = 'test'
+        self.loss_fn = get_instance_config(self.params['loss_fn'])
 
 
         data_cfg = self.local.config['parameters']['shadows']['shadow_in_data']
@@ -61,6 +63,9 @@ class MembershipInference(Measure):
 
         if "shadow_in_data" not in self.params["shadows"]:
             self.local.config['parameters']['shadows']['shadow_in_data']=copy.deepcopy(self.global_ctx.config.data)
+
+        if "loss_fn" not in self.params:
+            self.params["loss_fn"] = copy.deepcopy(self.global_ctx.config.predictor["parameters"]["loss_fn"])
 
 
 

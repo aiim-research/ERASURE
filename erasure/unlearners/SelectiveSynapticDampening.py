@@ -1,5 +1,4 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
-from erasure.utils.config.global_ctx import Global
 from fractions import Fraction
 
 import torch
@@ -8,6 +7,8 @@ from torch.utils.data import DataLoader, Subset, dataset
 import numpy as np
 from torch.utils.data import DataLoader
 from typing import Dict, List
+
+from erasure.core.factory_base import get_instance_kvargs
 
 class SelectiveSynapticDampening(TorchUnlearner):
     def init(self):
@@ -34,6 +35,10 @@ class SelectiveSynapticDampening(TorchUnlearner):
         'selection_weighting': self.selection_weighting,
         }
 
+        self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
+                                      {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
+
+
     def __unlearn__(self):
         """
         An implementation of the Selective Synaptic Dampening unlearning algorithm proposed in the following paper:
@@ -42,7 +47,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
         Codebase taken from the original implementation: https://github.com/if-loops/selective-synaptic-dampening/tree/main
         """
 
-        self.info('Starting Selective Synaptic Dampening')
+        self.info('Starting SSD')
 
         train_loader, _ = self.dataset.get_loader_for(self.ref_data_train, Fraction('0'))
 
@@ -50,10 +55,8 @@ class SelectiveSynapticDampening(TorchUnlearner):
 
 
         # load the trained model
-        optimizer = torch.optim.SGD(self.predictor.model.parameters(), lr=self.lr)
-
-        ssd = ParameterPerturber(self.predictor.model, optimizer, self.device, self.parameters)
-        self.predictor.model = self.predictor.model.eval()
+        ssd = ParameterPerturber(self.predictor.model, self.predictor.optimizer, self.device, self.parameters)
+        self.predictor.model.eval()
 
         sample_importances = ssd.calc_importance(forget_loader)
 
@@ -61,7 +64,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
 
         ssd.modify_weight(original_importances, sample_importances)
 
-        self.info(f'Selective Synaptic Dampening completed')
+        self.info(f'SSD completed')
         
         return self.predictor
 
@@ -73,6 +76,7 @@ class SelectiveSynapticDampening(TorchUnlearner):
         self.local.config['parameters']['lr'] = self.local.config['parameters'].get('lr', 0.1)  # Default learning rate is 0.1
         self.local.config['parameters']['dampening_constant'] = self.local.config['parameters'].get('dampening_constant', 0.1)  # The 'lambda' parameter in the paper
         self.local.config['parameters']['selection_weighting'] = self.local.config['parameters'].get('selection_weighting', 10) # The 'alpha' parameter in the paper
+        self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
 
 class ParameterPerturber:
     def __init__(

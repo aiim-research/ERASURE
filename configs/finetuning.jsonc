@@ -69,7 +69,13 @@
           "class": "erasure.unlearners.Finetuning.Finetuning",
           "parameters": {
               "epochs": 5, 
-              "ref_data":"retain"
+              "ref_data":"retain",
+              "optimizer": {
+                  "class": "torch.optim.Adam",
+                  "parameters": {
+                      "lr": 0.01
+                  }
+              }
           }
       }
   ],

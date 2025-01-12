@@ -2,9 +2,9 @@
     "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
                 "parameters": {
                     "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSource", 
-                                    "parameters": {"path": "torchvision.datasets.FashionMNIST"}
+                                    "parameters": {"path": "torchvision.datasets.FashionMNIST", "transform":["ToTensor"]}
                                 }, 
-                    "partitions":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_reduced","-"], "percentage":0.0125}},
+                    "partitions":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_reduced","-"], "percentage":0.125}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_reduced"}},
                                   {"class": "erasure.data.datasets.DataSplitter.DataSplitterClass", "parameters": {"parts_names":["forget","retain"], "label":1, "ref_data": "train"} },
                                  { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"parts_names":["example","-"], "n_samples":100, "ref_data":"forget"}}
@@ -16,7 +16,7 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 4,
+          "epochs": 40,
           "optimizer": {
             "class": "torch.optim.Adam",
             "parameters": {
@@ -36,13 +36,10 @@
         }
       },
 
-    "unlearners":[{
-        "class": "erasure.unlearners.GoldModel.GoldModel",
-        "parameters": {
-          "ref_data": "forget", 
-          "train_data": "train"
-        }
-    }],
+    "unlearners":[
+      {"compose_gold" : "configs/snippets/u_gold.json"},
+      {"compose_idt" : "configs/snippets/u_id.json"}
+    ],
 
     "evaluator":{
       "class": "erasure.evaluations.manager.Evaluator",
@@ -50,29 +47,36 @@
         "measures":[
           // All available measures
           { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
-          {"class": "erasure.evaluations.measures.AUS", "parameters":{}},
-          {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{
-            "req_acc": 0.7
-          }},
-          {"class": "erasure.evaluations.measures.AIN", "parameters":{
-            "alpha": 0.05,
-            "gold_model": {
-                "class": "erasure.unlearners.GoldModel.GoldModel",
-                "parameters": {
-                  "ref_data": "forget",
-                  "train_data": "train"
-                }
-            }
-          }},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"unlearned"}},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"original"}},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"unlearned"}},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
           {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
+          {"class": "erasure.evaluations.measures.AUS", "parameters":{
+            "forget_part": "forget",
+            "test_part": "test"
+          }},
+          {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{
+            "forget_part": "forget"
+          }},
+          {"class": "erasure.evaluations.measures.AIN", "parameters":{
+            "forget_part": "forget",
+            "alpha": 0.001,
+            "gold_model": {
+                "class": "erasure.unlearners.GoldModel.GoldModel",
+                "parameters": {
+                  "cached": true
+                }
+            }
+          }},
           {"class": "erasure.evaluations.measures.PartitionInfo", "parameters":{}},
           {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/test_run.json"}}
         ]
       }
+    },
+  "globals":{
+        "seed": 1046534644,
+        "cached": true
     }
   }

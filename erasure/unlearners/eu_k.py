@@ -4,10 +4,10 @@ from fractions import Fraction
 from erasure.core.factory_base import get_instance_kvargs
 
 
-class Finetuning(TorchUnlearner):
+class eu_k(TorchUnlearner):
     def init(self):
         """
-        Initializes the Finetuning class with global and local contexts.
+        Initializes the eu-k class with global and local contexts.
         """
 
         super().init()
@@ -21,12 +21,18 @@ class Finetuning(TorchUnlearner):
 
     def __unlearn__(self):
         """
-        Fine-tunes the model with a specific (sub)set of the full dataset (usually retain set)
+        Freeze all the model layers except the last k layers. Then the trainable layers are reset and finetuned with the reference data.
         """
 
-        self.info(f'Starting Finetuning with {self.epochs} epochs')
+        self.info(f'Starting eu-{self.local.config['parameters']['last_trainable_layers']} with {self.epochs} epochs')
 
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
+
+        for i, layer in enumerate(list(self.predictor.model.children())):
+                if i >= len(list(self.predictor.model.children())) - self.local.config['parameters']['last_trainable_layers']:
+                    if hasattr(layer, 'reset_parameters'):
+                        layer.reset_parameters()
+                        self.info(f'Layer {i} is reset')
         
         for epoch in range(self.epochs):
             losses = []
@@ -46,7 +52,7 @@ class Finetuning(TorchUnlearner):
                 self.predictor.optimizer.step()
             
             epoch_loss = sum(losses) / len(losses)
-            self.info(f'Finetuning - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
+            self.info(f'eu-{self.local.config['parameters']['last_trainable_layers']} - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
 
             self.predictor.lr_scheduler.step()
         
@@ -58,3 +64,4 @@ class Finetuning(TorchUnlearner):
         self.local.config['parameters']['epochs'] = self.local.config['parameters'].get("epochs", 5)  # Default 5 epoch
         self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'retain')  # Default reference data is retain
         self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
+        self.local.config['parameters']['last_trainable_layers'] = self.local.config['parameters'].get('last_trainable_layers', 1)  # Default last_trainable_layers is 1

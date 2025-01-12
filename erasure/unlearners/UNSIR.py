@@ -1,10 +1,11 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
-from erasure.utils.config.global_ctx import Global
 from fractions import Fraction
 
 import torch
 import torch.nn.functional as F
 from torch import nn
+
+from erasure.core.factory_base import get_instance_kvargs
 
 class Noise(nn.Module):
     """
@@ -28,6 +29,10 @@ class UNSIR(TorchUnlearner):
         self.ref_data_retain = self.local.config['parameters']['ref_data_retain']
         self.ref_data_forget = self.local.config['parameters']['ref_data_forget']
         self.noise_lr = self.local.config['parameters']['noise_lr']
+
+        self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
+                                      {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
+
     
     def __unlearn__(self):
         """
@@ -102,3 +107,4 @@ class UNSIR(TorchUnlearner):
         self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain')  # Default reference data is retain
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.local.config['parameters']['noise_lr'] = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
+        self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
