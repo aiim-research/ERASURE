@@ -19,16 +19,16 @@ def compute_accuracy(test_loader, model):
     return accuracy
 
 
-def compute_relearn_time(model, split_name='train', max_accuracy=0.8, max_epochs=40):
+def compute_relearn_time(model, data_loader, max_accuracy=0.8, max_epochs=100):
 
-    model = deepcopy(model)
+    # model = deepcopy(model)
 
-    data_loader, var_loader = model.dataset.get_loader_for(split_name)
+    epochs = 0
 
-    relearn_time = 0
+    curr_accuracy = compute_accuracy(data_loader, model.model)
 
-    # try the relearning step for a maximum of n epochs.
-    for epoch in range(40):
+    while (curr_accuracy < max_accuracy  # reached the target accuracy
+    and epochs < max_epochs):  # fine-tune for a maximum of epochs
         losses, preds, labels_list = [], [], []
         model.model.train()
         for batch, (X, labels) in enumerate(data_loader):
@@ -43,12 +43,9 @@ def compute_relearn_time(model, split_name='train', max_accuracy=0.8, max_epochs
             labels_list += list(labels.squeeze().long().detach().to('cpu').numpy())
             preds += list(pred.squeeze().detach().to('cpu').numpy())
 
-        accuracy = model.accuracy(labels_list, preds)
+        curr_accuracy = model.accuracy(labels_list, preds)
         model.lr_scheduler.step()
-        relearn_time += 1
 
-        if accuracy >= max_accuracy:
-            break
+        epochs += 1
 
-
-    return relearn_time
+    return epochs

@@ -1,5 +1,7 @@
 import json
 from collections import defaultdict
+from copy import deepcopy
+
 import torch
 import numpy as np
 
@@ -93,14 +95,25 @@ class PartitionInfo(Measure):
         return e
 
 class AUS(Measure):
-    """ Adaptive Unlearning Score """
+    """ Adaptive Unlearning Score
+        https://doi.org/10.48550/arXiv.2312.02052
+    """
+
+    def init(self):
+        self.forget_part = self.params["forget_part"]
+        self.test_part = self.params["test_part"]
+
+    def check_configuration(self):
+        self.params["forget_part"] = self.params.get("forget_part", "forget")
+        self.params["test_part"] = self.params.get("test_part", "test")
+
 
     def process(self, e: Evaluation):
         or_model = e.predictor
         ul_model = e.unlearned_model
 
-        test_loader, _ = e.unlearner.dataset.get_loader_for('test')
-        forget_loader, _ = e.unlearner.dataset.get_loader_for('forget')
+        test_loader, _ = e.unlearner.dataset.get_loader_for(self.test_part)
+        forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part)
 
         or_test_accuracy = compute_accuracy(test_loader, or_model.model)
         ul_test_accuracy = compute_accuracy(test_loader, ul_model.model)
@@ -190,36 +203,49 @@ class SaveValues(Measure):
 
 
 class RelearnTime(Measure):
+    """ Time (epochs) needed to acquire the original accuracy"""
 
     def init(self):
-        self.req_accuracy = self.params["req_accuracy"]
         self.forget_part = self.params["forget_part"]
 
     def check_configuration(self):
-        self.params["req_accuracy"] = self.params.get("req_accuracy", None)
         self.params["forget_part"] = self.params.get("forget_part", "forget")
 
     def process(self, e: Evaluation):
-        if self.req_accuracy is None:
-            # take the original model accuracy
-            test_loader, _ = e.predictor.dataset.get_loader_for('test')
-            self.req_accuracy = compute_accuracy(test_loader, e.predictor.model)
+        # evaluate the original model accuracy on Forget set
+        forget_loader, _ = e.unlearned_model.dataset.get_loader_for(self.forget_part)
+        original_accuracy = compute_accuracy(forget_loader, e.predictor.model)
 
-        relearn_time = compute_relearn_time(e.unlearned_model, self.forget_part, max_accuracy=self.req_accuracy)
+        # relearn over the Forget set
+        relearn_time = compute_relearn_time(e.unlearned_model, forget_loader, original_accuracy)
 
         self.info(f'Relearning Time: {relearn_time} epochs')
-        e.add_value('Relearning Time (epochs):', relearn_time)
+        e.add_value('RelearnTime', relearn_time)
 
         return e
 
 
 class AIN(Measure):
-    """ Anamnesis Index (AIN) """
+    """ Anamnesis Index (AIN)
+        https://doi.org/10.1109/TIFS.2023.3265506
+    """
 
     def init(self):
         self.alpha = self.params["alpha"]
         self.gold_cfg = self.params["gold_model"]
         self.forget_part = self.params["forget_part"]
+
+        # Gold Model creation
+        dataset = self.global_ctx.factory.get_object(Local(self.global_ctx.config.data))
+        current = Local(self.global_ctx.config.predictor)
+        current.dataset = dataset
+        predictor = self.global_ctx.factory.get_object(current)
+
+        current = Local(self.gold_cfg)
+        current.dataset = dataset
+        current.predictor = predictor
+        gold_model_unlearner = self.global_ctx.factory.get_object(current)
+        self.gold_model = gold_model_unlearner.unlearn()
 
     def check_configuration(self):
         self.params["alpha"] = self.params.get("alpha", 0.05)
@@ -227,27 +253,20 @@ class AIN(Measure):
 
     def process(self, e: Evaluation):
 
-        # Gold Model creation
-        current = Local(self.gold_cfg)
-        current.dataset = e.predictor.dataset
-        current.predictor = e.predictor
-        gold_model_unlearner = self.global_ctx.factory.get_object(current)
-        self.gold_model = gold_model_unlearner.unlearn()
-
         # orginal accuracy on forget
         forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part)
         original_forget_accuracy = compute_accuracy(forget_loader, e.predictor.model)
 
         max_accuracy = (1-self.alpha) * original_forget_accuracy
 
-        # relearn time of Unleaned model on forget
-        rt_unlearned = compute_relearn_time(e.unlearned_model, self.forget_part, max_accuracy=max_accuracy)
+        # relearn time of Unlearned model on forget
+        rt_unlearned = compute_relearn_time(e.unlearned_model, forget_loader, max_accuracy=max_accuracy)
 
         # relearn time of Gold model on forget
-        rt_gold = compute_relearn_time(e.unlearned_model, self.forget_part, max_accuracy=max_accuracy)
+        rt_gold = compute_relearn_time(deepcopy(self.gold_model), forget_loader, max_accuracy=max_accuracy)
 
         ain = rt_unlearned / rt_gold
         self.info(f'AIN: {ain}')
-        e.add_value('AIN:', ain)
+        e.add_value('AIN', ain)
 
         return e

@@ -3,7 +3,7 @@ import torch.nn as nn
 from torchvision.models import resnet18
 
 class CelebAResNet18(nn.Module):
-    def __init__(self, n_classes=40):
+    def __init__(self, n_classes=2):
         super(CelebAResNet18, self).__init__()
         
         resnet = resnet18(pretrained=True)
