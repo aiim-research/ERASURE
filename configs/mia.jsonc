@@ -16,9 +16,6 @@
           "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"parts_names": ["train", "-"], "percentage": 0.0125, "ref_data": "train"}
-        },
-        { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
           "parameters": {"parts_names": ["forget", "retain"], "percentage": 0.1, "ref_data": "train"}
         }
       ],
@@ -53,7 +50,7 @@
     {
       "class": "erasure.unlearners.Finetuning.Finetuning",
       "parameters": {
-          "epochs": 5, 
+          "epochs": 10, 
           "ref_data":"retain",
           "optimizer": {
               "class": "torch.optim.Adam",
@@ -66,7 +63,7 @@
     {
       "class": "erasure.unlearners.NegGrad.NegGrad",
       "parameters": {
-          "epochs": 1,
+          "epochs": 10,
           "ref_data": "forget",
           "optimizer": {
               "class": "torch.optim.Adam",
@@ -79,7 +76,7 @@
     {
       "class": "erasure.unlearners.Scrub.Scrub",
       "parameters": {
-          "epochs": 1, 
+          "epochs": 5, 
           "ref_data_retain": "retain", 
           "ref_data_forget": "forget",
           "T": 4.0,

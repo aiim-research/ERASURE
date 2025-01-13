@@ -92,13 +92,12 @@ class Attack(MembershipInference):
         #test_loader, _ = self.dataset.get_loader_for(self.test_part_plh +"_"+str(k))
 
         split_point = min(len(self.dataset.partitions[self.train_part_plh +"_"+str(k)]),\
-        #                  len(self.dataset.partitions[self.test_part_plh +"_"+str(k)]))
-                          len(self.dataset.partitions[self.attack_test_part]))
-        
+                          len(self.dataset.partitions[self.test_part_plh +"_"+str(k)]))
+        #                  len(self.dataset.partitions[self.attack_test_part]))
         
         train_indices = self.dataset.partitions[self.train_part_plh +"_"+str(k)][:split_point]
-        #test_indices = self.dataset.partitions[self.test_part_plh +"_"+str(k)][:split_point]
-        test_indices = self.dataset.partitions[self.attack_test_part][:split_point]
+        test_indices = self.dataset.partitions[self.test_part_plh +"_"+str(k)][:split_point]
+        #test_indices = self.dataset.partitions[self.attack_test_part][:split_point]
 
 
         train_loader = self.dataset.get_loader_for_ids(train_indices)

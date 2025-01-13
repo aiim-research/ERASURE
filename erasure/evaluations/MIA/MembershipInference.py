@@ -15,19 +15,21 @@ class MembershipInference(Measure):
     '''def __init__(self, global_ctx: Global, local_ctx):
         super().__init__(global_ctx, local_ctx)'''
     def init(self):
+        super().init()
         self.n_shadows = self.local.config['parameters']['shadows']['n_shadows']
         self.data_out_path = self.local.config['parameters']['data_out_path']+'_'+str(self.global_ctx.config.globals['seed'])
         self.train_part_plh = self.local.config['parameters']['shadows']['train_part_plh']
         self.test_part_plh = self.local.config['parameters']['shadows']['test_part_plh']
-        self.attack_test_part = self.local.config['parameters']['attack_test_part']
+        #self.attack_test_part = self.local.config['parameters']['attack_test_part']
         self.base_model_cfg = self.params["shadows"]["base_model"]
 
         self.local_config["parameters"]["attack_in_data"]["parameters"]['DataSource']["parameters"]['path'] += '_'+str(self.global_ctx.config.globals['seed'])
 
-        self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]        
+        self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]   
+            
 
         self.forget_part = 'forget'
-        #self.test_part = 'test'
+
         self.loss_fn = get_instance_config(self.params['loss_fn'])
 
 
@@ -36,7 +38,11 @@ class MembershipInference(Measure):
         self.attack_in_data_cfg['generated_from']=data_cfg
 
         self.dataset = self.global_ctx.factory.get_object(Local(data_cfg))
-        #self.dataset.add_partitions(self.local.config['parameters']['shadows']['dataset_preproc']) #TODO: add_partition can be removed
+
+        
+        self.base_model_cfg['per_shadows_partition']=self.local.config['parameters']['shadows']['per_shadows_partition'] #Let the cache working  when per_partition is changed
+        self.attack_in_data_cfg['generated_from_per_shadows']=self.base_model_cfg['per_shadows_partition'] #Let the cache working  when per_partition is changed
+         
 
         # Shadow Models
         shadow_models = []
@@ -68,7 +74,7 @@ class MembershipInference(Measure):
         if "loss_fn" not in self.params:
             self.params["loss_fn"] = copy.deepcopy(self.global_ctx.config.predictor["parameters"]["loss_fn"])
 
-        self.local.config['parameters']['attack_test_part'] = self.local.config['parameters'].get('attack_test_part','test')
+        #self.local.config['parameters']['attack_test_part'] = self.local.config['parameters'].get('attack_test_part','test')
 
 
 
@@ -87,6 +93,7 @@ class MembershipInference(Measure):
         """ create generic Shadow Model """
         # create shadow model
         shadow_base_model = copy.deepcopy(self.base_model_cfg)
+        shadow_base_model['current_shadow']=k
         shadow_base_model['parameters']['training_set'] = self.train_part_plh +"_"+str(k)
         current = Local(shadow_base_model)
 

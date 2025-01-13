@@ -73,7 +73,7 @@ class DatasetManager(Configurable):
             pass
 
         else:
-            main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
+            main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed(),drop_last=True)
             fold_loader = None
 
         return main_loader, fold_loader
