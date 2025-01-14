@@ -112,12 +112,16 @@ class DataSplitterClass(DataSplitter):
             idx for idx in range(len(ref_data))  
             if ref_data[idx][1] == self.label  
         ]
-        
 
         other_indices = [
             idx for idx in range(len(ref_data)) 
             if idx not in filtered_indices
         ]
+
+        # if not ref_data == "all":
+        #     filtered_indices = [ref_data.data.indices[i] for i in filtered_indices]
+        #     other_indices = [ref_data.data.indices[i] for i in other_indices]
+
 
         partitions[self.parts_names[0]] = filtered_indices 
         partitions[self.parts_names[1]] = other_indices
