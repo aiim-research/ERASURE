@@ -265,7 +265,8 @@ class AIN(Measure):
         # relearn time of Gold model on forget
         rt_gold = compute_relearn_time(deepcopy(self.gold_model), forget_loader, max_accuracy=max_accuracy)
 
-        ain = rt_unlearned / rt_gold
+        epsilon = 0.01
+        ain = (rt_unlearned + epsilon) / (rt_gold + epsilon)
         self.info(f'AIN: {ain}')
         e.add_value('AIN', ain)
 
