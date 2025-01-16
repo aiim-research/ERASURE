@@ -29,11 +29,13 @@ if __name__ == "__main__":
 
     #Create Dataset
     data_manager = global_ctx.factory.get_object( Local( global_ctx.config.data ))
+    global_ctx.dataset = data_manager
 
     #Create Predictor
     current = Local(global_ctx.config.predictor)
     current.dataset = data_manager
     predictor = global_ctx.factory.get_object(current)
+    global_ctx.predictor = predictor
     global_ctx.logger.info('Global Predictor: ' + str(predictor))
 
     #Create unlearners 
