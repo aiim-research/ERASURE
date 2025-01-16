@@ -25,11 +25,11 @@ class MembershipInference(Measure):
 
         self.local_config["parameters"]["attack_in_data"]["parameters"]['DataSource']["parameters"]['path'] += '_'+str(self.global_ctx.config.globals['seed'])
 
-        self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]   
-            
+        self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]
 
         self.forget_part = 'forget'
 
+        self.params["loss_fn"]["parameters"]["reduction"] = "none"
         self.loss_fn = get_instance_config(self.params['loss_fn'])
 
 
@@ -76,15 +76,6 @@ class MembershipInference(Measure):
 
         #self.local.config['parameters']['attack_test_part'] = self.local.config['parameters'].get('attack_test_part','test')
 
-
-
-
-
-
-        #init_dflts_to_of(self.local.config, 'function', 'sklearn.metrics.accuracy_score') # Default empty node for: sklearn.metrics.accuracy_score
-        #self.local.config['parameters']['partition'] = self.local.config['parameters'].get('partition', 'test')  # Default partition: test
-        #self.local.config['parameters']['name'] = self.local.config['parameters'].get('name', self.local.config['parameters']['function']['class'])  # Default name as metric name
-        #self.local.config['parameters']['target'] = self.local.config['parameters'].get('target', 'unlearned')  # Default partition: test
 
     def process(self, e: Evaluation):
         return e

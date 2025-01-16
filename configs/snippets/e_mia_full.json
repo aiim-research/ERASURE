@@ -2,6 +2,9 @@
     "class": "erasure.evaluations.MIA.mia.Attack",
 
     "parameters": {
+      "data_out_path": "resources/data/mia/mia.pt",
+      "attack_test_part": "test",
+
       "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
         "parameters": {
@@ -45,7 +48,6 @@
       
       "shadows": {
         "n_shadows": 5,
-        "data_out_path": "resources/data/mia/mia.pt",
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[
