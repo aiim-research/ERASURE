@@ -4,7 +4,6 @@ import numpy as np
 
 import torch
 from torch.utils.data import DataLoader
-import torch.nn as nn
 
 from erasure.evaluations.MIA.MembershipInference import MembershipInference
 from erasure.evaluations.evaluation import Evaluation
@@ -14,7 +13,7 @@ from erasure.utils.config.local_ctx import Local
 class Attack(MembershipInference):
     """ Likelihood Ratio membership inference Attack (LiRA)
         (https://doi.org/10.48550/arXiv.2403.01218)
-        the Carlini way
+        the Carlini way (https://doi.org/10.1109/SP46214.2022.9833649)
     """
 
     def process(self, e: Evaluation):
@@ -34,7 +33,6 @@ class Attack(MembershipInference):
         self.info(f"Target Forget: {target_forget}")
         #self.info(f"Target Test: {target_test/target_test.sum()}")
 
-        # Forgetting Rate (doi: 10.1109/TDSC.2022.3194884)
         self.info(f"LiRA: {target_forget}")
         e.add_value("LiRA", target_forget)
 
@@ -66,7 +64,7 @@ class Attack(MembershipInference):
         for f_id in self.dataset.partitions[self.forget_part]:
             f_idxs = (attack_samples[:, 0] == f_id).nonzero(as_tuple=True)[0]
             attack_datasets[f_id] = torch.utils.data.TensorDataset(attack_samples[f_idxs, 1:], attack_labels[f_idxs])
-            attack_datasets[f_id].n_classes = 1
+            attack_datasets[f_id].n_classes = 10
 
         # create DataManagers for the Attack model
         attack_datamanagers = {}
@@ -107,23 +105,25 @@ class Attack(MembershipInference):
 
         with torch.no_grad():
             for X, labels in loader:
-                original_labels = labels.view(len(labels), -1)
                 X = X.to(model.device)
                 _, predictions = model.model(X)  # shadow model prediction
 
-                losses = torch.tensor([self.loss_fn(predictions[i], labels[i]) for i in range(len(predictions))])
+                losses = self.loss_fn(predictions, labels)
+                # predictions = torch.nn.functional.softmax(predictions, dim=0)
 
-                predictions = predictions.to('cpu')
                 losses = losses.to('cpu')
+                predictions = predictions.to('cpu')
 
-                # attack_samples.append(predictions)
-                attack_samples.append(losses.unsqueeze(1))
+                attack_samples.append(
+                    # losses.unsqueeze(1)
+                    predictions
+                )
 
         attack_samples = torch.cat(attack_samples)
 
-        forget_ids = torch.tensor(self.dataset.partitions[self.forget_part])[...,None]
+        forget_ids = torch.tensor(self.dataset.partitions[self.forget_part])[:len(attack_samples),None]
         attack_samples = torch.cat([forget_ids, attack_samples], dim=1)
-        attack_labels = torch.tensor(label_values)
+        attack_labels = torch.tensor(label_values)[:len(attack_samples)]
 
         return attack_samples, attack_labels
 
@@ -139,7 +139,12 @@ class Attack(MembershipInference):
                     curr_f_id = data_ids[curr_id]
                     if curr_f_id in attack_models:
                         loss = self.loss_fn(target_predictions[i], labels[i])
-                        evaluation = attack_models[curr_f_id].evaluate(loss)
+
+                        # evaluation = attack_models[curr_f_id].evaluate(loss)
+
+                        _, prediction = attack_models[curr_f_id].model(target_predictions[i])
+                        evaluation = torch.nn.functional.softmax(prediction, dim=0)
+
                         if evaluation is not None:
                             evaluation += 0.0001
                             attack_predictions.append(evaluation[1]/evaluation[0])

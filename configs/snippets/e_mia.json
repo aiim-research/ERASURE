@@ -1,9 +1,9 @@
 {
-
     "class": "erasure.evaluations.MIA.mia.Attack",
     "parameters": {
       "data_out_path": "resources/data/mia/mia.pt",
-      "attack_test_part":"test",
+      "attack_test_part": "test",
+
       "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
         "parameters": {
@@ -21,6 +21,7 @@
           "batch_size": 32
         }
       },
+
       "attack_model": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
@@ -42,7 +43,8 @@
             "parameters": {"mult":[2,0.75]}
           }
         }
-      },   
+      },
+
       "shadows": {
         "n_shadows": 5,
         "train_part_plh":"shw_train",
