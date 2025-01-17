@@ -17,8 +17,8 @@ import os
 import yaml
 
 class TorchSKLearn(Measure):
-    def __init__(self, global_ctx: Global, local_ctx):
-        super().__init__(global_ctx, local_ctx)
+    def init(self):
+        super().init()
 
         self.partition_name = self.local.config['parameters']['partition']
         self.target = self.local.config['parameters']['target']
@@ -61,8 +61,8 @@ class TorchSKLearn(Measure):
         return e
     
 class PartitionInfo(Measure):
-    def __init__(self, global_ctx: Global, local_ctx):
-        super().__init__(global_ctx, local_ctx)
+    def init(self):
+        super().init()
 
         self.partition_name = self.local.config['parameters']['partition']
 
@@ -100,6 +100,7 @@ class AUS(Measure):
     """
 
     def init(self):
+        super().init()
         self.forget_part = self.params["forget_part"]
         self.test_part = self.params["test_part"]
 
@@ -129,8 +130,8 @@ class AUS(Measure):
 
 class SaveValues(Measure):
     # TODO: add configuration nodes
-    def __init__(self, global_ctx, local_ctx):
-        super().__init__(global_ctx, local_ctx)
+    def init(self):
+        super().init()
         self.path = self.params['path']
         self.output_format = self.local_config['parameters'].get('output_format', self.path.split(".")[-1])
 
@@ -206,6 +207,7 @@ class RelearnTime(Measure):
     """ Time (epochs) needed to acquire the original accuracy"""
 
     def init(self):
+        super().init()
         self.forget_part = self.params["forget_part"]
 
     def check_configuration(self):
@@ -231,6 +233,7 @@ class AIN(Measure):
     """
 
     def init(self):
+        super().init()
         self.alpha = self.params["alpha"]
         self.gold_cfg = self.params["gold_model"]
         self.forget_part = self.params["forget_part"]

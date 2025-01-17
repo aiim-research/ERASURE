@@ -78,10 +78,24 @@
               }
           }
       },
+      {
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "epochs": 5, 
+            "ref_data":"retain",
+            "optimizer": {
+                "class": "torch.optim.Adam",
+                "parameters": {
+                    "lr": 0.01
+                }
+            }
+        }
+    },
       {"compose_gold" : "configs/snippets/u_gold.json"}
   ],
   "compose_eval":"configs/snippets/default_evaluation.json",
   "globals":{
-        "seed": 543515248
+        "seed": 543515248,
+        "cached": true
     }
 }

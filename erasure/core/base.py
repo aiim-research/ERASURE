@@ -21,6 +21,8 @@ class Configurable(Base):
         super().__init__(global_ctx)
         self.local = local_ctx
         self.local_config = self.local.config
+
+        self.local.config['parameters'] = self.local.config.get('parameters',{})
         self.params = self.local.config['parameters']
 
         self.check_configuration()
@@ -31,7 +33,7 @@ class Configurable(Base):
               
         
     def check_configuration(self):
-        self.local.config['parameters'] = self.local.config.get('parameters',{})
+        pass #self.local.config['parameters'] = self.local.config.get('parameters',{})
 
     def __pre_init__(self):
         return False

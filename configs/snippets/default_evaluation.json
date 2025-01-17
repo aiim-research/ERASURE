@@ -3,7 +3,7 @@
         "class": "erasure.evaluations.manager.Evaluator",
         "parameters": {
           "measures":[
-            {"class":"erasure.evaluations.running.RunTime", "parameters":{}},
+            {"class":"erasure.evaluations.running.ChainOfRunners", "parameters":{"runners":["erasure.evaluations.running.PAPI","erasure.evaluations.running.RunTime"]}},
             {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"function":{"class":"sklearn.metrics.f1_score", "parameters":{"average":"macro"}}}},
             {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"unlearned"}},
             {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"original"}},
