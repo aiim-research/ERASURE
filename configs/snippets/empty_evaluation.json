@@ -1,0 +1,10 @@
+{
+    "evaluator":{
+        "class": "erasure.evaluations.manager.Evaluator",
+        "parameters": {
+          "measures":[
+            {"class":"erasure.evaluations.running.RunTime", "parameters":{}}
+          ]
+        }
+      }
+}
