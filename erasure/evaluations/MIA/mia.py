@@ -126,9 +126,8 @@ class Attack(MembershipInference):
                 original_labels = labels.view(len(labels), -1)
                 X = X.to(model.device)
                 _, predictions = model.model(X) # shadow model prediction #TODO check model to decide if applying the Softmax or not torch.nn.functional.softmax(model.model(X))
-                
+
                 predictions = predictions.to('cpu')
-               
 
                 attack_samples.append(
                     torch.cat([original_labels, predictions], dim=1)

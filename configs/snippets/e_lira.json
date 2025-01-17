@@ -1,6 +1,7 @@
 {
     "class": "erasure.evaluations.MIA.lira.Attack",
     "parameters": {
+      "data_out_path": "resources/data/lira/lira.pt",
 
       "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
@@ -26,8 +27,7 @@
       },
 
       "shadows": {
-        "n_shadows": 20,
-        "data_out_path": "resources/data/lira/lira.pt",
+        "n_shadows": 100,
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[

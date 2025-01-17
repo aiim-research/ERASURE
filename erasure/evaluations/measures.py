@@ -236,14 +236,14 @@ class AIN(Measure):
         self.forget_part = self.params["forget_part"]
 
         # Gold Model creation
-        dataset = self.global_ctx.factory.get_object(Local(self.global_ctx.config.data))
+        '''dataset = self.global_ctx.factory.get_object(Local(self.global_ctx.config.data))
         current = Local(self.global_ctx.config.predictor)
         current.dataset = dataset
-        predictor = self.global_ctx.factory.get_object(current)
+        predictor = self.global_ctx.factory.get_object(current)'''
 
         current = Local(self.gold_cfg)
-        current.dataset = dataset
-        current.predictor = predictor
+        '''current.dataset = dataset
+        current.predictor = predictor'''
         gold_model_unlearner = self.global_ctx.factory.get_object(current)
         self.gold_model = gold_model_unlearner.unlearn()
 

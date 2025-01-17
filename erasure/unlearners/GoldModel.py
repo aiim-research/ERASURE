@@ -10,11 +10,14 @@ class GoldModel(Unlearner):
         super().init()
 
         #Create Dataset
-        data_manager = self.global_ctx.factory.get_object(Local(self.local.config['parameters']['data']))
+        if self.local.config['parameters']['data'] == 'global':
+            data_manager = self.global_ctx.dataset
+        else:
+            data_manager = self.global_ctx.factory.get_object(Local(self.local.config['parameters']['data']))
     
         #Create Predictor
         self.current = Local(self.local.config['parameters']['predictor'])
-        self.current.dataset = data_manager
+        self.current.dataset = self.global_ctx.dataset
     
     def __unlearn__(self):
         """
@@ -29,13 +32,13 @@ class GoldModel(Unlearner):
         super().check_configuration()
 
         if 'data' not in self.local.config['parameters']:
-            self.local.config['parameters']['data'] = copy.deepcopy(self.dataset.local_config)
+            self.local.config['parameters']['data'] = 'global'#copy.deepcopy(self.global_ctx.dataset.local_config)
 
         self.local.config['parameters']['training_set'] = self.local.config['parameters'].get("training_set", 'retain')  # Default train data is retain
         self.local.config['parameters']['cached'] = self.local.config['parameters'].get("cached", False)  # Default cached to False
 
         if 'predictor' not in self.local.config['parameters']:
-            self.local.config['parameters']['predictor'] = copy.deepcopy(self.predictor.local_config)
+            self.local.config['parameters']['predictor'] = copy.deepcopy(self.global_ctx.predictor.local_config)
             self.local.config['parameters']['predictor']['parameters']['cached'] = self.local.config['parameters']['cached']
             self.local.config['parameters']['predictor']['parameters']['training_set'] = self.local.config['parameters']['training_set']
         else:

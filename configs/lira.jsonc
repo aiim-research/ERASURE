@@ -10,7 +10,7 @@
       },
       "partitions": [
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-          "parameters": {"parts_names": ["all_reduced", "-"], "percentage": 0.0525}
+          "parameters": {"parts_names": ["all_reduced", "-"], "percentage": 0.05}
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
           "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all_reduced"}
@@ -29,7 +29,7 @@
   "predictor": {
     "class": "erasure.model.TorchModel.TorchModel",
     "parameters": {
-      "epochs": 50,
+      "epochs": 20,
       "optimizer": {
         "class": "torch.optim.RMSprop",
         "parameters": {
@@ -49,8 +49,8 @@
     }
   },
   "unlearners": [
-    {"compose_idt" : "configs/snippets/u_id.json"},
-    {"compose_gold" : "configs/snippets/u_gold.json"}
+    {"compose_gold" : "configs/snippets/u_gold.json"},
+    {"compose_idt" : "configs/snippets/u_id.json"}
   ],
   "evaluator": {
     "class": "erasure.evaluations.manager.Evaluator",

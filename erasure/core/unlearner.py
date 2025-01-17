@@ -8,9 +8,13 @@ from erasure.utils.config.local_ctx import Local
 class Unlearner(Configurable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx: Global, local_ctx):
-        self.dataset = local_ctx.dataset
-        self.predictor = local_ctx.predictor
-        self.device = self.predictor.device
+        if hasattr(local_ctx,'dataset'):
+            self.dataset = local_ctx.dataset
+        if hasattr(local_ctx,'predictor'):
+            self.predictor = local_ctx.predictor
+            self.device = self.predictor.device
+        else:
+            self.predictor = 'global'
 
         super().__init__(global_ctx, local_ctx)   
 

@@ -11,7 +11,7 @@
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
                       "parts_names": ["all_reduced", "-"],
-                      "percentage": 0.0125
+                      "percentage": 0.125
                   }
               },
               {
@@ -77,7 +77,11 @@
                   }
               }
           }
-      }
+      },
+      {"compose_gold" : "configs/snippets/u_gold.json"}
   ],
-  "compose_eval":"configs/snippets/default_evaluation.json"
+  "compose_eval":"configs/snippets/default_evaluation.json",
+  "globals":{
+        "seed": 543515248
+    }
 }
