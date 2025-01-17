@@ -1,4 +1,5 @@
 import time
+import torch.profiler
 
 from erasure.core.measure import Measure
 from erasure.evaluations.manager import Evaluation
@@ -23,6 +24,32 @@ class RunTime(UnlearnRunner):
             metric_value = time.time() - start_time
 
         e.add_value('RunTime', metric_value)
+
+        return e
+
+class TorchFlops(UnlearnRunner):
+    """ FLOPS to execute the unlearn (iw works only with PyTorch models) """
+    def process(self, e: Evaluation):
+        if not e.unlearned_model:
+            with torch.profiler.profile(
+                activities=[
+                    torch.profiler.ProfilerActivity.CPU,
+                    torch.profiler.ProfilerActivity.CUDA,
+                ],
+                record_shapes=True,
+                profile_memory=True,
+                with_stack=True,
+                with_flops=True
+            ) as prof:
+                
+                e.unlearned_model = e.unlearner.unlearn()
+
+            metric_value = 0
+            for event in prof.key_averages():
+                if event.flops is not None:
+                    metric_value += event.flops
+
+        e.add_value('TorchFlops', metric_value)
 
         return e
 
