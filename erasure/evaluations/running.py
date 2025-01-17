@@ -44,10 +44,7 @@ class TorchFlops(UnlearnRunner):
                 
                 e.unlearned_model = e.unlearner.unlearn()
 
-            metric_value = 0
-            for event in prof.key_averages():
-                if event.flops is not None:
-                    metric_value += event.flops
+        metric_value = sum(event.flops for event in prof.key_averages())
 
         e.add_value('TorchFlops', metric_value)
 
