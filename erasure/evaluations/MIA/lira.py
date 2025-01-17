@@ -63,14 +63,15 @@ class Attack(MembershipInference):
         attack_datasets = {}
         for f_id in self.dataset.partitions[self.forget_part]:
             f_idxs = (attack_samples[:, 0] == f_id).nonzero(as_tuple=True)[0]
-            attack_datasets[f_id] = torch.utils.data.TensorDataset(attack_samples[f_idxs, 1:], attack_labels[f_idxs])
-            attack_datasets[f_id].n_classes = 10
+            if len(f_idxs) > 0:
+                attack_datasets[f_id] = torch.utils.data.TensorDataset(attack_samples[f_idxs, 1:], attack_labels[f_idxs])
+                attack_datasets[f_id].n_classes = 10
 
         # create DataManagers for the Attack model
         attack_datamanagers = {}
 
         os.makedirs(os.path.dirname(self.data_out_path), exist_ok=True)  # TODO Random temp path
-        for f_id in self.dataset.partitions[self.forget_part]:
+        for f_id in attack_datasets:
             file_path = self.data_out_path + str(f_id)
             torch.save(attack_datasets[f_id], file_path)
             # Create DataMangers and reload data
@@ -106,6 +107,8 @@ class Attack(MembershipInference):
         with torch.no_grad():
             for X, labels in loader:
                 X = X.to(model.device)
+                labels = labels.to(model.device)
+
                 _, predictions = model.model(X)  # shadow model prediction
 
                 losses = self.loss_fn(predictions, labels)
@@ -133,7 +136,9 @@ class Attack(MembershipInference):
         attack_predictions = []
         with torch.no_grad():
             for batch, (X, labels) in enumerate(dataloader):
-                _, target_predictions = target_model.model(X.to(target_model.device))
+                X = X.to(target_model.device)
+                labels = labels.to(target_model.device)
+                _, target_predictions = target_model.model(X)
                 for i in range(len(target_predictions)):
                     curr_id = batch*dataloader.batch_size + i
                     curr_f_id = data_ids[curr_id]
@@ -145,6 +150,7 @@ class Attack(MembershipInference):
                         _, prediction = attack_models[curr_f_id].model(target_predictions[i])
                         evaluation = torch.nn.functional.softmax(prediction, dim=0)
 
+                        evaluation = evaluation.to('cpu')
                         if evaluation is not None:
                             evaluation += 0.0001
                             attack_predictions.append(evaluation[1]/evaluation[0])

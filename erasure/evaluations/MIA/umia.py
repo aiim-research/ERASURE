@@ -135,6 +135,7 @@ class Attack(Measure):
         with torch.no_grad():
             for X, labels in loader:
                 X = X.to(model.device)
+                labels = labels.to(model.device)
                 _, predictions = model.model(X)  # model prediction
 
                 losses = self.loss_fn(predictions, labels)
