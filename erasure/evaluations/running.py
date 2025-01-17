@@ -1,8 +1,10 @@
 import time
 import torch.profiler
+import platform
 
-from pypapi import papi_low as papi
-from pypapi import events as papi_events
+if platform.system() != 'Darwin':
+    from pypapi import papi_low as papi
+    from pypapi import events as papi_events
 
 from erasure.core.measure import Measure
 from erasure.evaluations.manager import Evaluation
@@ -89,11 +91,15 @@ class TorchFlops(UnlearnRunner):
 
     def process(self, e: Evaluation):
         if not e.unlearned_model:
+            activities=[torch.profiler.ProfilerActivity.CPU]
+                        
+            if torch.cuda.is_available():
+                activities.append(torch.profiler.ProfilerActivity.CUDA)
+            if torch.xpu.is_available():
+                activities.append(torch.profiler.ProfilerActivity.XPU)
+
             with torch.profiler.profile(
-                activities=[
-                    torch.profiler.ProfilerActivity.CPU,
-                    torch.profiler.ProfilerActivity.CUDA,
-                ],
+                activities=activities,
                 record_shapes=True,
                 profile_memory=True,
                 with_stack=True,
