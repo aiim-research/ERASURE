@@ -30,7 +30,8 @@ class MIAAttack(nn.Module):
         intermediate_output = x
         x = self.fc4(x)
         return intermediate_output, x
-    
+
+
 class FlexSeqBin(nn.Module):
 
     def __init__(self, n_classes, mult=[2,1,0.5]):
@@ -50,5 +51,3 @@ class FlexSeqBin(nn.Module):
     def forward(self, x):
         intermediate_output = self.layers(x)
         return intermediate_output, self.last(intermediate_output)
-
-

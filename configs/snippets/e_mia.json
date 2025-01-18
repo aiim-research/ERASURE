@@ -52,10 +52,10 @@
         "dataset_preproc":[
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 1, "ref_data": "train"}
+            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 1.0, "ref_data": "train"}
           }
         ],
-        "per_shadows_partition":      
+        "per_shadows_partition":
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
             "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.5, "ref_data": "shadow_data", "shuffle": true}

@@ -68,10 +68,15 @@ class Attack(Measure):
             X, y = attack_loader.dataset[:]
             attack_model = sklearn.linear_model.LogisticRegression()
             cv = sklearn.model_selection.StratifiedShuffleSplit(n_splits=5, test_size=0.8)
-            accuracies = sklearn.model_selection.cross_val_score(
-                attack_model, X, y, cv=cv, scoring="accuracy")
+            try:
+                accuracies = sklearn.model_selection.cross_val_score(
+                    attack_model, X, y, cv=cv, scoring="accuracy")
+                umia_accuracy = accuracies.mean().item()
+            except ValueError as err:
+                self.global_ctx.logger.warning(repr(err))
+                self.global_ctx.logger.warning("U-MIA not calculated")
+                umia_accuracy = -1.0
 
-            umia_accuracy = accuracies.mean()
 
         self.info(f"UMIA accuracy: {umia_accuracy}")
         e.add_value("UMIA", umia_accuracy)

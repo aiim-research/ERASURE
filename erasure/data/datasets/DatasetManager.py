@@ -50,7 +50,11 @@ class DatasetManager(Configurable):
 
         dataset = self.partitions['all']
 
-        main_loader = DataLoader(Subset(dataset.data, list_ids), batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
+        # main_loader = DataLoader(Subset(dataset.data, list_ids), batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
+        main_loader = DataLoader(
+            self.datasource.get_wrapper(Subset(dataset.data, list_ids)),
+            batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed(), drop_last=True
+        )
 
         return main_loader
            

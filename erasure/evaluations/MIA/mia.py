@@ -38,7 +38,9 @@ class Attack(MembershipInference):
         #self.info(f"Target Test: {target_test/target_test.sum()}")
 
         # Forgetting Rate (doi: 10.1109/TDSC.2022.3194884)
-        fr = (target_forget[0] - original_forget[0]) / original_forget[1]
+        fr = (target_forget[0] - original_forget[0]) / (original_forget[1] +0.01)
+        fr = fr.item()
+
         self.info(f"Forgetting Rate: {fr}")
         e.add_value("Forgetting Rate", fr)
 

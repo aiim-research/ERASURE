@@ -17,13 +17,31 @@
               "parameters": {"parts_names": ["train", "test"], "percentage": 0.8, "ref_data": "all"}
             }
           ],
-          "batch_size": 1
+          "batch_size": 10
         }
       },
 
       "attack_model": {
-        "class": "erasure.evaluations.MIA.Distribution.Distribution",
-        "parameters": {}
+        "class": "erasure.model.TorchModel.TorchModel",
+        "parameters": {
+          "epochs": 50,
+          "optimizer": {
+            "class": "torch.optim.RMSprop",
+            "parameters": {
+              "lr": 0.01
+            }
+          },
+          "loss_fn": {
+            "class": "torch.nn.CrossEntropyLoss",
+            "parameters": {
+              "reduction": "mean"
+            }
+          },
+          "model": {
+            "class": "erasure.model.FF.FlexSeqBin",
+            "parameters": {"mult":[2,0.75]}
+          }
+        }
       },
 
       "shadows": {
@@ -33,13 +51,13 @@
         "dataset_preproc":[
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 1.0, "ref_data": "forget"}
+            "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 1.0, "ref_data": "train"}
           }
         ],
-        "per_shadows_partition":      
+        "per_shadows_partition":
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
-            "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.8, "ref_data": "shadow_data", "shuffle": true}
+            "parameters": {"parts_names": ["shw_train", "shw_test"], "percentage": 0.5, "ref_data": "shadow_data", "shuffle": true}
           }
       }
     }
