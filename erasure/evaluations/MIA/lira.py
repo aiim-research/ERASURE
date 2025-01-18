@@ -28,10 +28,11 @@ class Attack(MembershipInference):
 
         original_forget = self.test_dataset(self.attack_models, original, forget_dataloader, forget_ids)
         target_forget = self.test_dataset(self.attack_models, unlearned, forget_dataloader, forget_ids)
+        original_forget = original_forget.item()
+        target_forget = target_forget.item()
 
         self.info(f"Original Forget: {original_forget}")
         self.info(f"Target Forget: {target_forget}")
-        #self.info(f"Target Test: {target_test/target_test.sum()}")
 
         self.info(f"LiRA: {target_forget}")
         e.add_value("LiRA", target_forget)
@@ -65,7 +66,7 @@ class Attack(MembershipInference):
             f_idxs = (attack_samples[:, 0] == f_id).nonzero(as_tuple=True)[0]
             if len(f_idxs) > 0:
                 attack_datasets[f_id] = torch.utils.data.TensorDataset(attack_samples[f_idxs, 1:], attack_labels[f_idxs])
-                attack_datasets[f_id].n_classes = 10
+                attack_datasets[f_id].n_classes = self.dataset.n_classes
 
         # create DataManagers for the Attack model
         attack_datamanagers = {}
