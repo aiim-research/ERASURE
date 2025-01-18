@@ -11,7 +11,7 @@
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
                       "parts_names": ["all_reduced", "-"],
-                      "percentage": 0.125
+                      "percentage": 0.025
                   }
               },
               {

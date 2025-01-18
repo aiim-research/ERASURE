@@ -67,12 +67,27 @@
       {
         "class": "erasure.unlearners.Finetuning.Finetuning",
         "parameters": {
+            "epochs": 5, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
             "last_trainable_layers": 1,
             "epochs": 5, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
       },
+      {
+        "class": "erasure.unlearners.FisherForgetting.FisherForgetting",
+        "parameters": {
+            "ref_data":"retain",
+            "alpha": 1e-7
+            }
+        },
       {
         "class": "erasure.unlearners.eu_k.eu_k",
         "parameters": {
@@ -140,6 +155,37 @@
                       "epochs": 1, 
                       "ref_data":"retain",
                       "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+                  }
+              }
+            ]
+        }
+      },
+      {
+        "class": "erasure.unlearners.composite.Cascade",
+        "parameters": {
+            "sub_unlearner": [
+              {
+                "class": "erasure.unlearners.SaliencyMapGeneration.SaliencyMapGeneration",
+                "parameters": {
+                    "ref_data":"forget",
+                    "treshold": 0.5,
+                    "save_dir": "saliency_maps", 
+                    "file_name": "saliency_map"
+                    }
+                },
+                {
+                  "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
+                  "parameters": {
+                      "model_mask_path": "saliency_maps/saliency_map",
+                      "epochs": 1, 
+                      "ref_data_retain": "retain", 
+                      "ref_data_forget": "forget",
+                      "optimizer": {
+                          "class": "torch.optim.Adam",
+                          "parameters": {
+                              "lr": 0.001
+                          }
+                      }
                   }
               }
             ]
