@@ -24,7 +24,7 @@ class eu_k(TorchUnlearner):
         Freeze all the model layers except the last k layers. Then the trainable layers are reset and finetuned with the reference data.
         """
 
-        self.info(f'Starting eu-{self.local.config['parameters']['last_trainable_layers']} with {self.epochs} epochs')
+        self.info(f"Starting eu-{self.local.config['parameters']['last_trainable_layers']} with {self.epochs} epochs")
 
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
 
@@ -52,7 +52,7 @@ class eu_k(TorchUnlearner):
                 self.predictor.optimizer.step()
             
             epoch_loss = sum(losses) / len(losses)
-            self.info(f'eu-{self.local.config['parameters']['last_trainable_layers']} - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')
+            self.info(f"eu-{self.local.config['parameters']['last_trainable_layers']} - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}")
 
             self.predictor.lr_scheduler.step()
         

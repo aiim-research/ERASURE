@@ -12,8 +12,8 @@
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
                                 ],
-                    "batch_size":128,
-                    "split_seed":16}
+                    "batch_size":128
+                  }
                 },
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
@@ -32,8 +32,7 @@
             }
           },
           "model": {
-            "class": "erasure.model.classifiers.resnet18_for_celeba.CelebAResNet18",
-            "parameters": {}
+            "class": "erasure.model.classifiers.resnet18_for_celeba.CelebAResNet18","parameters": {}
           }
         }
       },
@@ -52,12 +51,7 @@
               "epochs": 1, 
               "ref_data_retain": "retain", 
               "ref_data_forget": "forget",
-              "optimizer": {
-                  "class": "torch.optim.Adam",
-                  "parameters": {
-                      "lr": 0.0001
-                  }
-              }
+              "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
           }
       },
       {
@@ -66,12 +60,7 @@
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.01
-                }
-            },
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}},
             "KL_temperature": 1.0
         }
       },
@@ -81,12 +70,7 @@
             "last_trainable_layers": 1,
             "epochs": 5, 
             "ref_data":"retain",
-            "optimizer": {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.01
-                }
-            }
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
       },
       {
@@ -95,12 +79,7 @@
             "last_trainable_layers": 2,
             "epochs": 40, 
             "ref_data":"retain",
-            "optimizer": {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.01
-                }
-            }
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
       },
       {"compose_idt" : "configs/snippets/u_id.json"},
@@ -109,12 +88,7 @@
         "parameters": {
             "epochs": 5,
             "ref_data": "forget",
-            "optimizer": {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.0001
-                }
-            }
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
         }
       },
       {
@@ -124,12 +98,7 @@
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
             "T": 4.0,
-            "optimizer": {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.001
-                }
-            }
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
         }
       },
       {
@@ -139,12 +108,7 @@
             "ref_data_forget": "forget",
             "dampening_constant": 0.1,
             "selection_weighting": 20,
-            "optimizer": {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.1
-                }
-            }
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.1}}
           }
       },
       {
@@ -153,12 +117,7 @@
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {
-                "class": "torch.optim.Adam",
-                "parameters": {
-                    "lr": 0.001
-                }
-            }
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
         }
       },
       {
@@ -172,12 +131,7 @@
                         "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
                         "noise_lr": 0.01,
-                        "optimizer": {
-                            "class": "torch.optim.Adam",
-                            "parameters": {
-                                "lr": 0.01
-                            }
-                        }
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
                     }
                 }, 
                 {
@@ -185,12 +139,7 @@
                   "parameters": {
                       "epochs": 1, 
                       "ref_data":"retain",
-                      "optimizer": {
-                            "class": "torch.optim.Adam",
-                            "parameters": {
-                                "lr": 0.01
-                            }
-                        }
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
                   }
               }
             ]
@@ -201,40 +150,23 @@
           "class": "erasure.evaluations.manager.Evaluator",
           "parameters": {
             "measures":[
-              { "class":"erasure.evaluations.running.RunTime", "parameters":{}},
+              {"class":"erasure.evaluations.running.RunTime"},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"unlearned"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"original"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"unlearned"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
-              {"class": "erasure.evaluations.measures.AUS", "parameters":{
-                "forget_part": "forget",
-                "test_part": "test"
-              }},
-              {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{
-                "forget_part": "forget"
-              }},
-              {"class": "erasure.evaluations.measures.AIN", "parameters":{
-                "forget_part": "forget",
-                "alpha": 0.001,
-                "gold_model": {
-                    "class": "erasure.unlearners.GoldModel.GoldModel",
-                    "parameters": {
-                      "cached": true
-                    }
-                }
-              }},
+              {"class": "erasure.evaluations.measures.AUS", "parameters":{"forget_part": "forget","test_part": "test"}},
+              {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
+              {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
+                "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
               {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               {"compose_lira" : "configs/snippets/e_lira.json"},
-              {"compose_lira" : "configs/snippets/e_lira_full.json"},
               {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/proof_of_concept.json"}}
             ]
           }
         },
-    "globals":{
-      "seed": 1046534644,
-      "cached": "true"
-  }
+    "globals":{"cached": "true","seed": 1046534644}
   }
