@@ -117,7 +117,8 @@ class Attack(Measure):
     def get_attack_samples(self, model):
         """ From the unlearned model, generate the attack samples """
 
-        forget_loader, _ = model.dataset.get_loader_for(self.forget_part)
+        forget_ids = model.dataset.partitions[self.forget_part]
+        forget_loader = model.dataset.get_loader_for_ids(forget_ids)
         test_loader, _ = model.dataset.get_loader_for(self.test_part)
 
         forget_samples, forget_labels = self.generate_samples(model, forget_loader, 1)

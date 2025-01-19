@@ -9,3 +9,5 @@ jsonc_parser
 jsonpickle
 pandas
 PyYAML
+gdown
+python_papi

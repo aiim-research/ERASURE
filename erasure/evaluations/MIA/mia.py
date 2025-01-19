@@ -25,7 +25,8 @@ class Attack(MembershipInference):
         original = e.predictor
         unlearned = e.unlearned_model
 
-        forget_dataloader, _ = original.dataset.get_loader_for(self.forget_part)
+        forget_ids = self.dataset.partitions[self.forget_part]
+        forget_dataloader = self.dataset.get_loader_for_ids(forget_ids)
 
         original_forget = self.test_dataset(self.attack_models, original, forget_dataloader)
         '''original_forget[0] = 1e-14
@@ -157,5 +158,5 @@ class Attack(MembershipInference):
         attack_predictions = torch.stack(attack_predictions)    # convert into a Tensor
         predicted_labels = torch.argmax(attack_predictions, dim=1)    # get the predicted label
 
-        return torch.bincount(predicted_labels)
+        return torch.bincount(predicted_labels, minlength=2)
 

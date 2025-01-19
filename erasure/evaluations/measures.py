@@ -12,7 +12,7 @@ from erasure.evaluations.utils import compute_accuracy, compute_relearn_time
 from erasure.utils.cfg_utils import init_dflts_to_of
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
-import pandas as pd 
+import pandas as pd
 import os
 import yaml
 
@@ -38,8 +38,8 @@ class TorchSKLearn(Measure):
 
         if self.target == 'unlearned':
             erasure_model = e.unlearned_model
-        
-        loader, _ = e.unlearner.dataset.get_loader_for(self.partition_name)
+
+        loader, _ = e.unlearner.dataset.get_loader_for(self.partition_name, drop_last=False)
 
         var_labels, var_preds = [], []
 
@@ -47,19 +47,21 @@ class TorchSKLearn(Measure):
             for batch, (X, labels) in enumerate(loader):
                 _, pred = erasure_model.model(X.to(erasure_model.model.device))
 
-                var_labels += list(labels.squeeze().to('cpu').numpy())
-                var_preds += list(pred.squeeze().to('cpu').numpy())
+                var_labels += list(labels.squeeze().to('cpu').numpy()) if len(labels) > 1 \
+                            else [labels.squeeze().to('cpu').numpy()]
+                var_preds += list(pred.squeeze().to('cpu').numpy()) if len(pred) > 1 \
+                            else [list(pred.squeeze().to('cpu').numpy())]
 
             # preprocessing predictions TODO: made a preprocessing class?
-            var_preds = np.argmax(var_preds, axis=1)            
-            
+            var_preds = np.argmax(var_preds, axis=1)
+
             value = self.metric_func(var_labels, var_preds,**self.metric_params)
             self.info(f"{self.metric_name} of \"{self.partition_name}\" on {self.target}: {value} of {erasure_model}")
 
             e.add_value(self.metric_name+'.'+self.partition_name+'.'+self.target,value)
 
         return e
-    
+
 class PartitionInfo(Measure):
     def init(self):
         super().init()
@@ -69,7 +71,6 @@ class PartitionInfo(Measure):
     def check_configuration(self):
         super().check_configuration()
         self.local.config['parameters']['partition'] = self.local.config['parameters'].get('partition', 'forget')  # Default partition: test
-        
 
     def process(self, e:Evaluation):
         info={}
@@ -77,9 +78,9 @@ class PartitionInfo(Measure):
 
         partition = e.unlearner.dataset.partitions[self.partition_name]
         part_len=len(partition)
-        
+
         info['size']=part_len
-        
+
         loader, _ = e.unlearner.dataset.get_loader_for(self.partition_name)
 
         distribution = defaultdict(int)
@@ -108,13 +109,12 @@ class AUS(Measure):
         self.params["forget_part"] = self.params.get("forget_part", "forget")
         self.params["test_part"] = self.params.get("test_part", "test")
 
-
     def process(self, e: Evaluation):
         or_model = e.predictor
         ul_model = e.unlearned_model
 
-        test_loader, _ = e.unlearner.dataset.get_loader_for(self.test_part)
-        forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part)
+        test_loader, _ = e.unlearner.dataset.get_loader_for(self.test_part, drop_last=False)
+        forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part, drop_last=False)
 
         or_test_accuracy = compute_accuracy(test_loader, or_model.model)
         ul_test_accuracy = compute_accuracy(test_loader, ul_model.model)
@@ -151,7 +151,7 @@ class SaveValues(Measure):
 
         if self.output_format == 'json':
             self.process_json(e)
-   
+
         elif self.output_format == 'csv':
             self.process_csv(e)
 
@@ -162,7 +162,7 @@ class SaveValues(Measure):
             self.process_excel(e)
 
         return e
-    
+
     def process_json(self, e):
         os.makedirs(os.path.dirname(self.path), exist_ok=True)
         with open(self.path, 'a') as json_file:
@@ -172,14 +172,14 @@ class SaveValues(Measure):
     def process_csv(self, e):
         df = pd.DataFrame.from_dict([self.flatten_dict(e.data_info)])
         if not pd.io.common.file_exists(self.path):
-            df.to_csv(self.path, mode='w', index=False)  
+            df.to_csv(self.path, mode='w', index=False)
         else:
-            df.to_csv(self.path, mode='a', index=False, header=False) 
+            df.to_csv(self.path, mode='a', index=False, header=False)
 
     def process_excel(self, e):
         df = pd.DataFrame.from_dict([self.flatten_dict(e.data_info)])
-        if not os.path.exists(self.path):  
-            df.to_excel(self.path, index=False, engine='openpyxl')  
+        if not os.path.exists(self.path):
+            df.to_excel(self.path, index=False, engine='openpyxl')
         else:
             with pd.ExcelWriter(self.path, mode='a', engine='openpyxl', if_sheet_exists='overlay') as writer:
                 sheet_name = "Sheet1"
@@ -188,10 +188,9 @@ class SaveValues(Measure):
 
     def process_yaml(self, e):
         flat_data = self.flatten_dict(e.data_info)
-        with open(self.path, 'a') as yaml_file:  
+        with open(self.path, 'a') as yaml_file:
             yaml.dump(flat_data, yaml_file, default_flow_style=False)
 
-    
     def flatten_dict(self, d, parent_key='', sep='.'):
         items = []
         for k, v in d.items():
@@ -215,7 +214,7 @@ class RelearnTime(Measure):
 
     def process(self, e: Evaluation):
         # evaluate the original model accuracy on Forget set
-        forget_loader, _ = e.unlearned_model.dataset.get_loader_for(self.forget_part)
+        forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part, drop_last=False)
         original_accuracy = compute_accuracy(forget_loader, e.predictor.model)
 
         # relearn over the Forget set
@@ -257,7 +256,7 @@ class AIN(Measure):
     def process(self, e: Evaluation):
 
         # orginal accuracy on forget
-        forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part)
+        forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part, drop_last=False)
         original_forget_accuracy = compute_accuracy(forget_loader, e.predictor.model)
 
         max_accuracy = (1-self.alpha) * original_forget_accuracy
@@ -274,3 +273,4 @@ class AIN(Measure):
         e.add_value('AIN', ain)
 
         return e
+

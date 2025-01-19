@@ -118,9 +118,9 @@ class DataSplitterClass(DataSplitter):
             if idx not in filtered_indices
         ]
 
-        # if not self.ref_data == "all":
-        #     filtered_indices = [ref_data.data.indices[i] for i in filtered_indices]
-        #     other_indices = [ref_data.data.indices[i] for i in other_indices]
+        if not self.ref_data == "all":
+            filtered_indices = [ref_data.data.indices[i] for i in filtered_indices]
+            other_indices = [ref_data.data.indices[i] for i in other_indices]
 
 
         partitions[self.parts_names[0]] = filtered_indices 

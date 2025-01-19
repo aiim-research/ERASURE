@@ -11,8 +11,10 @@ def compute_accuracy(test_loader, model):
         for batch, (X, labels) in enumerate(test_loader):
             _, pred = model(X.to(model.device))
 
-            var_labels += list(labels.squeeze().to('cpu').numpy())
-            var_preds += list(pred.squeeze().to('cpu').numpy())
+            var_labels += list(labels.squeeze().to('cpu').numpy()) if len(labels) > 1 \
+                else [labels.squeeze().to('cpu').numpy()]
+            var_preds += list(pred.squeeze().to('cpu').numpy()) if len(pred) > 1 \
+                else [list(pred.squeeze().to('cpu').numpy())]
 
         accuracy = accuracy_score(var_labels, np.argmax(var_preds, axis=1))
 

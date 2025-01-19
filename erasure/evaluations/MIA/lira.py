@@ -23,8 +23,8 @@ class Attack(MembershipInference):
         original = e.predictor
         unlearned = e.unlearned_model
 
-        forget_dataloader, _ = original.dataset.get_loader_for(self.forget_part)
-        forget_ids = original.dataset.partitions[self.forget_part]
+        forget_ids = self.dataset.partitions[self.forget_part]
+        forget_dataloader = self.dataset.get_loader_for_ids(forget_ids)
 
         original_forget = self.test_dataset(self.attack_models, original, forget_dataloader, forget_ids)
         target_forget = self.test_dataset(self.attack_models, unlearned, forget_dataloader, forget_ids)
@@ -85,8 +85,8 @@ class Attack(MembershipInference):
     def get_attack_samples(self, shadow_model, k):
         """ From the shadow model, generate the attack samples """
 
-        forget_loader, _ = self.dataset.get_loader_for(self.forget_part)
         forget_ids = self.dataset.partitions[self.forget_part]
+        forget_loader = self.dataset.get_loader_for_ids(forget_ids)
         shadow_train_ids = self.dataset.partitions[self.train_part_plh + "_" + str(k)]
 
         label_values = [int(f_id in shadow_train_ids) for f_id in forget_ids]

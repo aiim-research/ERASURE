@@ -18,7 +18,7 @@ class DatasetManager(Configurable):
         self.datasource = global_ctx.factory.get_object( Local (self.params['DataSource']) )
         self.info(self.params['DataSource'])
         
-        self.partitions['all'] = self.datasource.create_and_validate_data()        
+        self.partitions['all'] = self.datasource.create_and_validate_data()
         
         self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)
@@ -53,13 +53,13 @@ class DatasetManager(Configurable):
         # main_loader = DataLoader(Subset(dataset.data, list_ids), batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
         main_loader = DataLoader(
             self.datasource.get_wrapper(Subset(dataset.data, list_ids)),
-            batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed(), drop_last=True
+            batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed()
         )
 
         return main_loader
            
            
-    def get_loader_for(self, split_id, fold_fraction = None):
+    def get_loader_for(self, split_id, fold_fraction = None, drop_last=True):
 
         fold_fraction = None
 
@@ -77,7 +77,7 @@ class DatasetManager(Configurable):
             pass
 
         else:
-            main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed(),drop_last=True)
+            main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed(),drop_last=drop_last)
             fold_loader = None
 
         return main_loader, fold_loader
