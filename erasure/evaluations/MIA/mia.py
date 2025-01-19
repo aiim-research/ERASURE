@@ -34,8 +34,8 @@ class Attack(MembershipInference):
         target_forget = self.test_dataset(self.attack_models, unlearned, forget_dataloader)
         #target_test = self.__test_dataset(self.attack_models, unlearned, "test")
 
-        self.info(f"Original Forget: {original_forget / original_forget.sum()}")
-        self.info(f"Target Forget: {target_forget / target_forget.sum()}")
+        # self.info(f"Original Forget: {original_forget / original_forget.sum()}")
+        # self.info(f"Target Forget: {target_forget / target_forget.sum()}")
         #self.info(f"Target Test: {target_test/target_test.sum()}")
 
         # Forgetting Rate (doi: 10.1109/TDSC.2022.3194884)

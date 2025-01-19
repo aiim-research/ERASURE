@@ -31,8 +31,8 @@ class Attack(MembershipInference):
         original_forget = original_forget.item()
         target_forget = target_forget.item()
 
-        self.info(f"Original Forget: {original_forget}")
-        self.info(f"Target Forget: {target_forget}")
+        # self.info(f"Original Forget: {original_forget}")
+        # self.info(f"Target Forget: {target_forget}")
 
         self.info(f"LiRA: {target_forget}")
         e.add_value("LiRA", target_forget)
