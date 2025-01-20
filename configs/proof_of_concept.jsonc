@@ -101,7 +101,7 @@
       {
         "class": "erasure.unlearners.NegGrad.NegGrad",
         "parameters": {
-            "epochs": 5,
+            "epochs": 1,
             "ref_data": "forget",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
         }
