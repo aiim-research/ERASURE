@@ -67,7 +67,7 @@
       {
         "class": "erasure.unlearners.Finetuning.Finetuning",
         "parameters": {
-            "epochs": 5, 
+            "epochs": 1, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
@@ -75,8 +75,8 @@
       {
         "class": "erasure.unlearners.Finetuning.Finetuning",
         "parameters": {
-            "last_trainable_layers": 1,
-            "epochs": 5, 
+            "last_trainable_layers": 3,
+            "epochs": 1, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
@@ -91,8 +91,8 @@
       {
         "class": "erasure.unlearners.eu_k.eu_k",
         "parameters": {
-            "last_trainable_layers": 2,
-            "epochs": 40, 
+            "last_trainable_layers": 3,
+            "epochs": 10, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }

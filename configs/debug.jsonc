@@ -1,0 +1,66 @@
+{
+    "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
+                "parameters": {
+                    "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSourceCelebA", 
+                                    "parameters": {"path": "torchvision.datasets.CelebA", "transform":["ToTensor"], "label_column":"attr", "target_type":["attr","identity"],
+                                    "preprocess": [{"class":"erasure.data.preprocessing.reshape_y_z.reshape_y_z", "parameters":{"keep_as_y":[0,31], "move_to_z":[1]}}]
+                                  }
+                                }, 
+                    "partitions":  [  
+                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":0.1, "shuffle":true}},
+                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters":{"parts_names":["forget","other_ids"], "z_label":2820, "ref_data":"all_shuffled"}},
+                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
+                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
+                                ],
+                    "batch_size":128
+                  }
+                },
+    "predictor": {
+        "class": "erasure.model.TorchModel.TorchModel",
+        "parameters": {
+          "epochs": 1,
+          "optimizer": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+              "lr": 0.01
+            }
+          },
+          "loss_fn": {
+            "class": "torch.nn.CrossEntropyLoss",
+            "parameters": {
+              "reduction": "mean"
+            }
+          },
+          "model": {
+            "class": "erasure.model.classifiers.resnet18_for_celeba.CelebAResNet18","parameters": {}
+          }
+        }
+      },
+
+    "unlearners":[
+      {
+        "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+        }
+    }
+    ],
+      "evaluator":{
+          "class": "erasure.evaluations.manager.Evaluator",
+          "parameters": {
+            "measures":[
+              {"class":"erasure.evaluations.running.RunTime"},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"unlearned"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"original"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"unlearned"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}}
+            ]
+          }
+        },
+    "globals":{"cached": "true","seed": 1046534644}
+  }
