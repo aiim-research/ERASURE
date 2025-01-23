@@ -17,9 +17,8 @@ Additionally, it provides a flexible environment for defining and running unlear
 
 
 ## Team Information:
-* Prof. Giovanni Stilo, PhD. [project co-leader/research advisor]
-* Flavio Giobergia, PhD. [project co-leader/research advisor]
-* Prof. Francesco Gullo [research advisor]
+* Prof. Giovanni Stilo, PhD. [project leader/research advisor]
+* Flavio Giobergia, PhD. [research advisor]
 * Andrea D'Angelo [investigator]
 * Claudio Savelli [investigator]
 * Gabriele Tagliente [pivotal contributor]
