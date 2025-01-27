@@ -17,8 +17,6 @@ class TVDataSource(DataSource):
         self.transform = self.local_config['parameters']['transform']
         self.root_path = self.local_config.get('root_path','resources/data')
         self.label_column  = self.local_config['parameters']['label_column']
-
-
     
     def get_name(self):
         return self.path.split(".")[-1] 
@@ -104,6 +102,8 @@ class TVDataSourceCelebA(TVDataSource):
         train = dataset_class(split='train', root=self.root_path, download=True, transform=self.transform, target_type=self.target_type)
         test = dataset_class(split='test', root=self.root_path, download=True, transform=self.transform, target_type=self.target_type)
 
+        print("train len", len(train))
+        print("test len", len(test))
 
         concat =  ConcatDataset([train, test])
 

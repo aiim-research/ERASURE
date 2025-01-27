@@ -23,11 +23,12 @@ class SuccessiveRandomLabels(TorchUnlearner):
         self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
                                       {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
 
-        retain_set = self.dataset.get_dataset_from_partition(self.ref_data_retain)
-        forget_set = self.dataset.get_dataset_from_partition(self.ref_data_forget)
+        self.retain_set, _ = self.dataset.get_loader_for(self.ref_data_retain)
+        self.forget_set, _ = self.dataset.get_loader_for(self.ref_data_forget)
+        self.n_classes = self.dataset.n_classes
 
-        unlearning_data = UnLearningData(forget_set=forget_set, retain_set=retain_set, n_classes=self.dataset.n_classes)
-        self.unlearning_loader = DataLoader(unlearning_data, batch_size = self.dataset.batch_size, shuffle=True)
+        #unlearning_data = UnLearningData(forget_set=forget_set, retain_set=retain_set, n_classes=self.dataset.n_classes)
+        #self.unlearning_loader = DataLoader(unlearning_data, batch_size = self.dataset.batch_size, shuffle=True)
 
     def __unlearn__(self):
         """
@@ -40,7 +41,27 @@ class SuccessiveRandomLabels(TorchUnlearner):
             losses = []
             self.predictor.model.train()
 
-            for X, labels in self.unlearning_loader:
+            for X, y in self.forget_set:
+                X, y = X.to(self.device), y.to(self.device)
+
+                random_labels = []
+                for label in y:
+                    random_label = np.random.choice([c for c in range(self.n_classes) if c != label.item()])
+                    random_labels.append(random_label)
+                labels = torch.tensor(random_labels, device=self.device)
+                
+                self.predictor.optimizer.zero_grad() 
+
+                _, output = self.predictor.model(X.to(self.device))
+                
+                loss = self.predictor.loss_fn(output, labels.to(self.device))
+
+                losses.append(loss.to('cpu').detach().numpy())
+
+                loss.backward()
+                self.predictor.optimizer.step()
+
+            for X, labels in self.retain_set:
                 X, labels = X.to(self.device), labels.to(self.device)
                 
                 self.predictor.optimizer.zero_grad() 
@@ -68,29 +89,3 @@ class SuccessiveRandomLabels(TorchUnlearner):
         self.local.config['parameters']['ref_data_retain'] = self.local.config['parameters'].get("ref_data_retain", 'retain')  # Default reference data is retain
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
-
-class UnLearningData(Dataset):
-    def __init__(self, forget_set, retain_set, n_classes):
-        super().__init__()
-        self.forget_set = forget_set
-        self.retain_set = retain_set
-        self.forget_len = len(forget_set)
-        self.retain_len = len(retain_set)
-        self.n_classes = n_classes
-
-    def __len__(self):
-        return self.retain_len + self.forget_len
-    
-    def __getitem__(self, index):
-        if(index < self.forget_len):
-            x = self.forget_set[index][0]
-            original_label = self.forget_set[index][1]
-            y = np.random.randint(0, self.n_classes)
-            while y == original_label:
-                y = np.random.randint(0, self.n_classes)
-            y = torch.tensor(y)
-            return x,y
-        else:
-            x = self.retain_set[index - self.forget_len][0]
-            y = torch.tensor(self.retain_set[index - self.forget_len][1])
-            return x,y
