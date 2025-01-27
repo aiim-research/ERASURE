@@ -5,10 +5,7 @@
                                     "parameters": {"path": "resources/data/playmydata", "file_name":"playmydata.csv", "transform":["ToTensor"], "label":"rating"                   }
                                 }, 
                     "partitions":  [  
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters":{"parts_names":["forget","other_ids"], "z_label":2820, "ref_data":"all_shuffled"}},
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
+                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}}
                                 ],
                     "batch_size":4
                   }

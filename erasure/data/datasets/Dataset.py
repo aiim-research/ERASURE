@@ -20,6 +20,7 @@ class DatasetWrapper:
 
     def __realgetitem__(self, index: int):
         sample = self.data[index]
+        print(sample)
         X,y = sample
         return X,y
 

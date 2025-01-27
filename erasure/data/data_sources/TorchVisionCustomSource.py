@@ -11,6 +11,7 @@ from torchvision.transforms import Compose
 import torchvision
 import pandas as pd
 import re
+import numpy as np
 
 
 class TorchVisionCustomSource(DataSource):
@@ -36,12 +37,19 @@ class TorchVisionCustomSource(DataSource):
 
         data_csv['path'] = self.path + os.sep + data_csv['path']
 
-        df = DataFrameWithClasses(data_csv, self.label)
+        data_csv[self.label] = pd.to_numeric(data_csv[self.label], errors='coerce')
+        #### REMOVE nans
+        data_csv = data_csv.replace('Missing', np.nan)
+        data_csv = data_csv.dropna(subset=[self.label])
+        data_csv = data_csv.reset_index(drop=True)
 
-        return TorchVisionDatasetWrapper(df)
+        data_csv[self.label] = data_csv[self.label].astype(int)   
+        self.data_csv = data_csv 
+        return TorchVisionDatasetWrapper(self.data_csv, self.label, self.preprocess)
 
     def get_wrapper(self, data):
-        return DatasetWrapper(data, self.preprocess)
+        data_csv = self.data_csv.loc[data.indices]
+        return TorchVisionDatasetWrapper(data_csv, self.label, self.preprocess)
 
     def check_configuration(self):
         super().check_configuration()
@@ -52,42 +60,18 @@ class TorchVisionCustomSource(DataSource):
         self.local_config['parameters']['label'] = self.local_config['parameters']['label']
 
 
-class DataFrameWithClasses():
-    def __init__(self,data,label):
-        self.data = data
+class TorchVisionDatasetWrapper(DatasetWrapper):
+    def __init__(self, data, label, preprocess = []):
+
+        self.data = data 
+        self.preprocess = preprocess
         self.label = label
         self.classes =  self.data.loc[:,self.label].unique() 
 
-    def __len__(self):
-        return len(self.data)
-    
-    def __getitem__(self, index):
-        return self.data.iloc[index]
-
-
-class TorchVisionDatasetWrapper(DatasetWrapper):
-
-    def __init__(self, data, preprocess = []):
-        self.data = data 
-        self.preprocess = preprocess
-    
-
     def __realgetitem__(self, index: int):
-        img_path = os.path.join(self.data.loc[index,'path'])
-        y = [value for key, value in self.data.loc[index].items() if key != 'path']
-
-        image = Image.open(img_path).convert('RGB') 
-        transform = transforms.ToTensor() 
-
-        image = transform(image)
-
-        return image,y
-
-    def __realgetitem__(self, index: int):
-        """Retrieve the image and label for the given index."""
-        row = self.data.data.iloc[index]  
+        row = self.data.iloc[index]  
         img_path = row['path']
-        y = [value for key, value in row.items() if key != 'path']
+        y = self.data[self.label].to_list()
 
         image = Image.open(img_path).convert('RGB')
         transform = transforms.ToTensor()
@@ -95,6 +79,10 @@ class TorchVisionDatasetWrapper(DatasetWrapper):
         image = transform(image)
 
         return image, y
+
+    def get_n_classes(self):
+        return len(self.classes)
+
 
 
 def parse_transform(lib, transform_string):
