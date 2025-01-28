@@ -49,7 +49,7 @@ class AdvancedNegGrad(TorchUnlearner):
                     dataloader_iterator = iter(forget_loader)
                     (X_forget, labels_forget) = next(dataloader_iterator)
                 
-                if X_forget.size(0) != X_forget.size(0):
+                if X_retain.size(0) != X_forget.size(0):
                     continue
 
                 _, output_retain = self.predictor.model(X_retain.to(self.device))
