@@ -178,7 +178,6 @@ class DataSplitterByZ(DataSplitter):
 
 
     def split_data(self,partitions):
-
         ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
         
         
@@ -196,6 +195,49 @@ class DataSplitterByZ(DataSplitter):
             filtered_indices.extend((current_index + matching_indices).tolist())
             
             current_index += len(Z)
+
+        all_indices = set(range(len(ref_data)))
+        other_indices = list(all_indices - set(filtered_indices))
+
+        filtered_indices = [partitions[self.ref_data][i] for i in filtered_indices]
+        other_indices = [partitions[self.ref_data][i] for i in other_indices]
+
+        partitions[self.parts_names[0]] = filtered_indices 
+        partitions[self.parts_names[1]] = other_indices
+
+        return partitions
+    
+class DataSplitterByZList(DataSplitter):
+    def __init__(self, z_labels, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
+        self.z_labels = z_labels
+
+
+    def split_data(self,partitions):
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        
+        
+        dataloader = DataLoader(ref_data, batch_size=10000)
+
+        filtered_indices = []
+        current_index = 0  
+
+        for batch in tqdm(dataloader, desc="Filtering Data"):
+            _, _, Z = batch  # Z is a list of tensors
+            matched_indices = []
+
+            for i, z_tensor in enumerate(Z):
+                # Ensure it's a tensor and move to CPU
+                if isinstance(z_tensor, torch.Tensor):
+                    z_tensor = z_tensor.cpu()
+
+                # Check if any element in the tensor matches an element in self.z_labels
+                if torch.any(torch.isin(z_tensor, torch.tensor(self.z_labels))):
+                    matched_indices.append(current_index + i)  # Store index if match found
+
+            filtered_indices.extend(matched_indices)
+            current_index += len(Z)  # Keep track of overall index count
+
 
         all_indices = set(range(len(ref_data)))
         other_indices = list(all_indices - set(filtered_indices))

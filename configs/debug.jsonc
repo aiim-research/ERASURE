@@ -7,7 +7,7 @@
                                 }
                               }, 
                   "partitions":  [  
-                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":0.3, "shuffle":true}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters":{"parts_names":["forget","other_ids"], "z_labels":[2820, 3227, 3782, 3745, 3699, 9152, 8968, 9256, 4887, 6568, 4126, 2114, 4740, 1757, 4262, 4978, 9840, 9915, 2070, 10083], "ref_data":"all_shuffled"}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
@@ -38,13 +38,14 @@
     },
 
   "unlearners":[
+
       {
         "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
         "parameters": {
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+            "optimizer": {"class": "torch.optim.SGD","parameters": {"lr": 0.0001}}
         }
     }
   ],
@@ -60,13 +61,13 @@
             {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
             {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
             {"class": "erasure.evaluations.measures.AUS", "parameters":{"forget_part": "forget","test_part": "test"}},
-            //{"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
+            {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
             {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
             "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
             {"compose_mia" : "configs/snippets/e_mia.json"},
             {"compose_umia" : "configs/snippets/e_umia.json"},
-            //{"compose_lira" : "configs/snippets/e_lira.json"},
-            {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/proof_of_concept.json"}}
+            {"compose_lira" : "configs/snippets/e_lira.json"},
+            {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/proof_of_concept_1_epoch_ADN.json"}}
           ]
         }
       },

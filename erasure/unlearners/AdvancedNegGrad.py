@@ -1,5 +1,7 @@
 from erasure.unlearners.torchunlearner import TorchUnlearner
 from fractions import Fraction
+import torch.optim as optim
+
 
 from erasure.core.factory_base import get_instance_kvargs
 
@@ -34,9 +36,12 @@ class AdvancedNegGrad(TorchUnlearner):
 
         dataloader_iterator = iter(forget_loader)
 
+        print(self.predictor.optimizer)
+
         for epoch in range(self.epochs):
             losses = []
             self.predictor.model.train()
+            
 
             for X_retain, labels_retain in retain_loader:
                 X_retain, labels_retain = X_retain.to(self.device), labels_retain.to(self.device)
@@ -57,7 +62,7 @@ class AdvancedNegGrad(TorchUnlearner):
                 
                 loss_ascent_forget = -self.predictor.loss_fn(output_forget, labels_forget.to(self.device))
                 loss_retain = self.predictor.loss_fn(output_retain, labels_retain.to(self.device))
-
+                
                 # Overall loss
                 joint_loss = loss_ascent_forget + loss_retain
 
@@ -65,6 +70,7 @@ class AdvancedNegGrad(TorchUnlearner):
 
                 joint_loss.backward()
                 self.predictor.optimizer.step()
+
             
             epoch_loss = sum(losses) / len(losses)
             self.info(f'AdvancedNegGrad - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')

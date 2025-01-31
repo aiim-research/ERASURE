@@ -71,7 +71,7 @@ class TorchVisionDatasetWrapper(DatasetWrapper):
     def __realgetitem__(self, index: int):
         row = self.data.iloc[index]  
         img_path = row['path']
-        y = self.data[self.label].to_list()
+        y = torch.tensor( row[self.label] )
 
         image = Image.open(img_path).convert('RGB')
         transform = transforms.ToTensor()
@@ -80,8 +80,11 @@ class TorchVisionDatasetWrapper(DatasetWrapper):
 
         return image, y
 
-    def get_n_classes(self):
+    def get_classes(self):
         return len(self.classes)
+    
+    def __len__(self):
+        return len(self.data)
 
 
 

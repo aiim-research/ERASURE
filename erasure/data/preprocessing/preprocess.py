@@ -5,7 +5,8 @@ from erasure.core.factory_base import get_instance_kvargs
 from erasure.core.base import Configurable
 import numpy as np
 import copy
-import re
+import numbers
+import ast
 
 class Preprocess(Configurable):
     def __init__(self, global_ctx: Global, local_ctx: Local):
@@ -69,3 +70,40 @@ class Add(Preprocess):
             y = y + self.to_add
         
         return X, y, Z
+
+class StringToList(Preprocess):
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+        self.x = self.local_config['parameters']['x']
+        self.y = self.local_config['parameters']['y']
+        self.z = self.local_config['parameters']['z']
+        self.max_length = self.local_config['parameters']['max_length']
+
+    def convert_to_list(self, value, flag):
+        if flag and isinstance(value, str):
+            try:
+                value = ast.literal_eval(value)
+            except (ValueError, SyntaxError):
+                raise ValueError(f"Invalid format for value: {value}. Expected a string representation of a list.")
+            
+        if isinstance(value, numbers.Number):  
+            value = [value]
+        
+        if len(value) < self.max_length:
+            value.extend([-1] * (self.max_length - len(value)))
+
+        value = value[:self.max_length]
+        return value
+
+    def process(self, X, y, Z):
+        X = self.convert_to_list(X, self.x) if self.x else X
+        y = self.convert_to_list(y, self.y) if self.y else y
+        Z = self.convert_to_list(Z, self.z) if self.z else Z
+        return X, y, Z
+
+    def check_configuration(self):
+        self.local_config['parameters']['x'] = self.local_config['parameters'].get('x',False) 
+        self.local_config['parameters']['y'] = self.local_config['parameters'].get('y',False) 
+        self.local_config['parameters']['z'] = self.local_config['parameters'].get('z',False) 
+
+        return super().check_configuration()

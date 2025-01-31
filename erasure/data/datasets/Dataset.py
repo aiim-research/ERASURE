@@ -20,7 +20,6 @@ class DatasetWrapper:
 
     def __realgetitem__(self, index: int):
         sample = self.data[index]
-        print(sample)
         X,y = sample
         return X,y
 
@@ -30,7 +29,7 @@ class DatasetWrapper:
         Apply each preprocessing step to the data (X, y).
         """
         for preprocess in self.preprocess:
-            X, y,Z = preprocess.process(X,y,Z)
+            X,y,Z = preprocess.process(X,y,Z)
         return X, y, Z
 
 class DatasetExtendedWrapper:
