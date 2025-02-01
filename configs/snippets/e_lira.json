@@ -1,6 +1,7 @@
 {
     "class": "erasure.evaluations.MIA.lira.Attack",
     "parameters": {
+      "forget_part": "lira_forget",
       "data_out_path": "resources/data/lira/lira.pt",
 
       "attack_in_data": {
@@ -49,6 +50,9 @@
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[
+          { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
+            "parameters": {"parts_names": ["lira_forget", "-"], "n_samples": 200, "ref_data": "forget"}
+          },
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
             "parameters": {"parts_names": ["shadow_data", "-"], "percentage": 1.0, "ref_data": "train"}

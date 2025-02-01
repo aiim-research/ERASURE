@@ -27,7 +27,7 @@ class MembershipInference(Measure):
 
         self.attack_in_data_cfg = self.local_config["parameters"]["attack_in_data"]
 
-        self.forget_part = 'forget'
+        self.forget_part = self.params["forget_part"]
 
         self.params["loss_fn"]["parameters"]["reduction"] = "none"
         self.loss_fn = get_instance_config(self.params['loss_fn'])
@@ -74,8 +74,7 @@ class MembershipInference(Measure):
         if "loss_fn" not in self.params:
             self.params["loss_fn"] = copy.deepcopy(self.global_ctx.config.predictor["parameters"]["loss_fn"])
 
-        #self.local.config['parameters']['attack_test_part'] = self.local.config['parameters'].get('attack_test_part','test')
-
+        self.params['forget_part'] = self.params.get('forget_part', 'forget')
 
     def process(self, e: Evaluation):
         return e
