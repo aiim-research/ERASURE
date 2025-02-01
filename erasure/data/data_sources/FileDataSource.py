@@ -52,6 +52,7 @@ class CSVDatasetWrapper(DatasetWrapper):
         x = row[self.data_columns].values  
         y = row[self.label_columns].values
         x = x[0]
+
         return x, y
 
     def get_n_classes(self):

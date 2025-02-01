@@ -18,15 +18,20 @@ class TokenizeX(Preprocess):
         self.tokenizer = get_instance_config(self.local_config["parameters"]["tokenizer"])
 
     def process(self, X, y, z):    
-
         if isinstance(X, str): 
             tokenized = self.tokenizer(X)
             X = tokenized["input_ids"].squeeze(0)  
         else:
             raise ValueError("Expected text input in X, but got non-string data.")
     
+        input_ids = tokenized["input_ids"]
+        attention_mask = tokenized["attention_mask"]
 
-        return X, y, z
+        X_tensor = torch.stack((input_ids, attention_mask), dim=0) 
+
+        X_tensor = X_tensor.squeeze(1)
+
+        return X_tensor, int(y), z
 
     def check_configuration(self):
         super().check_configuration()

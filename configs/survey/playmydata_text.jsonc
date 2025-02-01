@@ -37,7 +37,7 @@
             }
           },
           "model": {
-            "class": "erasure.model.classifiers.resnet18_for_cifar20.Cifar20ResNet18","parameters": {}
+            "class": "erasure.model.classifiers.BERT_classifier.BERTClassifier","parameters": {}
           }
         }
       },
@@ -215,7 +215,7 @@
               {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/cifar100.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/playmydata_text.json"}}
             ]
           }
         },
