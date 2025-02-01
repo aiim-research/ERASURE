@@ -17,9 +17,6 @@
         },
         { "class": "erasure.data.datasets.DataSplitter.DataSplitterClass",
           "parameters": {"parts_names": ["forget", "retain"], "label": 1, "ref_data": "train"}
-        },
-        { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
-          "parameters": {"parts_names": ["example", "-"], "n_samples": 100, "ref_data": "forget"}
         }
       ],
       "batch_size": 128,
