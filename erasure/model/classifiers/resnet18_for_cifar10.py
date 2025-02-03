@@ -6,7 +6,7 @@ class Cifar10ResNet18(nn.Module):
     def __init__(self, n_classes=10):
         super(Cifar10ResNet18, self).__init__()
         
-        resnet = resnet18(pretrained=True)
+        resnet = resnet18()
         
         self.feature_extractor = nn.Sequential(*list(resnet.children())[:-1])  
         

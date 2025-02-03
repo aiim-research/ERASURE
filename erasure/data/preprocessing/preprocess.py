@@ -4,38 +4,33 @@ from erasure.utils.config.local_ctx import Local
 from erasure.core.factory_base import get_instance_kvargs
 from erasure.core.base import Configurable
 import numpy as np
-import copy
+import torch
 import numbers
 import ast
 
 class Preprocess(Configurable):
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
-        self.process_X = self.local_config['parameters'].get('process_X',True)
-        self.process_y = self.local_config['parameters'].get('process_y',True)
+        self.process_X = self.local_config['parameters'].get('process_X',False)
+        self.process_y = self.local_config['parameters'].get('process_y',False)
+        self.process_z = self.local_config['parameters'].get('process_z',False)
 
-
-class CategoricalEncode(Preprocess):
-    def __init__(self, global_ctx: Global, local_ctx: Local):
-        super().__init__(global_ctx, local_ctx)
-        self.encoder = get_instance_kvargs(self.local_config['parameters']['encoder']['class'],
-                                           self.local_config['parameters']['encoder']['parameters'])
-
+    @abstractmethod
     def process(self, X, y, Z):
-        X_encoded = X.copy()
+        pass 
 
-        if self.process_X:
-            encoder = copy.deepcopy(self.encoder)
-            if np.issubdtype(X.dtype, np.object_) or isinstance(X.iloc[0], str):
-                X = X.apply(lambda item: str(item).strip())
-            X_encoded = encoder.fit_transform(X).astype(int)
+class Encode(Preprocess):
+    def process(self, X, y, Z):
 
-        if self.process_y:
-            if np.issubdtype(y.dtype, np.object_) or isinstance(y[0], str):
-                y = np.array([str(item).strip() for item in y], dtype=object)
-            y = self.encoder.fit_transform(y).astype(int)
+        X = self.encode(X) if self.process_X else X
+        y = self.encode(y) if self.process_y else y
+        Z = self.encode(Z) if self.process_z else Z
 
-        return X_encoded, y, Z
+        return X,y,Z
+        
+    def encode(self, tensor):
+        return torch.unique(tensor, sorted=True, return_inverse=True)
+
 
 class RemoveCharacter(Preprocess):
     def __init__(self, global_ctx: Global, local_ctx: Local):
