@@ -31,6 +31,16 @@ class Encode(Preprocess):
     def encode(self, tensor):
         return torch.unique(tensor, sorted=True, return_inverse=True)
 
+class ListToTensor(Preprocess):
+    def process(self, X, y, Z):
+
+        X = torch.Tensor(X) if self.process_X else X
+        y = torch.Tensor(y) if self.process_y else y
+        Z = torch.Tensor(Z) if self.process_z else Z
+
+        return X,y,Z
+        
+
 
 class RemoveCharacter(Preprocess):
     def __init__(self, global_ctx: Global, local_ctx: Local):
