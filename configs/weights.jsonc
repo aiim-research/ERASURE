@@ -1,0 +1,80 @@
+{
+    "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
+                "parameters": {
+                    "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSource", 
+                                    "parameters": {"path": "torchvision.datasets.FashionMNIST", "transform":["ToTensor"]}
+                                }, 
+                    "partitions":  [  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_reduced","-"], "percentage":0.0125}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_reduced"}},
+                                  {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.1, "ref_data":"train"}},
+//                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterClass", "parameters": {"parts_names":["forget","retain"], "label":1, "ref_data": "train"}},
+                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"parts_names":["example","-"], "n_samples":100, "ref_data":"forget"}}
+                                ],
+                    "batch_size":128,
+                    "split_seed":16}
+                },
+    "predictor": {
+        "class": "erasure.model.TorchModel.TorchModel",
+        "parameters": {
+          "epochs": 10,
+          "optimizer": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+              "lr": 0.01
+            }
+          },
+          "loss_fn": {
+            "class": "torch.nn.CrossEntropyLoss",
+            "parameters": {
+              "reduction": "mean"
+            }
+          },
+          "model": {
+            "class": "erasure.model.cnns.standardCNN.FashionCNN",
+            "parameters": {}
+          }
+        }
+      },
+
+    "unlearners":[
+      {"compose_idt" : "configs/snippets/u_id.json"},
+      {"compose_gold" : "configs/snippets/u_gold.json"},
+      { "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+          "last_trainable_layers": 1,
+          "epochs": 5,
+          "ref_data":"retain",
+          "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+        }
+      },
+      { "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+          "last_trainable_layers": 5,
+          "epochs": 5,
+          "ref_data":"retain",
+          "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+        }
+      }
+    ],
+    "evaluator":{
+        "class": "erasure.evaluations.manager.Evaluator",
+        "parameters": {
+          "measures":[
+            { "class": "erasure.evaluations.weights.ModelDistance",
+              "parameters":{}
+            },
+            { "class": "erasure.evaluations.weights.ModelDistance",
+              "parameters":{
+                "function": {
+                  "class": "erasure.evaluations.weights.hausdorff",
+                  "parameters": {}
+                }
+            }}
+          ]
+        }
+      },
+    "globals":{
+        "seed": 1046534644,
+        "cached": true
+    }
+  }

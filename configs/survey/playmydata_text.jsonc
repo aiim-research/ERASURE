@@ -46,8 +46,7 @@
       {
         "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {
-          "ref_data": "forget", 
-          "train_data": "train"
+          "training_set": "retain"
         }
         },
         {
@@ -219,5 +218,5 @@
             ]
           }
         },
-    "globals":{"cached": "true","seed": 1046534644}
+    "globals":{"cached": "true","seed": 0}
   }

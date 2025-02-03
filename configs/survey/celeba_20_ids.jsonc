@@ -41,8 +41,7 @@
       {
         "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {
-          "ref_data": "forget", 
-          "train_data": "train"
+          "training_set": "retain"
         }
         },
         {
@@ -51,7 +50,7 @@
               "epochs": 1, 
               "ref_data_retain": "retain", 
               "ref_data_forget": "forget",
-              "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+              "optimizer": {"class": "torch.optim.SGD","parameters": {"lr": 0.0001}}
           }
       },
       {
@@ -214,5 +213,5 @@
             ]
           }
         },
-    "globals":{"cached": "true","seed": 1046534644}
+    "globals":{"cached": "true","seed": 0}
   }
