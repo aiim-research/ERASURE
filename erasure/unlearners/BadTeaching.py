@@ -78,11 +78,8 @@ class BadTeaching(TorchUnlearner):
         
         self.retain_set = self.dataset.get_dataset_from_partition(self.ref_data_retain)
         self.forget_set = self.dataset.get_dataset_from_partition(self.ref_data_forget)
-
-        retain_data = torch.stack([x[0] for x in self.retain_set])
-        forget_data = torch.stack([x[0] for x in self.forget_set])
-
-        unlearning_data = UnLearningData(forget_data=forget_data, retain_data=retain_data, transform=self.transform)
+        
+        unlearning_data = UnLearningData(forget_data=self.retain_set, retain_data=self.forget_set, transform=self.transform)
         unlearning_loader = DataLoader(unlearning_data, batch_size = self.batch_size, shuffle=True)
 
         self.info(f'Number of steps per epoch: { len(unlearning_loader)}')
@@ -134,10 +131,10 @@ class UnLearningData(Dataset):
     
     def __getitem__(self, index):
         if(index < self.forget_len):
-            x = self.transform(self.forget_data[index]) if self.transform else self.forget_data[index]
+            x = self.transform(self.forget_data[index][0]) if self.transform else self.forget_data[index][0]
             y = 1
             return x,y
         else:
-            x = self.transform(self.retain_data[index - self.forget_len]) if self.transform else self.retain_data[index - self.forget_len]
+            x = self.transform(self.retain_data[index - self.forget_len][0]) if self.transform else self.retain_data[index - self.forget_len][0]
             y = 0
             return x,y
