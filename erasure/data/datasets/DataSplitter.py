@@ -178,16 +178,17 @@ class DataSplitterByZ(DataSplitter):
 
 
     def split_data(self,partitions):
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
-        
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))        
         
         dataloader = DataLoader(ref_data, batch_size=10000)
 
         filtered_indices = []
+        all_possible_z = []
         current_index = 0  
 
         for batch in tqdm(dataloader, desc="Filtering Data"):
             _, _, Z = batch
+            all_possible_z.extend(Z)
             
             mask = torch.Tensor( np.isin(Z, self.z_labels) )
             matching_indices = torch.nonzero(mask, as_tuple=True)[0]  
@@ -204,6 +205,14 @@ class DataSplitterByZ(DataSplitter):
 
         partitions[self.parts_names[0]] = filtered_indices 
         partitions[self.parts_names[1]] = other_indices
+
+        all_possible_z = torch.tensor(all_possible_z)
+        all_possible_z = torch.unique(all_possible_z)
+        all_possible_z = torch.sort(all_possible_z).values
+        print("all possible z_labels in the data: ", all_possible_z)
+
+        print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
+        
 
         return partitions
     
