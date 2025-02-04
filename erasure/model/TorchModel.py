@@ -69,7 +69,6 @@ class TorchModel(Trainable):
 
 
                 _,pred = self.model(X)
-
                 loss = self.loss_fn(pred, labels)
                 
                 self.optimizer.zero_grad()

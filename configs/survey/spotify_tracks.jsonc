@@ -6,7 +6,8 @@
                         "data_columns":["artists","popularity","duration_ms","explicit","danceability","energy","key","loudness","mode","speechiness","acousticness","instrumentalness","liveness","valence","tempo","time_signature"],
                          "to_encode":["artists","popularity","explicit","track_genre"], "configuration":"", "label":"track_genre", 
                       "preprocess":[
-                        {"class":"erasure.data.preprocessing.reshape_x_z.reshape_x_z", "parameters":{"keep_as_x":[], "move_to_z":[0]}}]
+                        {"class":"erasure.data.preprocessing.reshape_x_z.reshape_x_z", "parameters":{"keep_as_x":[], "move_to_z":[0]}},
+                      {"class":"erasure.data.preprocessing.preprocess.ListToTensor","parameters":{"process_X":true}}]
                     }
                     }, 
         "partitions":  [  
@@ -21,7 +22,7 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 10,
+          "epochs": 50,
           "optimizer": {
             "class": "torch.optim.Adam",
             "parameters": {
@@ -31,11 +32,12 @@
           "loss_fn": {
             "class": "torch.nn.CrossEntropyLoss",
             "parameters": {
-              "reduction": "mean"
+              "reduction": "mean",
+              "label_smoothing":0.1
             }
           },
           "model": {
-            "class": "erasure.model.classifiers.BERT_classifier.BERTClassifier","parameters": {}
+            "class": "erasure.model.classifiers.standard_classifier.SpotifyNN","parameters": {}
           }
         }
       },

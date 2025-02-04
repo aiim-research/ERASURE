@@ -3,7 +3,8 @@ from erasure.data.datasets.Dataset import DatasetWrapper
 from torch.utils.data import ConcatDataset
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
-from datasets import load_dataset, DatasetDict, concatenate_datasets
+from datasets import load_dataset, Dataset, DatasetDict, concatenate_datasets
+from collections import Counter
 
 
 class HFDatasetWrapper(DatasetWrapper):
@@ -87,6 +88,14 @@ class SpotifyHFDataSource(HFDataSource):
         ds = load_dataset(self.path,self.configuration)    
 
         df = ds['train'].to_pandas()
+
+        label_counts = Counter(df[self.label])   
+
+        most_common_labels = {label for label, _ in label_counts.most_common(30)}
+
+        df = df[df[self.label].isin(most_common_labels)]
+
+        ds['train'] = Dataset.from_pandas(df)
 
         unique_artists = set()
         for artist_list in df['artists']:
