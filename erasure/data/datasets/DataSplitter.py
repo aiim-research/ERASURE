@@ -229,12 +229,14 @@ class DataSplitterByZList(DataSplitter):
         dataloader = DataLoader(ref_data, batch_size=10000)
 
         filtered_indices = []
+        all_possible_z = []
         current_index = 0  
 
         #### TODO: CAN BE OPTIMIZED
         for batch in tqdm(dataloader, desc="Filtering Data"):
             _, _, Z = batch  # Z is a list of tensors
             Z = torch.stack(Z, dim=1)
+            all_possible_z.extend(Z)
             matched_indices = []
 
             for i, z_tensor in enumerate(Z):
@@ -255,6 +257,13 @@ class DataSplitterByZList(DataSplitter):
         partitions[self.parts_names[0]] = filtered_indices 
         partitions[self.parts_names[1]] = other_indices
 
+        all_possible_z = torch.tensor(all_possible_z)
+        all_possible_z = torch.unique(all_possible_z)
+        all_possible_z = torch.sort(all_possible_z).values
+        print("all possible z_labels in the data: ", all_possible_z)
+
+        print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
+
         return partitions
     
 
@@ -270,6 +279,7 @@ class DataSplitterAnyZisIn(DataSplitter):
         dataloader = DataLoader(ref_data, batch_size=10000)
 
         filtered_indices = []
+        all_possible_z = []
         current_index = 0  
 
         for batch in tqdm(dataloader, desc="Filtering Data"):
@@ -277,6 +287,7 @@ class DataSplitterAnyZisIn(DataSplitter):
             if not isinstance(Z, list):
                 Z = [Z]
             Z = torch.stack(Z, dim=1)  
+            all_possible_z.extend(Z)
 
             z_labels_tensor = torch.tensor(self.z_labels)
 
@@ -297,5 +308,13 @@ class DataSplitterAnyZisIn(DataSplitter):
 
             partitions[self.parts_names[0]] = filtered_indices 
             partitions[self.parts_names[1]] = other_indices
+
+            # concat dataset to tensor and get unique values
+            all_possible_z = torch.tensor(all_possible_z)
+            all_possible_z = torch.unique(all_possible_z)
+            all_possible_z = torch.sort(all_possible_z).values
+            print("all possible z_labels in the data: ", all_possible_z)
+
+            print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
 
             return partitions

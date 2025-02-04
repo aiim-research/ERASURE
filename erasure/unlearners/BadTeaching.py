@@ -131,10 +131,18 @@ class UnLearningData(Dataset):
     
     def __getitem__(self, index):
         if(index < self.forget_len):
-            x = self.transform(self.forget_data[index][0]) if self.transform else self.forget_data[index][0]
+            if isinstance(self.forget_data[index], dict):
+                x = self.transform(list(self.forget_data[index].values())) if self.transform else list(self.forget_data[index].values())
+            else:
+                x = self.transform(self.forget_data[index][0]) if self.transform else self.forget_data[index][0]
             y = 1
+            print(x)
             return x,y
         else:
-            x = self.transform(self.retain_data[index - self.forget_len][0]) if self.transform else self.retain_data[index - self.forget_len][0]
+            if isinstance(self.retain_data[index - self.forget_len], dict):
+                x = self.transform(list(self.retain_data[index - self.forget_len].values())) if self.transform else list(self.retain_data[index - self.forget_len].values())
+            else:
+                x = self.transform(self.retain_data[index - self.forget_len][0]) if self.transform else self.retain_data[index - self.forget_len][0]
             y = 0
+            print(x)
             return x,y
