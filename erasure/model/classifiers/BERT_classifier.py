@@ -8,8 +8,8 @@ class BERTClassifier(nn.Module):
         
         self.bert = BertModel.from_pretrained("bert-base-uncased")
 
-        for param in self.bert.parameters():
-            param.requires_grad = False  
+        # for param in self.bert.parameters():
+        #     param.requires_grad = False  
         
         self.fc1 = nn.Linear(self.bert.config.hidden_size, 512)
         self.fc2 = nn.Linear(512, n_classes)
