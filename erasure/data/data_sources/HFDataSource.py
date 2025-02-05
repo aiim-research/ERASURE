@@ -91,7 +91,7 @@ class SpotifyHFDataSource(HFDataSource):
 
         label_counts = Counter(df[self.label])   
 
-        most_common_labels = {label for label, _ in label_counts.most_common(30)}
+        most_common_labels = {label for label, _ in label_counts.most_common(10)}
 
         df = df[df[self.label].isin(most_common_labels)]
 

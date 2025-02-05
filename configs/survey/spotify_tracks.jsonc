@@ -16,13 +16,13 @@
                       {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
                       {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
                     ],
-        "batch_size":64,
+        "batch_size":8,
         "split_seed":16}
     },
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 50,
+          "epochs": 10,
           "optimizer": {
             "class": "torch.optim.Adam",
             "parameters": {
