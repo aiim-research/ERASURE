@@ -73,6 +73,8 @@ class UCIRepositoryDataSource(DataSource):
 ##Adult has a lot of errors in its data, so it's best to handle them in a different loader.
 class UCI_Adult_DataSource(UCIRepositoryDataSource):
     
+    # column transformer 
+    
     def create_data(self):
 
         if self.dataset is None:
@@ -80,19 +82,16 @@ class UCI_Adult_DataSource(UCIRepositoryDataSource):
 
         pddataset = pd.DataFrame(self.dataset.data.original)
 
+        pddataset['native-country'] = pddataset['native-country'].apply(lambda x: 'United-States' if x == 'United-States' else 'Other')
+        pddataset = pd.get_dummies(pddataset, columns=self.to_encode)
+
         if not self.data_columns:
             self.data_columns = [col for col in pddataset if col != self.label]
 
-        self.label_mappings = {}
-        for column_to_encode in self.to_encode:
-            unique_labels = pddataset[column_to_encode].unique()
-            self.label_mappings[column_to_encode] = {orig_label: new_label for new_label, orig_label in enumerate(unique_labels)}
-
-
-            pddataset[column_to_encode] = pddataset[column_to_encode].map(lambda x: self.label_mappings[column_to_encode][x])
-
-
-
+        # normalize the numerical columns 
+        for col in self.data_columns:
+            if pddataset[col].dtype == 'float64' or pddataset[col].dtype == 'int64':
+                pddataset[col] = (pddataset[col] - pddataset[col].mean()) / pddataset[col].std()
             
         pddataset[self.label] = pddataset[self.label].apply(lambda x: 0 if '<' in x else 1)
         
@@ -102,6 +101,10 @@ class UCI_Adult_DataSource(UCIRepositoryDataSource):
         hfdataset = Dataset.from_pandas(pddataset)
         
         self.dataset = ConcatDataset( [ hfdataset ] )
+
+        # print number of columns and their name 
+        print(pddataset.columns)
+        print(len(pddataset.columns))
 
         self.dataset.classes = pddataset[self.label].unique()
 

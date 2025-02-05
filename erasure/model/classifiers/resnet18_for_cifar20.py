@@ -6,9 +6,12 @@ class Cifar20ResNet18(nn.Module):
     def __init__(self, n_classes=20):
         super(Cifar20ResNet18, self).__init__()
         
-        resnet = resnet18()
+        resnet = resnet18(pretrained=False)
+        # resnet.conv1 = nn.Conv2d(3, 64, kernel_size=(3, 3), stride=(1, 1), padding=(1, 1), bias=False)
+        # resnet.maxpool = nn.Identity()
         
         self.feature_extractor = nn.Sequential(*list(resnet.children())[:-1])  
+        
         
         self.fc1 = nn.Linear(resnet.fc.in_features, 512)  
         self.fc2 = nn.Linear(512, n_classes)  

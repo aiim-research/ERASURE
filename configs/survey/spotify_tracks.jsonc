@@ -4,17 +4,23 @@
         "DataSource": { "class":"erasure.data.data_sources.HFDataSource.SpotifyHFDataSource", 
                         "parameters": {"path": "maharshipandya/spotify-tracks-dataset", 
                         "data_columns":["artists","popularity","duration_ms","explicit","danceability","energy","key","loudness","mode","speechiness","acousticness","instrumentalness","liveness","valence","tempo","time_signature"],
-                         "to_encode":["artists","popularity","explicit","track_genre"], "configuration":"", "label":"track_genre", 
+                        "to_encode":["track_genre", "artists"],
+                         "to_normalize":["popularity","duration_ms","danceability","energy","key","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo"],  "label":"track_genre", "keep_top_k": 10, "keep_top_k_artist": 1000,
+                         "model": 2,
                       "preprocess":[
-                        {"class":"erasure.data.preprocessing.reshape_x_z.reshape_x_z", "parameters":{"keep_as_x":[], "move_to_z":[0]}},
+                        {"class":"erasure.data.preprocessing.reshape_x_z.reshape_x_z", "parameters":{"keep_as_x":[], "move_to_z":[3]}},
                       {"class":"erasure.data.preprocessing.preprocess.ListToTensor","parameters":{"process_X":true}}]
                     }
                     }, 
         "partitions":  [  
                       {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "ref_data":"all"}},
-                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterAnyZisIn", "parameters":{"parts_names":["forget","other_ids"], "z_labels":[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 19], "ref_data":"all_shuffled"}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterAnyZisIn", "parameters":{"parts_names":["test","other_ids"], "z_labels":[201, 202, 203, 204, 205, 206, 207, 208, 209, 210, 211, 212, 213, 214, 215, 216, 217, 218, 219, 220, 221, 222, 223, 224, 225, 226, 227, 228, 229, 230, 231, 232, 233, 234, 235, 236, 237, 238, 239, 240, 241, 242, 243, 244, 245, 246, 247, 248, 249], "ref_data":"all_shuffled"}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterAnyZisIn", "parameters":{"parts_names":["forget","retain"], "z_labels":[101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127, 128, 129, 130, 131, 132, 133, 134, 135, 136, 137, 138, 139, 140, 141, 142, 143, 144, 145, 146, 147, 148, 149], "ref_data":"other_ids"}},
                       {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
                       {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
+                      // {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
+                      // {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
+                      // {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train", "shuffle":false}}
                     ],
         "batch_size":64,
         "split_seed":16}
@@ -43,31 +49,32 @@
       },
 
     "unlearners":[
-      // {
-      //   "class": "erasure.unlearners.GoldModel.GoldModel",
-      //   "parameters": {
-      //     "training_set": "retain"
-      //   }
-      //   },
-      //   {
-      //     "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
-      //     "parameters": {
-      //         "epochs": 1, 
-      //         "ref_data_retain": "retain", 
-      //         "ref_data_forget": "forget",
-      //         "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-      //     }
-      // },
       {
-        "class": "erasure.unlearners.BadTeaching.BadTeaching",
+        "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}},
-            "KL_temperature": 1.0
+          "training_set": "retain"
         }
+        },
+        {
+          "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
+          "parameters": {
+              "epochs": 1, 
+              "ref_data_retain": "retain", 
+              "ref_data_forget": "forget",
+              "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+          }
       },
+      // TODO: solve bad teaching and in general item retrieval problem
+      // {
+      //   "class": "erasure.unlearners.BadTeaching.BadTeaching",
+      //   "parameters": {
+      //       "epochs": 1, 
+      //       "ref_data_retain": "retain", 
+      //       "ref_data_forget": "forget",
+      //       "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}},
+      //       "KL_temperature": 1.0
+      //   }
+      // },
       {
         "class": "erasure.unlearners.Finetuning.Finetuning",
         "parameters": {
@@ -211,7 +218,7 @@
               {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
               {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
               "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
-              {"compose_mia" : "configs/snippets/e_mia.json"},
+              // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
               {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/spotify_tracks.json"}}

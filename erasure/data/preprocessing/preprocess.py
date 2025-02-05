@@ -33,11 +33,9 @@ class Encode(Preprocess):
 
 class ListToTensor(Preprocess):
     def process(self, X, y, Z):
-
         X = torch.Tensor(X) if self.process_X else X
         y = torch.Tensor(y) if self.process_y else y
         Z = torch.Tensor(Z) if self.process_z else Z
-
         return X,y,Z
         
 

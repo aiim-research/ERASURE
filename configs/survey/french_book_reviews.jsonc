@@ -26,7 +26,7 @@
           "optimizer": {
             "class": "torch.optim.AdamW",
             "parameters": {
-              "lr": 1e-4
+              "lr": 1e-5
             }
           },
           "loss_fn": {
@@ -210,7 +210,7 @@
               {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
               {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
               "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
-              {"compose_mia" : "configs/snippets/e_mia.json"},
+              // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
               {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/french_book_reviews.json"}}

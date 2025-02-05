@@ -5,7 +5,9 @@ from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 from datasets import load_dataset, Dataset, DatasetDict, concatenate_datasets
 from collections import Counter
+import torch
 
+import numpy as np
 
 class HFDatasetWrapper(DatasetWrapper):
     def __init__(self, data, preprocess,label,data_columns):
@@ -79,10 +81,17 @@ class HFDataSource(DataSource):
         self.local_config['parameters']['label'] = self.local_config['parameters'].get('label',"")
         self.local_config['parameters']['data_columns'] = self.local_config['parameters']['data_columns']
         self.local_config['parameters']['to_encode'] = self.local_config['parameters'].get("to_encode",[])
+        self.local_config['parameters']['to_normalize'] = self.local_config['parameters'].get("to_normalize",[])
         self.local_config['parameters']['classes'] = self.local_config['parameters'].get("classes",-1)
 
 
 class SpotifyHFDataSource(HFDataSource):
+
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+        self.to_normalize = self.local_config['parameters']['to_normalize']
+        self.keep_top_k = self.local_config['parameters']['keep_top_k']
+        self.keep_top_k_artist = self.local_config['parameters']['keep_top_k_artist']
 
     def create_data(self):
         ds = load_dataset(self.path,self.configuration)    
@@ -91,17 +100,23 @@ class SpotifyHFDataSource(HFDataSource):
 
         label_counts = Counter(df[self.label])   
 
-        most_common_labels = {label for label, _ in label_counts.most_common(30)}
+        most_common_labels = {label for label, _ in label_counts.most_common(self.keep_top_k)}
 
         df = df[df[self.label].isin(most_common_labels)]
 
         ds['train'] = Dataset.from_pandas(df)
 
-        unique_artists = set()
+        unique_artists = {}
         for artist_list in df['artists']:
             if artist_list is not None:
                 artists = artist_list.split(';')  
-                unique_artists.update(artists)       
+                for artist in artists:
+                    if artist not in unique_artists:
+                        unique_artists[artist] = 0
+                    unique_artists[artist] += 1
+
+        unique_artists = [artist for artist, count in Counter(unique_artists).most_common(self.keep_top_k_artist)]   
+        print(f"Unique artists: {len(unique_artists)}") 
 
         artist_to_id = {artist: idx for idx, artist in enumerate(unique_artists)}
 
@@ -130,6 +145,16 @@ class SpotifyHFDataSource(HFDataSource):
             for split in ds.keys():
                 ds[split] = ds[split].map(encode_func)
 
+        for split in ds.keys():
+            for column_to_normalize in self.to_normalize:
+                values = ds[split][column_to_normalize]
+                mean = np.mean(values)
+                std = np.std(values)
+                normalized_values = (values - mean) / std
+
+                ds[split] = ds[split].remove_columns(column_to_normalize)
+                ds[split] = ds[split].add_column(column_to_normalize, normalized_values)
+                
         if isinstance(ds, dict) or hasattr(ds, "keys"):
             splits = [ds[split] for split in ds.keys()]
         else:
@@ -142,3 +167,9 @@ class SpotifyHFDataSource(HFDataSource):
         dataset = self.get_wrapper(concat)
 
         return dataset
+
+    def check_configuration(self):
+        super().check_configuration()
+        self.local_config['parameters']['to_normalize'] = self.local_config['parameters'].get("to_normalize",[])
+        self.local_config['parameters']['keep_top_k'] = self.local_config['parameters'].get("keep_top_k",10)
+        self.local_config['parameters']['keep_top_k_artist'] = self.local_config['parameters'].get("keep_top_k_artist",1000)

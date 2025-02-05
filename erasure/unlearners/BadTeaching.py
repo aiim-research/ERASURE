@@ -132,17 +132,22 @@ class UnLearningData(Dataset):
     def __getitem__(self, index):
         if(index < self.forget_len):
             if isinstance(self.forget_data[index], dict):
-                x = self.transform(list(self.forget_data[index].values())) if self.transform else list(self.forget_data[index].values())
+                x = {k: v for k, v in self.forget_data[index].items() if k != "income"}
+                print(x)
+                x = self.transform(list(x.values())) if self.transform else list(x.values())
+                print(x)
+                x = torch.tensor(x)
             else:
                 x = self.transform(self.forget_data[index][0]) if self.transform else self.forget_data[index][0]
             y = 1
-            print(x)
             return x,y
         else:
             if isinstance(self.retain_data[index - self.forget_len], dict):
-                x = self.transform(list(self.retain_data[index - self.forget_len].values())) if self.transform else list(self.retain_data[index - self.forget_len].values())
+                # remove income key and value if present 
+                x = {k: v for k, v in self.retain_data[index - self.forget_len].items() if k != "income"}
+                x = self.transform(list(x.values())) if self.transform else list(x.values())
+                x = torch.tensor(x)
             else:
                 x = self.transform(self.retain_data[index - self.forget_len][0]) if self.transform else self.retain_data[index - self.forget_len][0]
             y = 0
-            print(x)
             return x,y

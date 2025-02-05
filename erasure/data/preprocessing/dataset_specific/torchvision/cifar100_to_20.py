@@ -7,6 +7,8 @@ import numpy as np
 import pickle
 from erasure.data.preprocessing.preprocess import Preprocess
 
+import torch.nn.functional as F
+
 class CIFAR100preprocess(Preprocess):
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
@@ -31,5 +33,20 @@ class CIFAR100preprocess(Preprocess):
         
         Z = y
         y = self.fine_to_coarse_dict[Z]
+        # if len(X.shape) == 3:
+        #     X = X.unsqueeze(0)
+        
+        # # Perform upscaling using bilinear interpolation
+        # X = F.interpolate(
+        #     X,
+        #     size=(256, 256),
+        #     mode='bilinear',
+        #     align_corners=False
+        # )
+        
+        # # Remove batch dimension if it was added
+        # if len(X.shape) == 4:
+        #     X = X.squeeze(0)
+
 
         return X, y , Z

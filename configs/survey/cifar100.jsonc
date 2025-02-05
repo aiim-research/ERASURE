@@ -3,7 +3,7 @@
                 "parameters": {
                     "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSource", 
                                     "parameters": {"path": "torchvision.datasets.CIFAR100", "transform":["ToTensor"], "classes":20,
-                                    "preprocess": [{"class":"erasure.data.preprocessing.dataset_specific.torchvision.cifar100_to_20.CIFAR100preprocess", "parameters":{}}]}
+                                    "preprocess": [{"class":"erasure.data.preprocessing.dataset_specific.torchvision.cifar100_to_20.CIFAR100preprocess", "parameters":{"dim":256, "method":"resize"}}]}
                                 }, 
                     "partitions":  [  
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
@@ -16,7 +16,7 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 50,
+          "epochs": 10,
           "optimizer": {
             "class": "torch.optim.SGD",
             "parameters": {

@@ -6,7 +6,7 @@ class BERTClassifier(nn.Module):
     def __init__(self, n_classes=2):
         super(BERTClassifier, self).__init__()
         
-        self.bert = BertModel.from_pretrained("bert-base-uncased")
+        self.bert = BertModel.from_pretrained("bert-base-uncased") # automodel 
 
         # for param in self.bert.parameters():
         #     param.requires_grad = False  
@@ -18,10 +18,6 @@ class BERTClassifier(nn.Module):
         self.last_layer = self.fc2
 
     def forward(self, X):
-
-        input_ids = X[:, 0, :]  
-        attention_mask = X[:, 1, :] 
-
 
         input_ids = X[:, 0, :].long()  
         attention_mask = X[:, 1, :].long()  
