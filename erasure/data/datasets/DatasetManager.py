@@ -110,7 +110,7 @@ class DatasetManager(Configurable):
             Dataset: The dataset corresponding to the partition ID.
         """
         if split_id in self.partitions:
-            return self.partitions['all'].data if split_id == 'all' else DatasetWrapper(Subset(self.partitions['all'].data, self.partitions[split_id])).data
+            return self.partitions['all'].data if split_id == 'all' else self.datasource.get_wrapper(Subset(self.partitions['all'].data, self.partitions[split_id])).data
         else:
             raise ValueError(f"Partition ID '{split_id}' not found in partitions.")
    
