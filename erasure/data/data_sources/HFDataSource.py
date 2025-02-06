@@ -114,19 +114,30 @@ class SpotifyHFDataSource(HFDataSource):
                     if artist not in unique_artists:
                         unique_artists[artist] = 0
                     unique_artists[artist] += 1
-
-        unique_artists = [artist for artist, count in Counter(unique_artists).most_common(self.keep_top_k_artist)]   
-        print(f"Unique artists: {len(unique_artists)}") 
-
-        artist_to_id = {artist: idx for idx, artist in enumerate(unique_artists)}
+        
+        topk_artists = sorted(unique_artists.items(), key=lambda x: x[1], reverse=True)[:self.keep_top_k_artist]
+        artist_to_id = {artist: idx for idx, (artist, _) in enumerate(topk_artists)}
+        print("Top artists", len(artist_to_id))
+        print("Total artists", artist_to_id)
 
         def map_artists_to_ids(artist_list):
-            if not artist_list: 
-                return []
-            return [artist_to_id[artist] for artist in artist_list.split(';') if artist in artist_to_id]
-
+            if not artist_list:
+                return -1
+            elif artist_list in artist_to_id.keys():
+                return artist_to_id[artist_list]
+            else:
+                return -1
 
         df['artist_ids'] = df['artists'].apply(map_artists_to_ids)
+
+        # remove rows that have -1 as artist id
+        df = df[df['artist_ids'] != -1]
+        print("After removing -1", len(df))
+
+        # remove the same rows from the dataset
+        ds['train'] = Dataset.from_pandas(df)
+
+
 
         ds['train'] = ds['train'].remove_columns("artists")  
         ds['train'] = ds['train'].add_column("artists", df['artists'].tolist())
@@ -154,7 +165,10 @@ class SpotifyHFDataSource(HFDataSource):
 
                 ds[split] = ds[split].remove_columns(column_to_normalize)
                 ds[split] = ds[split].add_column(column_to_normalize, normalized_values)
-                
+            
+        
+        print("Dataset", ds['train'][0], ds['train'][1], ds['train'][2], ds['train'][3], ds['train'][4])
+
         if isinstance(ds, dict) or hasattr(ds, "keys"):
             splits = [ds[split] for split in ds.keys()]
         else:
@@ -172,4 +186,4 @@ class SpotifyHFDataSource(HFDataSource):
         super().check_configuration()
         self.local_config['parameters']['to_normalize'] = self.local_config['parameters'].get("to_normalize",[])
         self.local_config['parameters']['keep_top_k'] = self.local_config['parameters'].get("keep_top_k",10)
-        self.local_config['parameters']['keep_top_k_artist'] = self.local_config['parameters'].get("keep_top_k_artist",1000)
+        self.local_config['parameters']['keep_top_k_artist'] = self.local_config['parameters'].get("keep_top_k_artist",10000000000000)

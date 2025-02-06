@@ -60,12 +60,8 @@ class UNSIR(TorchUnlearner):
                 if x_retain.size(0) != retain_loader.batch_size or x_forget.size(0) != forget_loader.batch_size:
                     continue
 
-                # Initialize the noise.
-                if len(x_retain.size()) == 4:
-                    noise_dim = x_retain.size(1), x_retain.size(2), x_retain.size(3)
-                else:
-                    noise_dim = x_retain.size(1)
-                noise = Noise(batch_size_forget, *noise_dim).to(self.device)
+                noise_dim = x_forget.size()
+                noise = Noise(*noise_dim).to(self.device)
                 noise_optimizer = torch.optim.Adam(noise.parameters(), lr=self.noise_lr)
                 noise_tensor = noise()[:batch_size_forget]
 

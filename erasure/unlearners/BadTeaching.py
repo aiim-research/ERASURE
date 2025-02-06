@@ -76,8 +76,11 @@ class BadTeaching(TorchUnlearner):
 
         self.bad_teacher = self.global_ctx.factory.get_object(self.current_bt)
         
-        self.retain_set = self.dataset.get_dataset_from_partition(self.ref_data_retain)
-        self.forget_set = self.dataset.get_dataset_from_partition(self.ref_data_forget)
+        retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain)
+        forget_loader, _ = self.dataset.get_loader_for(self.ref_data_forget)
+
+        self.retain_set = retain_loader.dataset
+        self.forget_set = forget_loader.dataset
         
         unlearning_data = UnLearningData(forget_data=self.retain_set, retain_data=self.forget_set, transform=self.transform)
         unlearning_loader = DataLoader(unlearning_data, batch_size = self.batch_size, shuffle=True)
@@ -132,10 +135,8 @@ class UnLearningData(Dataset):
     def __getitem__(self, index):
         if(index < self.forget_len):
             if isinstance(self.forget_data[index], dict):
-                x = {k: v for k, v in self.forget_data[index].items() if k != "income"}
-                print(x)
-                x = self.transform(list(x.values())) if self.transform else list(x.values())
-                print(x)
+                x = self.forget_data[index].values()
+                x = self.transform(list(x)) if self.transform else list(x)
                 x = torch.tensor(x)
             else:
                 x = self.transform(self.forget_data[index][0]) if self.transform else self.forget_data[index][0]
@@ -143,9 +144,9 @@ class UnLearningData(Dataset):
             return x,y
         else:
             if isinstance(self.retain_data[index - self.forget_len], dict):
-                # remove income key and value if present 
-                x = {k: v for k, v in self.retain_data[index - self.forget_len].items() if k != "income"}
-                x = self.transform(list(x.values())) if self.transform else list(x.values())
+                x = self.retain_data[index - self.forget_len].values()
+                x = self.transform(list(x)) if self.transform else list(x)
+                print(x)
                 x = torch.tensor(x)
             else:
                 x = self.transform(self.retain_data[index - self.forget_len][0]) if self.transform else self.retain_data[index - self.forget_len][0]
