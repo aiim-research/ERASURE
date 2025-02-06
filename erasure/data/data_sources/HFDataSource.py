@@ -38,12 +38,14 @@ class HFDataSource(DataSource):
         return self.path.split("/")[-1] 
 
     def create_data(self):
-        ds = load_dataset(self.path,self.configuration)            
+        ds = load_dataset(self.path)            
 
         self.label_mappings = {}
         for column_to_encode in self.to_encode:
-            unique_labels = ds['train'].unique(column_to_encode)
-            #unique_labels_sorted = sorted(unique_labels)
+            unique_labels = set()
+            for split in ds.keys():
+                unique_labels.update(ds[split].unique(column_to_encode))
+                
             self.label_mappings[column_to_encode] = {orig_label: new_label for new_label, orig_label in enumerate(unique_labels)}
 
             def encode_func(example, col=column_to_encode):

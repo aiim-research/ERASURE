@@ -206,6 +206,8 @@ class DataSplitterByZ(DataSplitter):
         partitions[self.parts_names[0]] = filtered_indices 
         partitions[self.parts_names[1]] = other_indices
 
+
+        '''
         all_possible_z = torch.tensor(all_possible_z)
         all_possible_z = torch.unique(all_possible_z)
         all_possible_z = torch.sort(all_possible_z).values
@@ -213,7 +215,8 @@ class DataSplitterByZ(DataSplitter):
 
         print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
         
-
+        '''
+        
         return partitions
     
 class DataSplitterByZList(DataSplitter):
@@ -257,13 +260,14 @@ class DataSplitterByZList(DataSplitter):
         partitions[self.parts_names[0]] = filtered_indices 
         partitions[self.parts_names[1]] = other_indices
 
+        '''
         all_possible_z = torch.tensor(all_possible_z)
         all_possible_z = torch.unique(all_possible_z)
         all_possible_z = torch.sort(all_possible_z).values
         print("all possible z_labels in the data: ", all_possible_z)
 
         print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
-
+        '''
         return partitions
     
 
