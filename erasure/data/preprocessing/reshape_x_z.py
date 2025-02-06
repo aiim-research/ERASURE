@@ -34,6 +34,7 @@ class reshape_x_z(Preprocess):
         z = X
         for idx in self.move_to_z:
             z = z[idx]
+
         return true_x, y , z
     
     def check_configuration(self):
