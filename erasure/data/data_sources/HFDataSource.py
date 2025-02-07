@@ -47,7 +47,6 @@ class HFDataSource(DataSource):
                 unique_labels.update(ds[split].unique(column_to_encode))
                 
             self.label_mappings[column_to_encode] = {orig_label: new_label for new_label, orig_label in enumerate(unique_labels)}
-
             def encode_func(example, col=column_to_encode):
                 example[col] = self.label_mappings[col][example[col]]
                 return example
@@ -86,6 +85,43 @@ class HFDataSource(DataSource):
         self.local_config['parameters']['to_normalize'] = self.local_config['parameters'].get("to_normalize",[])
         self.local_config['parameters']['classes'] = self.local_config['parameters'].get("classes",-1)
 
+class IMDBHFDataSource(HFDataSource):
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+    
+    def create_data(self):
+
+        ds = load_dataset(self.path,self.configuration)
+
+        self.label_mappings = {}
+        for column_to_encode in self.to_encode:
+            unique_labels = set()
+            for split in ds.keys():
+                unique_labels.update(ds[split].unique(column_to_encode))
+                
+            self.label_mappings[column_to_encode] = {orig_label: new_label for new_label, orig_label in enumerate(unique_labels)}
+            def encode_func(example, col=column_to_encode):
+                example[col] = self.label_mappings[col][example[col]]
+                return example
+            
+            for split in ds.keys():
+                ds[split] = ds[split].map(encode_func)
+
+        if isinstance(ds, dict) or hasattr(ds, "keys"):
+            splits = [ds[split] for split in ds.keys()]
+        else:
+            splits = [ds]
+
+        concat = ConcatDataset(splits)
+
+        concat.classes = splits[0].unique(self.label) if self.classes == -1 else self.classes
+        print(concat.classes)
+        dataset = self.get_wrapper(concat)
+
+        return dataset
+
+    def check_configuration(self):
+        return super().check_configuration()
 
 class SpotifyHFDataSource(HFDataSource):
 
