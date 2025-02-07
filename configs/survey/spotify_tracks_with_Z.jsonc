@@ -1,19 +1,29 @@
 {
     "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
-                "parameters": {
-                  "DataSource": { "class":"erasure.data.data_sources.UCIRepositoryDataSource.UCI_Adult_DataSource", 
-                  "parameters": {"id": 2, "label":"income", "to_encode":["workclass", "education", "marital-status", "occupation", "relationship", "race","sex","native-country"],
-                  "preprocess": [   
-                                ] }
-              },
-                    "partitions":  [  
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train", "shuffle":false}}
-                                ],
-                    "batch_size":64
-                  }
-                },
+    "parameters": {
+        "DataSource": { "class":"erasure.data.data_sources.HFDataSource.SpotifyHFDataSource", 
+                        "parameters": {"path": "maharshipandya/spotify-tracks-dataset", 
+                        "data_columns":["artists","popularity","duration_ms","explicit","danceability","energy","key","loudness","mode","speechiness","acousticness","instrumentalness","liveness","valence","tempo","time_signature"],
+                        "to_encode":["track_genre", "artists"],
+                         "to_normalize":["popularity","duration_ms","danceability","energy","key","loudness","speechiness","acousticness","instrumentalness","liveness","valence","tempo"],  "label":"track_genre", "keep_top_k": 10, "keep_top_k_artist": 1000,
+                      "preprocess":[
+                        {"class":"erasure.data.preprocessing.reshape_x_z.reshape_x_z", "parameters":{"keep_as_x":[], "move_to_z":[3]}},
+                      {"class":"erasure.data.preprocessing.preprocess.ListToTensor","parameters":{"process_X":true}}]
+                    }
+                    }, 
+        "partitions":  [  
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "ref_data":"all"}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterAnyZisInRange", "parameters":{"parts_names":["test","other_ids"], "z_labels":[200, 250], "ref_data":"all_shuffled"}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterAnyZisInRange", "parameters":{"parts_names":["forget","retain"], "z_labels":[325, 349], "ref_data":"other_ids"}},
+                      // {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
+                      // {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
+                      // {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
+                      // {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train", "shuffle":false}}
+                    ],
+        "batch_size":32,
+        "split_seed":16}
+    },
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
@@ -27,31 +37,33 @@
           "loss_fn": {
             "class": "torch.nn.CrossEntropyLoss",
             "parameters": {
-              "reduction": "mean"
+              "reduction": "mean",
+              "label_smoothing":0.1
             }
           },
           "model": {
-            "class": "erasure.model.classifiers.standard_classifier.AdultNN","parameters": {}
+            "class": "erasure.model.classifiers.standard_classifier.SpotifyNN","parameters": {}
           }
         }
       },
 
     "unlearners":[
-      // {
-      //   "class": "erasure.unlearners.GoldModel.GoldModel",
-      //   "parameters": {
-      //     "training_set": "retain"
-      //   }
-      //   },
-      //   {
-      //     "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
-      //     "parameters": {
-      //         "epochs": 1, 
-      //         "ref_data_retain": "retain", 
-      //         "ref_data_forget": "forget",
-      //         "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-      //     }
-      // },
+      {
+        "class": "erasure.unlearners.GoldModel.GoldModel",
+        "parameters": {
+          "training_set": "retain"
+        }
+        },
+        {
+          "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
+          "parameters": {
+              "epochs": 1, 
+              "ref_data_retain": "retain", 
+              "ref_data_forget": "forget",
+              "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+          }
+      },
+      // TODO: solve bad teaching and in general item retrieval problem
       // {
       //   "class": "erasure.unlearners.BadTeaching.BadTeaching",
       //   "parameters": {
@@ -62,21 +74,21 @@
       //       "KL_temperature": 1.0
       //   }
       // },
-      // {
-      //   "class": "erasure.unlearners.Finetuning.Finetuning",
-      //   "parameters": {
-      //       "epochs": 1, 
-      //       "ref_data":"retain",
-      //       "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-      //   }
-      // },
       {
         "class": "erasure.unlearners.Finetuning.Finetuning",
         "parameters": {
-            "last_trainable_layers": 2,
             "epochs": 1, 
             "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "last_trainable_layers": 3,
+            "epochs": 1, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
       },
       {
@@ -89,8 +101,8 @@
       {
         "class": "erasure.unlearners.eu_k.eu_k",
         "parameters": {
-            "last_trainable_layers":2,
-            "epochs": 20, 
+            "last_trainable_layers": 3,
+            "epochs": 10, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
@@ -203,10 +215,12 @@
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
               {"class": "erasure.evaluations.measures.AUS", "parameters":{"forget_part": "forget","test_part": "test"}},
               {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
-              {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
-              "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
+              // {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
+              // "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
+              // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/adult_income.json"}}
+              //{"compose_lira" : "configs/snippets/e_lira.json"},
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/spotify_tracks.json"}}
             ]
           }
         },

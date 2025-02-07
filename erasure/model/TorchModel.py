@@ -13,6 +13,8 @@ import torch.nn as nn
 
 from fractions import Fraction
 
+from tqdm import tqdm
+
 
 class TorchModel(Trainable):
        
@@ -62,7 +64,9 @@ class TorchModel(Trainable):
             losses, preds, labels_list = [], [], []
             self.model.train()
 
-            for batch, (X, labels) in enumerate(train_loader):
+            for batch, (X, labels) in tqdm(enumerate(train_loader)):
+                # print(X)
+                # print(labels)
                 X, labels = X.to(self.device), labels.to(self.device)
                 self.optimizer.zero_grad()
 
@@ -71,7 +75,7 @@ class TorchModel(Trainable):
                 loss = self.loss_fn(pred, labels)
                 
                 self.optimizer.zero_grad()
-
+                # print(loss)
                 losses.append(loss.to('cpu').detach().numpy())
                 loss.backward()
                 

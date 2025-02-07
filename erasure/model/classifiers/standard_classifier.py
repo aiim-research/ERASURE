@@ -67,7 +67,7 @@ class AdultNN(nn.Module):
 #         return intermediate_output, x
     
 class SpotifyNN(nn.Module):
-    def __init__(self, n_classes, n_layers=10, inputsize=15, hidden_size=100):
+    def __init__(self, n_classes, n_layers=3, inputsize=15, hidden_size=100):
         super(SpotifyNN, self).__init__()
         print("The number of classes is: ", n_classes)
         self.fc1 = nn.Linear(inputsize, hidden_size)  
