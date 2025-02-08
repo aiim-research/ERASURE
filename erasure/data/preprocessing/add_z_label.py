@@ -17,7 +17,11 @@ class StringContain(Preprocess):
 
     def process(self, X, y, z):
 
-        z = 1 if self.contains in X else 0
+        z = 0
+        for string in self.contains:
+            if string in X:
+                z = 1
+                break
 
         return X,y,z
     

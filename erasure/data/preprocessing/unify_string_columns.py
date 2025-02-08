@@ -19,7 +19,7 @@ class UnifyStringColumns(Preprocess):
 
         new_s = ""
         for s in self.columns:
-            new_s = new_s + X[s]
+            new_s = new_s + " " + X[s]
 
         X = new_s
 

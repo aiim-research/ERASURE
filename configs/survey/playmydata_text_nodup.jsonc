@@ -13,7 +13,7 @@
                                 }, 
                     "partitions":  [  
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
-                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterByZList", "parameters":{"parts_names":["forget","other_ids"], "z_labels":[41, 42], "ref_data":"all_shuffled"}},
+                                    {"class":"erasure.data.datasets.DataSplitter.DataSplitterByZList", "parameters":{"parts_names":["forget","other_ids"], "z_labels":[18,22, 37, 137, 130, 41, 42], "ref_data":"all_shuffled"}},
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
                                 ],
