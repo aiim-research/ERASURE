@@ -176,7 +176,6 @@ class DataSplitterByZ(DataSplitter):
         super().__init__(ref_data,parts_names) 
         self.z_labels = z_labels
 
-
     def split_data(self,partitions):
         ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))        
         
@@ -369,6 +368,8 @@ class DataSplitterAnyZisInRange(DataSplitter):
             all_possible_z = torch.unique(all_possible_z)
             all_possible_z = torch.sort(all_possible_z).values
             print("all possible z_labels in the data: ", all_possible_z)
+            print("number of z selected: ", len(filtered_indices))
+            print("number of all possible z_labels in the data: ", len(all_possible_z))
 
             print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
 

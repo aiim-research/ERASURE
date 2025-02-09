@@ -8,6 +8,8 @@ from collections import Counter
 import torch
 
 import numpy as np
+import pandas as pd
+from tqdm import tqdm
 
 class HFDatasetWrapper(DatasetWrapper):
     def __init__(self, data, preprocess,label,data_columns):
@@ -225,3 +227,72 @@ class SpotifyHFDataSource(HFDataSource):
         self.local_config['parameters']['to_normalize'] = self.local_config['parameters'].get("to_normalize",[])
         self.local_config['parameters']['keep_top_k'] = self.local_config['parameters'].get("keep_top_k",10)
         self.local_config['parameters']['keep_top_k_artist'] = self.local_config['parameters'].get("keep_top_k_artist",10000000000000)
+
+from torchvision import transforms
+
+
+class HFImageDatasetWrapper(DatasetWrapper):
+    def __init__(self, data, preprocess, label):
+        super().__init__(data, preprocess)
+        self.data = data 
+        self.preprocess = preprocess
+        self.label = label # label column name
+        self.classes =  [0,1]
+
+        self.transform = transforms.Compose([
+                    transforms.Resize((224, 224)),
+                    transforms.ToTensor(),
+                ])
+
+    def __realgetitem__(self, index: int):
+        image = self.transform(self.data[index]["image"])
+
+        y = torch.tensor([self.data[index][self.label], self.data[index]['artist']])
+        return image, y
+
+    def get_n_classes(self):
+        return len(self.classes)
+    
+    def __len__(self):
+        return len(self.data)
+    
+class WikiArtDatasource(DataSource):
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+        self.classes = [0,1]
+        self.path = "huggan/wikiart"
+
+    def get_name(self):
+        return self.path.split("/")[-1] 
+    
+    def get_simple_wrapper(self, data):
+        return HFImageDatasetWrapper(data, self.preprocess, 'style')
+    
+    def create_data(self):
+        dataset = load_dataset(self.path)
+
+        dataset = dataset['train'].select(range(3000))
+        df = pd.DataFrame(dataset)
+
+        to_keep = [12, 21]
+
+        df_filtered = df[df['style'].isin(to_keep)]
+        df_filtered = df_filtered.reset_index(drop=True)
+        df_filtered['style'] = df_filtered['style'].apply(lambda x: to_keep.index(x))
+        df_filtered = df_filtered.to_dict('records')
+        
+        if isinstance(df_filtered, dict) or hasattr(df_filtered, "keys"):
+            splits = [df_filtered[split] for split in df_filtered.keys()]
+        else:
+            splits = [df_filtered]
+
+        concat = ConcatDataset(splits)
+
+        concat.classes = self.classes
+
+        dataset = self.get_wrapper(concat)
+
+        return dataset
+    
+    def check_configuration(self):
+        super().check_configuration()
