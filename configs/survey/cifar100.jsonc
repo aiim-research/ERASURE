@@ -16,11 +16,11 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 10,
+          "epochs": 100,
           "optimizer": {
-            "class": "torch.optim.SGD",
+            "class": "torch.optim.Adam",
             "parameters": {
-              "lr": 0.1
+              "lr": 0.001
             }
           },
           "loss_fn": {
@@ -211,5 +211,5 @@
             ]
           }
         },
-    "globals":{"cached": "true","seed": 0}
+    "globals":{"cached": "false","seed": 0}
   }
