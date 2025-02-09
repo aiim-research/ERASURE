@@ -22,11 +22,11 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 5,
+          "epochs": 2,
           "optimizer": {
             "class": "torch.optim.AdamW",
             "parameters": {
-              "lr": 1e-5
+              "lr": 2e-5
             }
           },
           "loss_fn": {

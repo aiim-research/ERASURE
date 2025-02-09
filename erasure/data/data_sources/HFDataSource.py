@@ -95,10 +95,12 @@ class IMDBHFDataSource(HFDataSource):
 
         ds = load_dataset(self.path,self.configuration)
 
+        keys = ['train','test']
+
         self.label_mappings = {}
         for column_to_encode in self.to_encode:
             unique_labels = set()
-            for split in ds.keys():
+            for split in keys:
                 unique_labels.update(ds[split].unique(column_to_encode))
                 
             self.label_mappings[column_to_encode] = {orig_label: new_label for new_label, orig_label in enumerate(unique_labels)}
@@ -106,18 +108,17 @@ class IMDBHFDataSource(HFDataSource):
                 example[col] = self.label_mappings[col][example[col]]
                 return example
             
-            for split in ds.keys():
+            for split in keys:
                 ds[split] = ds[split].map(encode_func)
 
         if isinstance(ds, dict) or hasattr(ds, "keys"):
-            splits = [ds[split] for split in ds.keys()]
+            splits = [ds[split] for split in keys]
         else:
             splits = [ds]
 
         concat = ConcatDataset(splits)
 
         concat.classes = splits[0].unique(self.label) if self.classes == -1 else self.classes
-        print(concat.classes)
         dataset = self.get_wrapper(concat)
 
         return dataset
