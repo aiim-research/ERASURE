@@ -10,17 +10,18 @@
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
                                     {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train", "shuffle":false}}
                                 ],
-                    "batch_size":64
+                    "batch_size":32
                   }
                 },
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 100,
+          "epochs": 20,
           "optimizer": {
             "class": "torch.optim.Adam",
             "parameters": {
-              "lr": 0.001
+              "lr": 0.001,
+              "weight_decay": 0.001
             }
           },
           "loss_fn": {
@@ -36,6 +37,7 @@
       },
 
     "unlearners":[
+      {"compose_idt" : "configs/snippets/u_id.json"},
       {
         "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {
@@ -94,7 +96,6 @@
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
       },
-      {"compose_idt" : "configs/snippets/u_id.json"},
       {
         "class": "erasure.unlearners.NegGrad.NegGrad",
         "parameters": {
@@ -202,8 +203,8 @@
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
               {"class": "erasure.evaluations.measures.AUS", "parameters":{"forget_part": "forget","test_part": "test"}},
               {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
-              {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
-              "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
+              // {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
+              // "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
               // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               // {"compose_lira" : "configs/snippets/e_lira.json"},

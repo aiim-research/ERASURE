@@ -13,8 +13,6 @@ import torch.nn as nn
 
 from fractions import Fraction
 
-from tqdm import tqdm
-
 
 class TorchModel(Trainable):
        
@@ -64,7 +62,7 @@ class TorchModel(Trainable):
             losses, preds, labels_list = [], [], []
             self.model.train()
 
-            for batch, (X, labels) in tqdm(enumerate(train_loader)):
+            for batch, (X, labels) in enumerate(train_loader):
                 # print(X)
                 # print(labels)
                 X, labels = X.to(self.device), labels.to(self.device)
