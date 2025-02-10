@@ -47,37 +47,6 @@
 
     "unlearners":[
       {
-        "class": "erasure.unlearners.GoldModel.GoldModel",
-        "parameters": {
-          "training_set": "retain"
-        }
-        },
-        {
-          "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
-          "parameters": {
-              "epochs": 1, 
-              "ref_data_retain": "retain", 
-              "ref_data_forget": "forget",
-              "optimizer": {"class": "torch.optim.SGD","parameters": {"lr": 1e-5}}
-          }
-      },
-      {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
-        "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 1, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.FisherForgetting.FisherForgetting",
-        "parameters": {
-            "ref_data":"retain",
-            "alpha": 1e-7
-            }
-        },
-      {
         "class": "erasure.unlearners.eu_k.eu_k",
         "parameters": {
             "last_trainable_layers": 3,
@@ -125,7 +94,7 @@
                         "epochs": 1,
                         "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
-                        "noise_lr": 0.01,
+                        "noise_lr": 1e-5,
                         "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
                     }
                 }, 
@@ -199,7 +168,7 @@
               // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/ag_news.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/ag_news_2.json"}}
             ]
           }
         },

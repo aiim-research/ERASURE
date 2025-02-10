@@ -13,10 +13,12 @@
                     }
                     }, 
         "partitions":  [  
-                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.5, "ref_data":"all", "shuffle":false}},
-                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterAnyZisInRange", "parameters":{"parts_names":["forget","retain"], "z_labels":[0,1500], "ref_data":"train"}}
+          {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
+          {"class":"erasure.data.datasets.DataSplitter.DataSplitterAnyZisInRange", "parameters":{"parts_names":["forget","other_ids"], "z_labels":[0,1500], "ref_data":"all_shuffled"}},
+          {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
+          {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
                     ],
-        "batch_size":16,
+        "batch_size":32,
         "split_seed":16}
     },
     "predictor": {
@@ -54,7 +56,7 @@
               "epochs": 1, 
               "ref_data_retain": "retain", 
               "ref_data_forget": "forget",
-              "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+              "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
           }
       },
       {
@@ -63,7 +65,7 @@
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}},
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}},
             "KL_temperature": 1.0
         }
       },
@@ -72,7 +74,7 @@
         "parameters": {
             "epochs": 1, 
             "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
         }
       },
       {
@@ -81,7 +83,7 @@
             "last_trainable_layers": 3,
             "epochs": 1, 
             "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
         }
       },
       {
@@ -97,7 +99,7 @@
             "last_trainable_layers": 3,
             "epochs": 10, 
             "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
         }
       },
       {"compose_idt" : "configs/snippets/u_id.json"},
@@ -106,7 +108,7 @@
         "parameters": {
             "epochs": 1,
             "ref_data": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
         }
       },
       {
@@ -116,7 +118,7 @@
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
             "T": 4.0,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
         }
       },
       {
@@ -126,7 +128,7 @@
             "ref_data_forget": "forget",
             "dampening_constant": 0.1,
             "selection_weighting": 20,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.1}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
           }
       },
       {
@@ -140,7 +142,7 @@
                         "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
                         "noise_lr": 0.01,
-                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
                     }
                 }, 
                 {
@@ -148,7 +150,7 @@
                   "parameters": {
                       "epochs": 1, 
                       "ref_data":"retain",
-                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
                   }
               }
             ]
@@ -160,7 +162,7 @@
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
         }
       },
       {
@@ -186,7 +188,7 @@
                       "optimizer": {
                           "class": "torch.optim.Adam",
                           "parameters": {
-                              "lr": 0.001
+                              "lr": 1e-5
                           }
                       }
                   }
@@ -213,7 +215,7 @@
               // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/french_book_reviews.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/IMDB.json"}}
             ]
           }
         },
