@@ -7,6 +7,8 @@ import copy
 from tqdm import tqdm
 from erasure.core.factory_base import get_instance_kvargs
 
+import time
+
 class FisherForgetting(TorchUnlearner):
     def init(self):
         """
@@ -23,6 +25,9 @@ class FisherForgetting(TorchUnlearner):
         Computes the Fisher Information Matrix for each parameter using the retain set.
         Now generalized for any type of data without class-specific computation.
         """
+
+        start = time.time()
+
         self.predictor.model.eval()
         dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
 
@@ -31,7 +36,10 @@ class FisherForgetting(TorchUnlearner):
             p.grad_acc = 0
             p.grad2_acc = 0
         
+        start_time = time.time() - start
+        times = []
         for data, orig_target in tqdm(dataloader):
+            start = time.time()
             data, orig_target = data.to(self.device), orig_target.to(self.device)
             _, output = self.predictor.model(data)
             prob = F.softmax(output, dim=-1).data
@@ -45,6 +53,14 @@ class FisherForgetting(TorchUnlearner):
                     if p.requires_grad:
                         p.grad_acc += (orig_target == target).float() * p.grad.data
                         p.grad2_acc += prob[:, y] * p.grad.data.pow(2)
+            
+            times.append(time.time() - start)
+            if len(times) == 100: 
+                break
+        
+        additional_time = (sum(times) / len(times)) * len(dataloader)
+
+        start = time.time()
         for p in self.predictor.model.parameters():
             p.grad_acc /= len(dataloader)
             p.grad2_acc /= len(dataloader)
@@ -54,6 +70,11 @@ class FisherForgetting(TorchUnlearner):
         for p in self.predictor.model.parameters():
             p.grad_acc /= n_samples
             p.grad2_acc /= n_samples
+        
+        start_time_2 = time.time() - start
+
+        total_time = start_time + additional_time + start_time_2
+        return total_time
 
     def get_mean_var(self, p, is_base_dist=False, alpha=3e-6):
         var = copy.deepcopy(1./(p.grad2_acc+1e-8))
@@ -97,16 +118,26 @@ class FisherForgetting(TorchUnlearner):
         """
         self.info(f'Starting Fisher Forgetting')
 
+        start = time.time()
+
         # Get data loaders
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
+        start_time = time.time() - start
+
         # Compute Fisher Information using retain set
         self.info('Computing Fisher Information Matrix')
-        self.compute_fisher_information(retain_loader.dataset)
+        additional_time = self.compute_fisher_information(retain_loader.dataset)
 
+        start = time.time()
         # Apply Fisher noise for selective forgetting
         self.info('Applying Fisher noise for selective forgetting')
         self.apply_fisher_noise()
+
+        total_time = (time.time() - start) + start_time + additional_time
+
+        with open("times.txt", "a") as f:
+            f.write(f"Fisher Forgetting: {total_time}\n")
 
         return self.predictor
 

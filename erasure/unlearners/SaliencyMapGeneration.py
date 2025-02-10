@@ -5,6 +5,7 @@ import torch
 from erasure.core.factory_base import get_instance_kvargs
 
 import os
+import time
 
 class SaliencyMapGeneration(TorchUnlearner):
     def init(self):
@@ -32,6 +33,8 @@ class SaliencyMapGeneration(TorchUnlearner):
         """
 
         self.info(f'Starting Saliency Mask Generation')
+
+        start = time.time()
         
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
 
@@ -92,6 +95,12 @@ class SaliencyMapGeneration(TorchUnlearner):
             start_index += num_elements
 
             torch.save(hard_dict, os.path.join(self.save_dir, self.file_name))
+        
+        total_time = time.time() - start
+
+        with open("times.txt", "a") as f:
+            f.write(f"SaliencyMapGeneration: {total_time}\n")
+
         
         return self.predictor
     

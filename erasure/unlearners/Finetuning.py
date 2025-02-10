@@ -3,6 +3,8 @@ from fractions import Fraction
 
 from erasure.core.factory_base import get_instance_kvargs
 
+import time
+
 
 class Finetuning(TorchUnlearner):
     def init(self):
@@ -26,13 +28,19 @@ class Finetuning(TorchUnlearner):
 
         self.info(f'Starting Finetuning with {self.epochs} epochs')
 
+        start = time.time()
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
         
+        starting_time = time.time() - start
+
         for epoch in range(self.epochs):
             losses = []
             self.predictor.model.train()
 
+            total_batches = len(retain_loader)
+
             for batch, (X, labels) in enumerate(retain_loader):
+                start = time.time()
                 X, labels = X.to(self.device), labels.to(self.device)
                 self.predictor.optimizer.zero_grad() 
 
@@ -44,6 +52,13 @@ class Finetuning(TorchUnlearner):
                 loss.backward()
 
                 self.predictor.optimizer.step()
+                step_time = time.time() - start
+                break
+
+            total_time = starting_time + step_time * total_batches
+            
+            with open('times.txt', 'a') as f:
+                f.write(f"Finetuning: {total_time}\n")
             
             epoch_loss = sum(losses) / len(losses)
             self.info(f'Finetuning - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')

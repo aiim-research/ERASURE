@@ -2,6 +2,9 @@ from erasure.unlearners.torchunlearner import TorchUnlearner
 from fractions import Fraction
 import torch.optim as optim
 
+import time
+import numpy as np
+
 
 from erasure.core.factory_base import get_instance_kvargs
 
@@ -30,20 +33,25 @@ class AdvancedNegGrad(TorchUnlearner):
 
         self.info(f'Starting AdvancedNegGrad with {self.epochs} epochs')
 
+        start = time.time()
+
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data_forget, Fraction('0'))
 
         dataloader_iterator = iter(forget_loader)
 
-        print(self.predictor.optimizer)
+        starting_time = time.time() - start
 
         for epoch in range(self.epochs):
             losses = []
             self.predictor.model.train()
-            
+
+            # get total number of batches
+            total_batches = len(retain_loader)
 
             for X_retain, labels_retain in retain_loader:
+                start = time.time() 
                 X_retain, labels_retain = X_retain.to(self.device), labels_retain.to(self.device)
                 
                 self.predictor.optimizer.zero_grad() 
@@ -71,6 +79,14 @@ class AdvancedNegGrad(TorchUnlearner):
                 joint_loss.backward()
                 self.predictor.optimizer.step()
 
+                step_time = time.time() - start
+                break
+            
+            total_time = starting_time + (step_time * total_batches)
+
+            # print on a txt file the name of the method and the time 
+            with open("times.txt", "a") as f:
+                f.write(f"AdvancedNegGrad: {total_time}\n")
             
             epoch_loss = sum(losses) / len(losses)
             self.info(f'AdvancedNegGrad - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')

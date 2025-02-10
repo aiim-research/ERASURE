@@ -5,8 +5,7 @@ from erasure.core.factory_base import get_instance_kvargs
 import torch
 import numpy as np
 
-from torch.utils.data import DataLoader
-from torch.utils.data import Dataset
+import time
 
 class SuccessiveRandomLabels(TorchUnlearner):
     def init(self):
@@ -41,7 +40,10 @@ class SuccessiveRandomLabels(TorchUnlearner):
             losses = []
             self.predictor.model.train()
 
+            total_batches = len(self.forget_set)
+
             for X, y in self.forget_set:
+                start = time.time()
                 X, y = X.to(self.device), y.to(self.device)
 
                 random_labels = []
@@ -60,8 +62,13 @@ class SuccessiveRandomLabels(TorchUnlearner):
 
                 loss.backward()
                 self.predictor.optimizer.step()
+                step_time = time.time() - start
+                break
+
+            total_batches_2 = len(self.retain_set)
 
             for X, labels in self.retain_set:
+                start = time.time()
                 X, labels = X.to(self.device), labels.to(self.device)
                 
                 self.predictor.optimizer.zero_grad() 
@@ -74,6 +81,14 @@ class SuccessiveRandomLabels(TorchUnlearner):
 
                 loss.backward()
                 self.predictor.optimizer.step()
+            
+                step_time_2 = time.time() - start
+                break
+
+            total_time = step_time * total_batches + step_time_2 * total_batches_2
+
+            with open('times.txt', 'a') as f:
+                f.write(f"SRL: {total_time}\n")
             
             epoch_loss = sum(losses) / len(losses)
             self.info(f'SRL - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')

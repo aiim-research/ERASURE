@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch import nn
 
 from copy import copy
+import time
 
 from erasure.core.factory_base import get_instance_kvargs
 
@@ -50,6 +51,8 @@ class Scrub(TorchUnlearner):
 
         self.info(f'Starting scrub with {self.epochs} epochs')
 
+        start = time.time()
+
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data_forget, Fraction('0'))
@@ -59,12 +62,19 @@ class Scrub(TorchUnlearner):
         total_loss_retain = 0
         total_loss_forget = 0
 
+        starting_time = time.time() - start
+
         for epoch in range(self.epochs):
             self.predictor.model.train()
             self.teacher.eval()
 
             # Training with retain data.
+
+            total_batches = len(retain_loader)
+
             for inputs_retain, labels_retain in retain_loader:
+
+                start = time.time()
 
                 self.predictor.optimizer.zero_grad()
 
@@ -91,8 +101,14 @@ class Scrub(TorchUnlearner):
 
                 self.predictor.optimizer.step()
 
+                step_time = time.time() - start
+                break
+
+            total_batches_2 = len(forget_loader)
+
             # Training with forget data.
             for inputs_forget, labels_forget in forget_loader:
+                start = time.time()
                 inputs_forget, labels_forget = inputs_forget.to(self.device), labels_forget.to(self.device)
 
                 self.predictor.optimizer.zero_grad()
@@ -113,6 +129,14 @@ class Scrub(TorchUnlearner):
                 # Backward pass
                 loss_div_forget.backward()
                 self.predictor.optimizer.step()
+
+                step_time_2 = time.time() - start
+                break
+
+            total_time = starting_time + (step_time * total_batches) + (step_time_2 * total_batches_2)
+
+            with open("times.txt", "a") as f:
+                f.write(f"Scrub: {total_time}\n")
 
             avg_loss_retain = total_loss_retain / len(retain_loader)
 

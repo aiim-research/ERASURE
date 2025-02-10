@@ -3,6 +3,8 @@ from fractions import Fraction
 
 from erasure.core.factory_base import get_instance_kvargs
 
+import time
+
 
 class eu_k(TorchUnlearner):
     def init(self):
@@ -26,6 +28,8 @@ class eu_k(TorchUnlearner):
 
         self.info(f"Starting eu-{self.local.config['parameters']['last_trainable_layers']} with {self.epochs} epochs")
 
+        start = time.time()
+
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
 
         for i, layer in enumerate(list(self.predictor.model.children())):
@@ -34,11 +38,16 @@ class eu_k(TorchUnlearner):
                         layer.reset_parameters()
                         self.info(f'Layer {i} is reset')
         
+        starting_time = time.time() - start
+
         for epoch in range(self.epochs):
             losses = []
             self.predictor.model.train()
 
+            total_batches = len(retain_loader)
+
             for batch, (X, labels) in enumerate(retain_loader):
+                start = time.time()
                 X, labels = X.to(self.device), labels.to(self.device)
                 self.predictor.optimizer.zero_grad() 
 
@@ -50,11 +59,19 @@ class eu_k(TorchUnlearner):
                 loss.backward()
 
                 self.predictor.optimizer.step()
-            
-            epoch_loss = sum(losses) / len(losses)
-            self.info(f"eu-{self.local.config['parameters']['last_trainable_layers']} - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}")
+                step_time = time.time() - start
+                break
 
-            self.predictor.lr_scheduler.step()
+        total_time = starting_time + (step_time * total_batches * self.epochs)
+    
+
+        with open("times.txt", "a") as f:
+            f.write(f"eu-{self.local.config['parameters']['last_trainable_layers']}: {total_time}\n")
+            
+            # epoch_loss = sum(losses) / len(losses)
+            # self.info(f"eu-{self.local.config['parameters']['last_trainable_layers']} - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}")
+
+            # self.predictor.lr_scheduler.step()
         
         return self.predictor
     

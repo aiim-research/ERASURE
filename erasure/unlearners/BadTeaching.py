@@ -12,6 +12,8 @@ from torch.utils.data import Dataset
 from erasure.utils.config.local_ctx import Local
 from erasure.core.factory_base import get_instance_kvargs
 
+import time
+
 class BadTeaching(TorchUnlearner):
     def init(self):
         """
@@ -49,7 +51,9 @@ class BadTeaching(TorchUnlearner):
     def unlearning_step(self, model, good_teacher, bad_teacher, unlearn_data_loader, optimizer, 
                 device, KL_temperature):
         losses = []
+        total_batches = len(unlearn_data_loader)
         for batch in unlearn_data_loader:
+            start = time.time()
             x, y = batch
             x, y = x.to(device), y.to(device)
             with torch.no_grad():
@@ -62,7 +66,10 @@ class BadTeaching(TorchUnlearner):
             loss.backward()
             optimizer.step()
             losses.append(loss.detach().cpu().numpy())
-        return np.mean(losses)
+            step_time = time.time() - start
+            break
+        proxy_time = step_time * total_batches
+        return proxy_time
 
     def __unlearn__(self):
         """
@@ -73,6 +80,8 @@ class BadTeaching(TorchUnlearner):
         """
 
         self.info(f'Starting BadTeaching with {self.epochs} epochs')
+
+        start = time.time()
 
         self.bad_teacher = self.global_ctx.factory.get_object(self.current_bt)
         
@@ -92,11 +101,19 @@ class BadTeaching(TorchUnlearner):
         good_teacher.eval()
         self.bad_teacher.model.eval()        
 
+        starting_time = time.time() - start
+
         for epoch in range(self.epochs):
-            loss = self.unlearning_step(model = self.predictor.model, good_teacher= good_teacher, 
+            proxy_time = self.unlearning_step(model = self.predictor.model, good_teacher= good_teacher, 
                             bad_teacher=self.bad_teacher.model, unlearn_data_loader=unlearning_loader, 
                             optimizer=self.predictor.optimizer, device=self.device, KL_temperature=self.KL_temperature)
-            self.info(f'Epoch {epoch} Unlearning Loss {loss}')
+            
+        total_time = starting_time + proxy_time
+
+        with open("times.txt", "a") as f:
+                f.write(f"Bad_teaching: {total_time}\n")
+
+
             
         return self.predictor
 

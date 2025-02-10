@@ -9,6 +9,7 @@ from torch.utils.data import DataLoader
 from typing import Dict, List
 
 from erasure.core.factory_base import get_instance_kvargs
+import time 
 
 class SelectiveSynapticDampening(TorchUnlearner):
     def init(self):
@@ -49,6 +50,8 @@ class SelectiveSynapticDampening(TorchUnlearner):
 
         self.info('Starting SSD')
 
+        start = time.time()
+
         train_loader, _ = self.dataset.get_loader_for(self.ref_data_train, Fraction('0'))
 
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data_forget, Fraction('0'))
@@ -63,6 +66,11 @@ class SelectiveSynapticDampening(TorchUnlearner):
         original_importances = ssd.calc_importance(train_loader)
 
         ssd.modify_weight(original_importances, sample_importances)
+
+        total_time = time.time() - start
+
+        with open('times.txt', 'a') as f:
+            f.write(f"SSD: {total_time}\n")
 
         self.info(f'SSD completed')
         

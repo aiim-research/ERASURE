@@ -3,6 +3,8 @@ from fractions import Fraction
 
 from erasure.core.factory_base import get_instance_kvargs
 
+import time
+
 class NegGrad(TorchUnlearner):
     def init(self):
         """
@@ -28,13 +30,20 @@ class NegGrad(TorchUnlearner):
 
         self.info(f'Starting NegGrad with {self.epochs} epochs')
 
+        start = time.time()
+
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
+
+        starting_time = time.time() - start
 
         for epoch in range(self.epochs):
             losses, preds, labels_list = [], [], []
             self.predictor.model.train()
 
+            total_batches = len(forget_loader)
+
             for X, labels in forget_loader:
+                start = time.time()
                 X, labels = X.to(self.device), labels.to(self.device)
                 self.predictor.optimizer.zero_grad() 
 
@@ -49,6 +58,14 @@ class NegGrad(TorchUnlearner):
                 preds += list(pred.squeeze().detach().to('cpu').numpy())
 
                 self.predictor.optimizer.step()
+
+                step_time = time.time() - start
+                break 
+
+            total_time = starting_time + step_time * total_batches
+
+            with open('times.txt', 'a') as f:
+                f.write(f"NegGrad: {total_time}\n")
             
             epoch_loss = sum(losses) / len(losses)
             self.info(f'NegGrad - epoch = {epoch} ---> var_loss = {epoch_loss:.4f}')

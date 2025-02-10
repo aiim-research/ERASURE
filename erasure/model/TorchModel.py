@@ -10,6 +10,7 @@ import torch.optim.lr_scheduler as lr_scheduler
 from torch.utils.data import Subset
 #from torch_geometric.loader import DataLoader
 import torch.nn as nn
+import time 
 
 from fractions import Fraction
 
@@ -54,17 +55,24 @@ class TorchModel(Trainable):
     
     def real_fit(self):
 
+        print("NOT REAL TRAINING; JUST TO TAKE THE TIME")
+        start = time.time()
+
         train_loader, val_loader = self.dataset.get_loader_for(self.training_set, Fraction('1/10'))
+
+        start_time = time.time() - start
         
         best_loss = [0,0]
         
         for epoch in range(self.epochs):
             losses, preds, labels_list = [], [], []
             self.model.train()
-
             for batch, (X, labels) in enumerate(train_loader):
                 # print(X)
                 # print(labels)
+
+                start = time.time()
+
                 X, labels = X.to(self.device), labels.to(self.device)
                 self.optimizer.zero_grad()
 
@@ -84,42 +92,54 @@ class TorchModel(Trainable):
                
                 self.optimizer.step()
 
-            accuracy = self.accuracy(labels_list, preds)
-            self.global_ctx.logger.info(f'epoch = {epoch} ---> loss = {np.mean(losses):.4f}\t accuracy = {accuracy:.4f}')
-            self.lr_scheduler.step()
+                step_time = time.time() - start
+                break
+            break
+        
+        if self.epochs != 0: 
+            total_time = start_time + (step_time * len(train_loader) * self.epochs) 
+
+            with open('times.txt', 'a') as f:
+                f.write(f"Gold: {total_time}\n")
+        
+
+
+            # accuracy = self.accuracy(labels_list, preds)
+            # self.global_ctx.logger.info(f'epoch = {epoch} ---> loss = {np.mean(losses):.4f}\t accuracy = {accuracy:.4f}')
+            # self.lr_scheduler.step()
             
-            # check if we need to do early stopping
-            if self.early_stopping_threshold and len(val_loader) > 0:
-                self.model.eval()
-                var_losses, var_labels, var_preds = [], [], []
-                with torch.no_grad():
-                    for batch, (X, labels) in enumerate(train_loader):
+            # # check if we need to do early stopping
+            # if self.early_stopping_threshold and len(val_loader) > 0:
+            #     self.model.eval()
+            #     var_losses, var_labels, var_preds = [], [], []
+            #     with torch.no_grad():
+            #         for batch, (X, labels) in enumerate(train_loader):
 
                         
-                        X, labels = X.to(self.device), labels.to(self.device)
-                        self.optimizer.zero_grad()
-                        _,pred = self.model(X)
-                        loss = self.loss_fn(pred, labels)
+            #             X, labels = X.to(self.device), labels.to(self.device)
+            #             self.optimizer.zero_grad()
+            #             _,pred = self.model(X)
+            #             loss = self.loss_fn(pred, labels)
                     
                             
-                        var_labels += list(labels.squeeze().to('cpu').numpy())
-                        var_preds += list(pred.squeeze().to('cpu').numpy())
+            #             var_labels += list(labels.squeeze().to('cpu').numpy())
+            #             var_preds += list(pred.squeeze().to('cpu').numpy())
                         
-                        var_losses.append(loss.item())
+            #             var_losses.append(loss.item())
                         
-                    best_loss.pop(0)
-                    var_loss = np.mean(var_losses)
-                    best_loss.append(var_loss)
+            #         best_loss.pop(0)
+            #         var_loss = np.mean(var_losses)
+            #         best_loss.append(var_loss)
                             
-                    accuracy = self.accuracy(var_labels, var_preds)
-                    self.global_ctx.logger.info(f'epoch = {epoch} ---> var_loss = {var_loss:.4f}\t var_accuracy = {accuracy:.4f}')
+            #         accuracy = self.accuracy(var_labels, var_preds)
+            #         self.global_ctx.logger.info(f'epoch = {epoch} ---> var_loss = {var_loss:.4f}\t var_accuracy = {accuracy:.4f}')
                 
-                if abs(best_loss[0] - best_loss[1]) < self.early_stopping_threshold:
-                    self.patience += 1
+            #     if abs(best_loss[0] - best_loss[1]) < self.early_stopping_threshold:
+            #         self.patience += 1
                     
-                    if self.patience == 4:
-                        self.global_ctx.logger.info(f"Early stopped training at epoch {epoch}")
-                        break  
+            #         if self.patience == 4:
+            #             self.global_ctx.logger.info(f"Early stopped training at epoch {epoch}")
+            #             break  
                 
     def check_configuration(self):
         super().check_configuration()

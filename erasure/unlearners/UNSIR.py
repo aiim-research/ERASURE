@@ -6,6 +6,7 @@ import torch.nn.functional as F
 from torch import nn
 
 from erasure.core.factory_base import get_instance_kvargs
+import time
 
 class Noise(nn.Module):
     """
@@ -45,6 +46,8 @@ class UNSIR(TorchUnlearner):
         """
 
         self.info(f'Starting UNSIR with {self.epochs} epochs for the impair phase')
+
+        start = time.time()
 
         retain_loader, _ = self.dataset.get_loader_for(self.ref_data_retain, Fraction('0'))
 
@@ -96,6 +99,11 @@ class UNSIR(TorchUnlearner):
             average_train_loss = running_loss / (len(retain_loader) * x_retain.size(0))
             
             self.info(f'UNSIR-1 - epoch = {epoch} ---> var_loss = {average_train_loss:.4f}')
+        
+        total_time = time.time() - start
+
+        with open('times.txt', 'a') as f:
+            f.write(f"UNSIR: {total_time}\n")
 
         return self.predictor
 
