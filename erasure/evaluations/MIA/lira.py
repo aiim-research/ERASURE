@@ -119,8 +119,8 @@ class Attack(MembershipInference):
                 predictions = predictions.to('cpu')
 
                 attack_samples.append(
-                    # losses.unsqueeze(1)
-                    predictions
+                    losses.unsqueeze(1)
+                    # predictions
                 )
 
         attack_samples = torch.cat(attack_samples)
@@ -145,15 +145,17 @@ class Attack(MembershipInference):
                     curr_f_id = data_ids[curr_id]
                     if curr_f_id in attack_models:
                         loss = self.loss_fn(target_predictions[i], labels[i])
+                        loss = loss.cpu()
 
-                        # evaluation = attack_models[curr_f_id].evaluate(loss)
+                        evaluation = attack_models[curr_f_id].evaluate(loss)
 
-                        _, prediction = attack_models[curr_f_id].model(target_predictions[i])
-                        evaluation = torch.nn.functional.softmax(prediction, dim=0)
+                        # _, prediction = attack_models[curr_f_id].model(target_predictions[i])
+                        # evaluation = torch.nn.functional.softmax(prediction, dim=0)
+                        # evaluation = evaluation.to('cpu')
 
-                        evaluation = evaluation.to('cpu')
                         if evaluation is not None:
-                            evaluation += 0.0001
+                            evaluation[0] += 0.00001
+                            evaluation[1] += 0.00001
                             attack_predictions.append(evaluation[1]/evaluation[0])
 
         return np.mean(attack_predictions)

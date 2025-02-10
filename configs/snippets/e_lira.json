@@ -23,6 +23,11 @@
       },
 
       "attack_model": {
+        "class": "erasure.evaluations.MIA.Distribution.Distribution",
+        "parameters": {}
+      },
+
+      "attack_model1": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
           "epochs": 50,
@@ -46,7 +51,7 @@
       },
 
       "shadows": {
-        "n_shadows": 10,
+        "n_shadows": 250,
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[

@@ -18,7 +18,7 @@ class Distribution(Configurable):
         try:
             self.curve_out = scipy.stats.gaussian_kde(self.distribution_out)
             self.curve_in  = scipy.stats.gaussian_kde(self.distribution_in)
-        except (numpy.linalg.LinAlgError, ValueError):
+        except (numpy.linalg.LinAlgError, ValueError) as e:
             self.curve_out = None
             self.curve_in = None
 
@@ -27,10 +27,10 @@ class Distribution(Configurable):
         """ Returns the probability of a sample z to be in both the distribution (in & out) """
 
         if self.curve_out and self.curve_in:
-            return (
+            return [
                 self.curve_out.evaluate(z),
                 self.curve_in.evaluate(z)
-            )
+            ]
 
 
 
