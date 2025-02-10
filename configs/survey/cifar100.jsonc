@@ -1,7 +1,7 @@
 {
     "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
                 "parameters": {
-                    "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSource", 
+                    "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSourceCifar100", 
                                     "parameters": {"path": "torchvision.datasets.CIFAR100", "transform":["ToTensor"], "classes":20,
                                     "preprocess": [{"class":"erasure.data.preprocessing.dataset_specific.torchvision.cifar100_to_20.CIFAR100preprocess", "parameters":{"dim":256, "method":"resize"}}]}
                                 }, 
@@ -40,7 +40,10 @@
       {
         "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {
-          "training_set": "retain"
+            "epochs": 1, 
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
         }
         },
     {
@@ -177,6 +180,7 @@
         "parameters": {
             "last_trainable_layers": 3,
             "epochs": 20, 
+            "epochs": 20, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
@@ -286,7 +290,7 @@
                         "epochs": 1,
                         "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
-                        "noise_lr": 0.01,
+                        "noise_lr": 0.001,
                         "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
                     }
                 }, 
@@ -401,7 +405,7 @@
                       "optimizer": {
                           "class": "torch.optim.Adam",
                           "parameters": {
-                              "lr": 0.001
+                              "lr": 0.0001
                           }
                       }
                   }
@@ -487,10 +491,12 @@
               {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
               {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
               "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
+              {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
+              "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/cifar100.json"}}
             ]
           }
         },
-    "globals":{"cached": "false","seed": 0}
+    "globals":{"cached": "true","seed": 1}
   }
