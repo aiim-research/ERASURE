@@ -180,7 +180,6 @@
         "parameters": {
             "last_trainable_layers": 3,
             "epochs": 20, 
-            "epochs": 20, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
         }
