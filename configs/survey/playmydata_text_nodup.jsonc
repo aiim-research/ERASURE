@@ -141,7 +141,8 @@
                         "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
                         "noise_lr": 0.01,
-                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}},
+                        "sample_tipe": "text"
                     }
                 }, 
                 {

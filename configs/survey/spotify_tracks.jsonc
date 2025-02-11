@@ -502,7 +502,7 @@
               {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
               "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
               {"compose_umia" : "configs/snippets/e_umia.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/spotify_tracks_seed_2.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/test.json"}}
             ]
           }
         },

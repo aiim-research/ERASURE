@@ -45,6 +45,13 @@
 
     "unlearners":[
       {
+        "class": "erasure.unlearners.FisherForgetting.FisherForgetting",
+        "parameters": {
+            "ref_data":"retain",
+            "alpha": 1e-7
+            }
+        },
+      {
         "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {
           "training_set": "retain"
@@ -87,17 +94,10 @@
         }
       },
       {
-        "class": "erasure.unlearners.FisherForgetting.FisherForgetting",
-        "parameters": {
-            "ref_data":"retain",
-            "alpha": 1e-7
-            }
-        },
-      {
         "class": "erasure.unlearners.eu_k.eu_k",
         "parameters": {
             "last_trainable_layers": 3,
-            "epochs": 10, 
+            "epochs": 2, 
             "ref_data":"retain",
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
         }
@@ -142,7 +142,8 @@
                         "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
                         "noise_lr": 0.01,
-                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}},
+                        "sample_tipe": "text"
                     }
                 }, 
                 {
@@ -212,12 +213,10 @@
               {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
               {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
               "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
-              // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
-              //{"compose_lira" : "configs/snippets/e_lira.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/IMDB.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/IMDB_seed_1.json"}}
             ]
           }
         },
-    "globals":{"cached": "true","seed": 0}
+    "globals":{"cached": "true","seed": 1}
   }

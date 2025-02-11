@@ -32,6 +32,8 @@ class UNSIR(TorchUnlearner):
 
         self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
                                       {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
+        
+        self.sample_type = self.local.config['parameters']['sample_type']
 
     
     def __unlearn__(self):
@@ -64,6 +66,9 @@ class UNSIR(TorchUnlearner):
                 noise = Noise(*noise_dim).to(self.device)
                 noise_optimizer = torch.optim.Adam(noise.parameters(), lr=self.noise_lr)
                 noise_tensor = noise()[:batch_size_forget]
+                if self.sample_type == 'text':
+                    noise_tensor[:, 1, :] = 1
+                    noise_tensor = noise_tensor.int()
 
                 # Update the noise for increasing the loss value.
                 for _ in range(5):
@@ -107,3 +112,4 @@ class UNSIR(TorchUnlearner):
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.local.config['parameters']['noise_lr'] = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
         self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
+        self.local.cconfig['parameters']['sample_type'] = self.local.config['parameters'].get("sample_type", 'default')
