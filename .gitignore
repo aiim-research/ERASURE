@@ -9,3 +9,5 @@ resources/data/*
 resources/cached/*
 output/runs
 saliency_maps/*
+*.pdf
+launchers/*

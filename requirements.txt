@@ -10,4 +10,4 @@ jsonpickle
 pandas
 PyYAML
 gdown
-python_papi
+python_papi; sys_platform != 'darwin'

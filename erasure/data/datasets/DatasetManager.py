@@ -19,6 +19,8 @@ class DatasetManager(Configurable):
         self.info(self.params['DataSource'])
         
         self.partitions['all'] = self.datasource.create_and_validate_data()
+
+        self.ref_data_dict = {'all':'all'}
         
         self.parts_cfgs = self.params['partitions']
         self.info(self.partitions['all'].data)
@@ -42,6 +44,10 @@ class DatasetManager(Configurable):
         splitted_data = get_instance_config(split)
         splitted_data.set_source(self.datasource)
 
+        ##add dictionary to self of what partition refers to what data -> partition: ref_data
+        self.ref_data_dict[splitted_data.parts_names[0]] = splitted_data.ref_data
+        self.ref_data_dict[splitted_data.parts_names[1]] = splitted_data.ref_data
+
         self.partitions = splitted_data.split_data(self.partitions)
 
         self.info(list(self.partitions.keys()))
@@ -62,10 +68,9 @@ class DatasetManager(Configurable):
     def get_loader_for(self, split_id, fold_fraction = None, drop_last=True):
 
         fold_fraction = None
+        ref_data = self.ref_data_dict[split_id]
 
         dataset = self.datasource.get_wrapper(self.partitions['all'].data) if split_id == 'all' else self.datasource.get_wrapper(Subset(self.partitions['all'].data, self.partitions[split_id]))
-
-        #dataset = self.partitions['all'].data if split_id == 'all' else DatasetWrapper(Subset(self.partitions['all'].data, self.partitions[split_id])).data
 
         num_samples = len(dataset)
 
@@ -105,7 +110,7 @@ class DatasetManager(Configurable):
             Dataset: The dataset corresponding to the partition ID.
         """
         if split_id in self.partitions:
-            return self.partitions['all'].data if split_id == 'all' else DatasetWrapper(Subset(self.partitions['all'].data, self.partitions[split_id])).data
+            return self.partitions['all'].data if split_id == 'all' else self.datasource.get_wrapper(Subset(self.partitions['all'].data, self.partitions[split_id])).data
         else:
             raise ValueError(f"Partition ID '{split_id}' not found in partitions.")
    

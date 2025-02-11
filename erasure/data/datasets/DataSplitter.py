@@ -7,6 +7,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 import torch
 import hashlib
+import numpy as np
 
 class DataSplitter(ABC):
     def __init__(self, ref_data,parts_names):
@@ -34,8 +35,6 @@ class DataSplitterPercentage(DataSplitter):
         split_point = int(self.total_size * self.percentage)
 
         indices = self.get_indices(indices) if self.shuffle else indices
-
-        #print(indices[:5])
 
         split_indices_1 = indices[:split_point]
         split_indices_2 = indices[split_point:]
@@ -109,18 +108,14 @@ class DataSplitterClass(DataSplitter):
         ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
         
         filtered_indices = [
-            idx for idx in range(len(ref_data))  
+            ref_data.data.indices[idx] for idx in range(len(ref_data))  
             if ref_data[idx][1] == self.label  
         ]
 
         other_indices = [
-            idx for idx in range(len(ref_data)) 
+            ref_data.data.indices[idx] for idx in range(len(ref_data)) 
             if idx not in filtered_indices
         ]
-
-        if not self.ref_data == "all":
-            filtered_indices = [ref_data.data.indices[i] for i in filtered_indices]
-            other_indices = [ref_data.data.indices[i] for i in other_indices]
 
 
         partitions[self.parts_names[0]] = filtered_indices 
@@ -171,36 +166,155 @@ class DataSplitterList(DataSplitter):
         return partitions
     
 class DataSplitterByZ(DataSplitter):
-    def __init__(self, z_label, parts_names, ref_data = 'all'):
+    def __init__(self, z_labels, parts_names, ref_data = 'all'):
         super().__init__(ref_data,parts_names) 
-        self.z_label = z_label
+        self.z_labels = z_labels
+
+
+class DataSplitterByZ(DataSplitter):
+    def __init__(self, z_labels, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
+        self.z_labels = z_labels
 
 
     def split_data(self,partitions):
-
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))        
         
-        dataloader = DataLoader(ref_data, batch_size=5000)
+        dataloader = DataLoader(ref_data, batch_size=10000)
 
         filtered_indices = []
+        all_possible_z = []
         current_index = 0  
-        import torch
+
         for batch in tqdm(dataloader, desc="Filtering Data"):
             _, _, Z = batch
+            all_possible_z.extend(Z)
             
-            mask = (Z == self.z_label)
+            mask = torch.Tensor( np.isin(Z, self.z_labels) )
             matching_indices = torch.nonzero(mask, as_tuple=True)[0]  
             
             filtered_indices.extend((current_index + matching_indices).tolist())
             
             current_index += len(Z)
 
-        other_indices = [
-            idx for idx in range(len(ref_data)) 
-            if idx not in filtered_indices
-        ]
+        all_indices = set(range(len(ref_data)))
+        other_indices = list(all_indices - set(filtered_indices))
+
+        filtered_indices = [partitions[self.ref_data][i] for i in filtered_indices]
+        other_indices = [partitions[self.ref_data][i] for i in other_indices]
 
         partitions[self.parts_names[0]] = filtered_indices 
         partitions[self.parts_names[1]] = other_indices
 
+        all_possible_z = torch.tensor(all_possible_z)
+        all_possible_z = torch.unique(all_possible_z)
+        all_possible_z = torch.sort(all_possible_z).values
+        print("all possible z_labels in the data: ", all_possible_z)
+
+        print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
+        
+
         return partitions
+    
+class DataSplitterByZList(DataSplitter):
+    def __init__(self, z_labels, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
+        self.z_labels = z_labels
+
+
+    def split_data(self,partitions):
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        
+        
+        dataloader = DataLoader(ref_data, batch_size=10000)
+
+        filtered_indices = []
+        all_possible_z = []
+        current_index = 0  
+
+        #### TODO: CAN BE OPTIMIZED
+        for batch in tqdm(dataloader, desc="Filtering Data"):
+            _, _, Z = batch  # Z is a list of tensors
+            Z = torch.stack(Z, dim=1)
+            all_possible_z.extend(Z)
+            matched_indices = []
+
+            for i, z_tensor in enumerate(Z):
+                results = [i for i in self.z_labels if i in z_tensor]
+
+                if len(results)>0:
+                    matched_indices.append(current_index + i)  
+
+            filtered_indices.extend(matched_indices)
+            current_index += len(Z)  
+
+        all_indices = set(range(len(ref_data)))
+        other_indices = list(all_indices - set(filtered_indices))
+
+        filtered_indices = [partitions[self.ref_data][i] for i in filtered_indices]
+        other_indices = [partitions[self.ref_data][i] for i in other_indices]
+
+        partitions[self.parts_names[0]] = filtered_indices 
+        partitions[self.parts_names[1]] = other_indices
+
+        all_possible_z = torch.tensor(all_possible_z)
+        all_possible_z = torch.unique(all_possible_z)
+        all_possible_z = torch.sort(all_possible_z).values
+        print("all possible z_labels in the data: ", all_possible_z)
+
+        print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
+
+        return partitions
+    
+
+class DataSplitterAnyZisIn(DataSplitter):
+    def __init__(self, z_labels, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
+        self.z_labels = z_labels
+
+
+    def split_data(self, partitions):
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+
+        dataloader = DataLoader(ref_data, batch_size=10000)
+
+        filtered_indices = []
+        all_possible_z = []
+        current_index = 0  
+
+        for batch in tqdm(dataloader, desc="Filtering Data"):
+            _, _, Z = batch  
+            if not isinstance(Z, list):
+                Z = [Z]
+            Z = torch.stack(Z, dim=1)  
+            all_possible_z.extend(Z)
+
+            z_labels_tensor = torch.tensor(self.z_labels)
+
+            matched_indices = []
+
+            for i, z_tensor in enumerate(Z):
+                if torch.isin(z_tensor, z_labels_tensor).any():
+                    matched_indices.append(current_index + i)  
+
+            filtered_indices.extend(matched_indices)
+            current_index += len(Z)  
+            
+            all_indices = set(range(len(ref_data)))
+            other_indices = list(all_indices - set(filtered_indices))
+
+            filtered_indices = [partitions[self.ref_data][i] for i in filtered_indices]
+            other_indices = [partitions[self.ref_data][i] for i in other_indices]
+
+            partitions[self.parts_names[0]] = filtered_indices 
+            partitions[self.parts_names[1]] = other_indices
+
+            # concat dataset to tensor and get unique values
+            all_possible_z = torch.tensor(all_possible_z)
+            all_possible_z = torch.unique(all_possible_z)
+            all_possible_z = torch.sort(all_possible_z).values
+            print("all possible z_labels in the data: ", all_possible_z)
+
+            print("ratio of z_labels in the data: ", len(filtered_indices)/len(other_indices))
+
+            return partitions

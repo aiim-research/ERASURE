@@ -23,6 +23,7 @@ class reshape_y_z(Preprocess):
         ##  if keep_as_y is (0,0), we keep the first column of the first downloaded_attribute
 
         true_y = y
+
         for idx in self.keep_as_y:
             true_y = true_y[idx]
          

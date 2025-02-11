@@ -100,15 +100,13 @@ class TorchFlops(UnlearnRunner):
 
             with torch.profiler.profile(
                 activities=activities,
-                record_shapes=True,
-                profile_memory=True,
-                with_stack=True,
                 with_flops=True
             ) as prof:
                 
                 super().process(e)
 
-            metric_value = sum(event.flops for event in prof.key_averages())
+            filtered_events = [event for event in prof.events() if event.flops not in (None, 0)]
+            metric_value = sum(event.flops for event in filtered_events)
 
             e.add_value('TorchFlops', metric_value)
 

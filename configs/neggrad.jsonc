@@ -11,7 +11,7 @@
                   "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
                   "parameters": {
                       "parts_names": ["all_reduced", "-"],
-                      "percentage": 0.0125
+                      "percentage": 0.025
                   }
               },
               {
@@ -68,7 +68,7 @@
       {
           "class": "erasure.unlearners.NegGrad.NegGrad",
           "parameters": {
-              "epochs": 5,
+              "epochs": 1,
               "ref_data": "forget",
               "optimizer": {
                   "class": "torch.optim.Adam",

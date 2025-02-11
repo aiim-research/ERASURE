@@ -34,7 +34,7 @@ class TorchModel(Trainable):
         
         self.lr_scheduler =  lr_scheduler.LinearLR(self.optimizer, start_factor=1.0, end_factor=0.5, total_iters=self.epochs)
 
-        self.training_set = self.local.config['parameters']['training_set']
+        self.training_set = self.local.config['parameters'].get('training_set','train')
 
 
 
@@ -69,7 +69,6 @@ class TorchModel(Trainable):
 
 
                 _,pred = self.model(X)
-
                 loss = self.loss_fn(pred, labels)
                 
                 self.optimizer.zero_grad()

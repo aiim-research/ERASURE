@@ -58,9 +58,6 @@ class DataSource(Configurable):
         if not self.check_integrity(data):
             raise ValueError(f"Integrity check failed for data source: {self.get_name()}")
         
-
-        #data = self.shuffle_data(data, 0) ##add seed
-
         return data
 
     ##needs to be fixed because classes isn't preserved

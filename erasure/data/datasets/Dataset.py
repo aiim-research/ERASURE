@@ -29,7 +29,7 @@ class DatasetWrapper:
         Apply each preprocessing step to the data (X, y).
         """
         for preprocess in self.preprocess:
-            X, y,Z = preprocess.process(X,y,Z)
+            X,y,Z = preprocess.process(X,y,Z)
         return X, y, Z
 
 class DatasetExtendedWrapper:

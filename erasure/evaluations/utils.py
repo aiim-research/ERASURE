@@ -42,8 +42,15 @@ def compute_relearn_time(model, data_loader, max_accuracy=0.8, max_epochs=100):
             model.optimizer.step()
 
             losses.append(loss.to('cpu').detach().numpy())
-            labels_list += list(labels.squeeze().long().detach().to('cpu').numpy())
-            preds += list(pred.squeeze().detach().to('cpu').numpy())
+            if labels.dim() == 0:  # If labels is a scalar
+                labels_list += [labels.item()]  # Add scalar as a single element list
+            else:
+                labels_list += list(labels.squeeze().long().detach().to('cpu').numpy())
+            if pred.dim() == 0:  # If pred is a scalar
+                preds += [pred.item()]  # Add scalar as a single element list
+            else:
+                preds += list(pred.squeeze().detach().to('cpu').numpy())
+
 
         curr_accuracy = model.accuracy(labels_list, preds)
         model.lr_scheduler.step()
