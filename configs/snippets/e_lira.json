@@ -51,7 +51,7 @@
       },
 
       "shadows": {
-        "n_shadows": 250,
+        "n_shadows": 100,
         "train_part_plh":"shw_train",
         "test_part_plh":"shw_test",
         "dataset_preproc":[
