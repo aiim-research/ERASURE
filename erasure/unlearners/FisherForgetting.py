@@ -62,6 +62,8 @@ class FisherForgetting(TorchUnlearner):
 
     def get_mean_var(self, p, is_base_dist=False, alpha=3e-6):
         var = copy.deepcopy(1./(p.grad2_acc+1e-8))
+        if isinstance(var, float):  
+            var = torch.tensor(var) 
         var = var.clamp(max=1e3)
         if p.size(0) == self.num_classes:
             var = var.clamp(max=1e2)
@@ -93,6 +95,9 @@ class FisherForgetting(TorchUnlearner):
 
             if not hasattr(p, 'data0'):
                 p.data0 = copy.deepcopy(p.data.clone())
+
+            if not isinstance(p.grad2_acc, torch.Tensor):
+                    continue
             
             mu, var = self.get_mean_var(p)
             p.data = mu + var.sqrt() * torch.empty_like(p.data0).normal_()

@@ -58,7 +58,7 @@
               "epochs": 1, 
               "ref_data_retain": "retain", 
               "ref_data_forget": "forget",
-              "optimizer": {"class": "torch.optim.SGD","parameters": {"lr": 0.0001}}
+              "optimizer": {"class": "torch.optim.SGD","parameters": {"lr": 1e-06}}
           }
       },
       {
@@ -67,7 +67,7 @@
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}},
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}},
             "KL_temperature": 1.0
         }
       },
@@ -76,7 +76,7 @@
         "parameters": {
             "epochs": 1, 
             "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
         }
       },
       {
@@ -85,7 +85,35 @@
             "last_trainable_layers": 3,
             "epochs": 1, 
             "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.eu_k.eu_k",
+        "parameters": {
+            "last_trainable_layers": 3,
+            "epochs": 5, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
+        }
+      },
+      {"compose_idt" : "configs/snippets/u_id.json"},
+      {
+        "class": "erasure.unlearners.NegGrad.NegGrad",
+        "parameters": {
+            "epochs": 1,
+            "ref_data": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.Scrub.Scrub",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "T": 4.0,
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
         }
       },
       {
@@ -96,41 +124,13 @@
             }
         },
       {
-        "class": "erasure.unlearners.eu_k.eu_k",
-        "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 10, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-        }
-      },
-      {"compose_idt" : "configs/snippets/u_id.json"},
-      {
-        "class": "erasure.unlearners.NegGrad.NegGrad",
-        "parameters": {
-            "epochs": 1,
-            "ref_data": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.Scrub.Scrub",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "T": 4.0,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-        }
-      },
-      {
         "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
         "parameters": {
             "ref_data_train": "train", 
             "ref_data_forget": "forget",
             "dampening_constant": 0.1,
             "selection_weighting": 20,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
           }
       },
       {
@@ -144,7 +144,7 @@
                         "ref_data_retain": "retain", 
                         "ref_data_forget": "forget", 
                         "noise_lr": 0.01,
-                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}},
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}},
                         "sample_tipe": "text"
                     }
                 }, 
@@ -153,7 +153,7 @@
                   "parameters": {
                       "epochs": 1, 
                       "ref_data":"retain",
-                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
                   }
               }
             ]
@@ -165,7 +165,7 @@
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-06}}
         }
       },
       {
@@ -191,7 +191,7 @@
                       "optimizer": {
                           "class": "torch.optim.Adam",
                           "parameters": {
-                              "lr": 0.0001
+                              "lr": 1e-06
                           }
                       }
                   }
@@ -212,13 +212,13 @@
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
               {"class": "erasure.evaluations.measures.AUS", "parameters":{"forget_part": "forget","test_part": "test"}},
-              {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
+              //{"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
               {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,
               "gold_model": {"class": "erasure.unlearners.GoldModel.GoldModel","parameters": {"cached": true}}}},
               // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/ag_news.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/ag_news_1e-6.json"}}
             ]
           }
         },

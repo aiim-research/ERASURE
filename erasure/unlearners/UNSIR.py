@@ -112,4 +112,4 @@ class UNSIR(TorchUnlearner):
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.local.config['parameters']['noise_lr'] = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
         self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
-        self.local.cconfig['parameters']['sample_type'] = self.local.config['parameters'].get("sample_type", 'default')
+        self.local.config['parameters']['sample_type'] = self.local.config['parameters'].get("sample_type", 'default')
