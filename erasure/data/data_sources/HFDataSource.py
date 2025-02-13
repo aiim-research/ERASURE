@@ -218,6 +218,7 @@ class SpotifyHFDataSource(HFDataSource):
         concat = ConcatDataset(splits)
 
         concat.classes = splits[0].unique(self.label) if self.classes == -1 else self.classes
+        print("Classes", concat.classes, len(concat.classes))
 
         dataset = self.get_wrapper(concat)
 

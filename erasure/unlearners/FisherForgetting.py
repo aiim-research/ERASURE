@@ -43,8 +43,12 @@ class FisherForgetting(TorchUnlearner):
                 loss.backward(retain_graph=True)
                 for p in self.predictor.model.parameters():
                     if p.requires_grad:
+                        if p.grad is None:
+                            continue
                         p.grad_acc += (orig_target == target).float() * p.grad.data
                         p.grad2_acc += prob[:, y] * p.grad.data.pow(2)
+            
+            break
         for p in self.predictor.model.parameters():
             p.grad_acc /= len(dataloader)
             p.grad2_acc /= len(dataloader)
@@ -54,9 +58,12 @@ class FisherForgetting(TorchUnlearner):
         for p in self.predictor.model.parameters():
             p.grad_acc /= n_samples
             p.grad2_acc /= n_samples
+        
 
     def get_mean_var(self, p, is_base_dist=False, alpha=3e-6):
         var = copy.deepcopy(1./(p.grad2_acc+1e-8))
+        if isinstance(var, float):  
+            var = torch.tensor(var) 
         var = var.clamp(max=1e3)
         if p.size(0) == self.num_classes:
             var = var.clamp(max=1e2)
@@ -82,8 +89,15 @@ class FisherForgetting(TorchUnlearner):
         Applies Fisher noise to model parameters for selective forgetting.
         """        
         for p in self.predictor.model.parameters():
+            
+            if not isinstance(p, torch.Tensor):
+                continue
+
             if not hasattr(p, 'data0'):
                 p.data0 = copy.deepcopy(p.data.clone())
+
+            if not isinstance(p.grad2_acc, torch.Tensor):
+                    continue
             
             mu, var = self.get_mean_var(p)
             p.data = mu + var.sqrt() * torch.empty_like(p.data0).normal_()

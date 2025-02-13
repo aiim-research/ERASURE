@@ -44,12 +44,6 @@
       },
 
     "unlearners":[
-      {
-        "class": "erasure.unlearners.GoldModel.GoldModel",
-        "parameters": {
-          "training_set": "retain"
-        }
-        },
         {
           "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
           "parameters": {
@@ -70,33 +64,6 @@
         }
       },
       {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
-        "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 1, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.eu_k.eu_k",
-        "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 2, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
-        }
-      },
-      {"compose_idt" : "configs/snippets/u_id.json"},
-      {
         "class": "erasure.unlearners.NegGrad.NegGrad",
         "parameters": {
             "epochs": 1,
@@ -104,26 +71,8 @@
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
         }
       },
-      {
-        "class": "erasure.unlearners.Scrub.Scrub",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "T": 4.0,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
-        "parameters": {
-            "ref_data_train": "train", 
-            "ref_data_forget": "forget",
-            "dampening_constant": 0.1,
-            "selection_weighting": 20,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
-          }
-      },
+
+
       {
         "class": "erasure.unlearners.composite.Cascade",
         "parameters": {
