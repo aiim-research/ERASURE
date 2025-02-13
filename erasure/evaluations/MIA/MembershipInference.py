@@ -39,10 +39,10 @@ class MembershipInference(Measure):
 
         self.dataset = self.global_ctx.factory.get_object(Local(data_cfg))
 
-        
+
         self.base_model_cfg['per_shadows_partition']=self.local.config['parameters']['shadows']['per_shadows_partition'] #Let the cache working  when per_partition is changed
         self.attack_in_data_cfg['generated_from_per_shadows']=self.base_model_cfg['per_shadows_partition'] #Let the cache working  when per_partition is changed
-         
+
 
         # Shadow Models
         shadow_models = []

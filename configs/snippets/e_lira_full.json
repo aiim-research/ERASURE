@@ -25,26 +25,8 @@
       },
 
       "attack_model": {
-        "class": "erasure.model.TorchModel.TorchModel",
-        "parameters": {
-          "epochs": 50,
-          "optimizer": {
-            "class": "torch.optim.RMSprop",
-            "parameters": {
-              "lr": 0.01
-            }
-          },
-          "loss_fn": {
-            "class": "torch.nn.CrossEntropyLoss",
-            "parameters": {
-              "reduction": "mean"
-            }
-          },
-          "model": {
-            "class": "erasure.model.FF.MIAAttack",
-            "parameters": {}
-          }
-        }
+        "class": "erasure.evaluations.MIA.Distribution.Distribution",
+        "parameters": {}
       },
 
       "shadows": {
@@ -110,7 +92,7 @@
               "parameters": {}
             }
           }
-        }                
+        }
       }
     }
 }

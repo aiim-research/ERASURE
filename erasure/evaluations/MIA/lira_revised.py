@@ -12,8 +12,7 @@ from erasure.utils.config.local_ctx import Local
 
 class Attack(MembershipInference):
     """ Likelihood Ratio membership inference Attack (LiRA)
-        (https://doi.org/10.48550/arXiv.2403.01218)
-        the Carlini way (https://doi.org/10.1109/SP46214.2022.9833649)
+        revised with logits and FF
     """
 
     def process(self, e: Evaluation):
@@ -119,8 +118,8 @@ class Attack(MembershipInference):
                 predictions = predictions.to('cpu')
 
                 attack_samples.append(
-                    losses.unsqueeze(1)
-                    # predictions
+                    # losses.unsqueeze(1)
+                    predictions
                 )
 
         attack_samples = torch.cat(attack_samples)
@@ -145,17 +144,15 @@ class Attack(MembershipInference):
                     curr_f_id = data_ids[curr_id]
                     if curr_f_id in attack_models:
                         loss = self.loss_fn(target_predictions[i], labels[i])
-                        loss = loss.cpu()
 
-                        evaluation = attack_models[curr_f_id].evaluate(loss)
+                        # evaluation = attack_models[curr_f_id].evaluate(loss)
 
-                        # _, prediction = attack_models[curr_f_id].model(target_predictions[i])
-                        # evaluation = torch.nn.functional.softmax(prediction, dim=0)
-                        # evaluation = evaluation.to('cpu')
+                        _, prediction = attack_models[curr_f_id].model(target_predictions[i])
+                        evaluation = torch.nn.functional.softmax(prediction, dim=0)
 
+                        evaluation = evaluation.to('cpu')
                         if evaluation is not None:
-                            evaluation[0] += 0.00001
-                            evaluation[1] += 0.00001
+                            evaluation += 0.0001
                             attack_predictions.append(evaluation[1]/evaluation[0])
 
         return np.mean(attack_predictions)

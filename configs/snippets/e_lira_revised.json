@@ -1,8 +1,8 @@
 {
-    "class": "erasure.evaluations.MIA.lira.Attack",
+    "class": "erasure.evaluations.MIA.lira_revised.Attack",
     "parameters": {
-      "forget_part": "lira_forget",
-      "data_out_path": "resources/data/lira/lira.pt",
+      "forget_part": "lira_rev_forget",
+      "data_out_path": "resources/data/lira_rev/lira.pt",
 
       "attack_in_data": {
         "class": "erasure.data.datasets.DatasetManager.DatasetManager",
@@ -10,7 +10,7 @@
           "DataSource": {
             "class": "erasure.data.data_sources.TorchFileDataSource.TorchFileDataSource",
             "parameters": {
-              "path": "resources/data/lira/lira.pt"
+              "path": "resources/data/lira_rev/lira.pt"
             }
           },
           "partitions": [
@@ -23,8 +23,26 @@
       },
 
       "attack_model": {
-        "class": "erasure.evaluations.MIA.Distribution.Distribution",
-        "parameters": {}
+        "class": "erasure.model.TorchModel.TorchModel",
+        "parameters": {
+          "epochs": 50,
+          "optimizer": {
+            "class": "torch.optim.RMSprop",
+            "parameters": {
+              "lr": 0.01
+            }
+          },
+          "loss_fn": {
+            "class": "torch.nn.CrossEntropyLoss",
+            "parameters": {
+              "reduction": "mean"
+            }
+          },
+          "model": {
+            "class": "erasure.model.FF.FlexSeqBin",
+            "parameters": {"mult":[2,0.75]}
+          }
+        }
       },
 
       "shadows": {
@@ -33,7 +51,7 @@
         "test_part_plh":"shw_test",
         "dataset_preproc":[
           { "class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples",
-            "parameters": {"parts_names": ["lira_forget", "-"], "n_samples": 200, "ref_data": "forget"}
+            "parameters": {"parts_names": ["lira_rev_forget", "-"], "n_samples": 200, "ref_data": "forget"}
           },
           {
             "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
