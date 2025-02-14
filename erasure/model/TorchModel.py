@@ -65,11 +65,21 @@ class TorchModel(Trainable):
             for batch, (X, labels) in enumerate(train_loader):
                 # print(X)
                 # print(labels)
-                X, labels = X.to(self.device), labels.to(self.device)
+
+                if isinstance(X,list):
+                    for i in X:
+                        i = i.to(self.device)
+
+                    _,pred = self.model(X, batch)
+                else:
+                    X = X.to(self.device)
+                    _,pred = self.model(X)
+                    
+                labels =  labels.to(self.device)
+
                 self.optimizer.zero_grad()
 
-
-                _,pred = self.model(X)
+                _,pred = self.model(X, batch)
                 loss = self.loss_fn(pred, labels)
                 
                 self.optimizer.zero_grad()
@@ -95,10 +105,19 @@ class TorchModel(Trainable):
                 with torch.no_grad():
                     for batch, (X, labels) in enumerate(train_loader):
 
-                        
-                        X, labels = X.to(self.device), labels.to(self.device)
                         self.optimizer.zero_grad()
-                        _,pred = self.model(X)
+                        if isinstance(X,list):
+                            for i in X:
+                                i = i.to(self.device)
+
+                            _,pred = self.model(X, batch)
+                        else:
+                            X = X.to(self.device)
+                            _,pred = self.model(X)
+                            
+                        labels =  labels.to(self.device)
+
+
                         loss = self.loss_fn(pred, labels)
                     
                             
