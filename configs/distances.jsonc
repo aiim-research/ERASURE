@@ -60,16 +60,16 @@
         "class": "erasure.evaluations.manager.Evaluator",
         "parameters": {
           "measures":[
-            { "class": "erasure.evaluations.activations.ActivationDistance",
+            { "class": "erasure.evaluations.distances.activations.ActivationDistance",
               "parameters":{}
             },
-            { "class": "erasure.evaluations.weights.ModelDistance",
+            { "class": "erasure.evaluations.distances.weights.ModelDistance",
               "parameters":{}
             },
-            { "class": "erasure.evaluations.weights.ModelDistance",
+            { "class": "erasure.evaluations.distances.weights.ModelDistance",
               "parameters":{
                 "function": {
-                  "class": "erasure.evaluations.weights.hausdorff",
+                  "class": "erasure.evaluations.distances.weights.hausdorff",
                   "parameters": {}
                 }
             }}

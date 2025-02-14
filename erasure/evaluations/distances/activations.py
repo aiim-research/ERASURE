@@ -19,7 +19,7 @@ class ActivationDistance(Measure):
 
     def check_configuration(self):
         super().check_configuration()
-        init_dflts_to_of(self.local.config, 'function', 'erasure.evaluations.activations.l2norm')  # Default distance is L2 norm
+        init_dflts_to_of(self.local.config, 'function', 'erasure.evaluations.distances.activations.l2norm')  # Default distance is L2 norm
         self.params['name'] = self.params.get('name', self.params['function']['class'])  # Default name as distance name
         self.params['forget_part'] = self.params.get('forget_part', "forget")
 
