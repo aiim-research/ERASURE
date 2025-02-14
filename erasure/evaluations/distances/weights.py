@@ -5,7 +5,7 @@ from erasure.core.factory_base import get_function
 from erasure.core.measure import Measure
 from erasure.evaluations.evaluation import Evaluation
 from erasure.utils.cfg_utils import init_dflts_to_of
-
+from erasure.utils.config.global_ctx import strtobool
 
 class ModelDistance(Measure):
     """ Compute the distance between the original and the unlearned model.
@@ -18,11 +18,14 @@ class ModelDistance(Measure):
         self.distance_name = self.params['name']
         self.distance_params = self.params['function']['parameters']
         self.distance_func = get_function(self.params['function']['class'])
+        self.block_diag = strtobool(self.params['block_diag'])
+
 
     def check_configuration(self):
         super().check_configuration()
         init_dflts_to_of(self.local.config, 'function', 'erasure.evaluations.distances.weights.l2norm') # Default distance is L2 norm
         self.params['name'] = self.params.get('name', self.params['function']['class'])  # Default name as distance name
+        self.params['block_diag'] = self.params.get('block_diag', "false")
 
     def process(self, e:Evaluation):
         unlearned = e.unlearned_model
@@ -31,8 +34,9 @@ class ModelDistance(Measure):
         unlearned_params = list(unlearned.model.parameters())
         original_params = list(original.model.parameters())
 
-        unlearned_params = create_block_diagonal(unlearned_params)
-        original_params = create_block_diagonal(original_params)
+        if self.block_diag:
+            unlearned_params = [create_block_diagonal(unlearned_params)]
+            original_params = [create_block_diagonal(original_params)]
 
         # compute the distance of all layers
         distance = self.distance_func(unlearned_params, original_params, **self.distance_params)
@@ -78,7 +82,7 @@ def create_block_diagonal(list):
     new_list = []
     for elem in list:
         new_list.append(
-            elem.detach().reshape(len(elem), -1)
+                elem.detach().reshape(len(elem), -1)
         )
 
-    return new_list
+    return torch.block_diag(*new_list)

@@ -60,9 +60,6 @@
         "class": "erasure.evaluations.manager.Evaluator",
         "parameters": {
           "measures":[
-            { "class": "erasure.evaluations.distances.activations.ActivationDistance",
-              "parameters":{}
-            },
             { "class": "erasure.evaluations.distances.weights.ModelDistance",
               "parameters":{}
             },
@@ -72,7 +69,23 @@
                   "class": "erasure.evaluations.distances.weights.hausdorff",
                   "parameters": {}
                 }
-            }}
+            }},
+            { "class": "erasure.evaluations.distances.weights.ModelDistance",
+              "parameters":{
+                "block_diag": "true"
+              }
+            },
+            { "class": "erasure.evaluations.distances.weights.ModelDistance",
+              "parameters":{
+                "block_diag": "true",
+                "function": {
+                  "class": "erasure.evaluations.distances.weights.hausdorff",
+                  "parameters": {}
+                }
+            }},
+            { "class": "erasure.evaluations.distances.activations.ActivationDistance",
+              "parameters":{}
+            }
           ]
         }
       },
