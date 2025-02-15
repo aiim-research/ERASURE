@@ -1,5 +1,6 @@
 import torch
 import scipy
+import sklearn
 
 from erasure.core.factory_base import get_function
 from erasure.core.measure import Measure
@@ -77,6 +78,21 @@ def hausdorff(list1, list2):
     # return the mean of all distances
     return torch.mean(torch.tensor(distances)).item()
 
+def kldivergence(list1, list2):
+    distances = []
+
+    for mat1, mat2 in zip(list1, list2):
+        mat1 = mat1.detach().flatten()
+        mat1 = torch.nn.functional.softmax(mat1, dim=0)
+        mat2 = mat2.detach().flatten()
+        mat2 = torch.nn.functional.softmax(mat2, dim=0)
+
+        distances.append(
+            scipy.special.kl_div(mat1, mat2).mean()
+            # sklearn.metrics.mutual_info_score(mat1, mat2)
+        )
+
+    return torch.mean(torch.tensor(distances)).item()
 
 def create_block_diagonal(list):
     new_list = []
