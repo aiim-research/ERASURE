@@ -60,32 +60,132 @@
         "class": "erasure.evaluations.manager.Evaluator",
         "parameters": {
           "measures":[
-            { "class": "erasure.evaluations.distances.weights.ModelDistance",
+// weight distances
+            { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{}
             },
-            { "class": "erasure.evaluations.distances.weights.ModelDistance",
+            { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "function": {
-                  "class": "erasure.evaluations.distances.weights.hausdorff",
+                  "class": "erasure.evaluations.distances.hausdorff",
                   "parameters": {}
                 }
             }},
-            { "class": "erasure.evaluations.distances.weights.ModelDistance",
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "function": {
+                  "class": "erasure.evaluations.distances.kldivergence",
+                  "parameters": {}
+                }
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "function": {
+                  "class": "erasure.evaluations.distances.jsdistance",
+                  "parameters": {}
+                }
+            }},
+// weight block matrix
+            { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "block_diag": "true"
               }
             },
-            { "class": "erasure.evaluations.distances.weights.ModelDistance",
+            { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "block_diag": "true",
                 "function": {
-                  "class": "erasure.evaluations.distances.weights.hausdorff",
+                  "class": "erasure.evaluations.distances.hausdorff",
                   "parameters": {}
                 }
             }},
-            { "class": "erasure.evaluations.distances.activations.ActivationDistance",
-              "parameters":{}
-            }
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "block_diag": "true",
+                "function": {
+                  "class": "erasure.evaluations.distances.kldivergence",
+                  "parameters": {}
+                }
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "block_diag": "true",
+                "function": {
+                  "class": "erasure.evaluations.distances.jsdistance",
+                  "parameters": {}
+                }
+            }},
+// activation distances
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "activations": "true",
+                "ref_data": "forget"
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "activations": "true",
+                "ref_data": "forget",
+                "function": {
+                  "class": "erasure.evaluations.distances.hausdorff",
+                  "parameters": {}
+                }
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "activations": "true",
+                "ref_data": "forget",
+                "function": {
+                  "class": "erasure.evaluations.distances.kldivergence",
+                  "parameters": {}
+                }
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "activations": "true",
+                "ref_data": "forget",
+                "function": {
+                  "class": "erasure.evaluations.distances.jsdistance",
+                  "parameters": {}
+                }
+            }},
+// activation block matrix
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "block_diag": "true",
+                "activations": "true",
+                "ref_data": "forget"
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "block_diag": "true",
+                "activations": "true",
+                "ref_data": "forget",
+                "function": {
+                  "class": "erasure.evaluations.distances.hausdorff",
+                  "parameters": {}
+                }
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "block_diag": "true",
+                "activations": "true",
+                "ref_data": "forget",
+                "function": {
+                  "class": "erasure.evaluations.distances.kldivergence",
+                  "parameters": {}
+                }
+            }},
+            { "class": "erasure.evaluations.distances.ModelDistance",
+              "parameters":{
+                "block_diag": "true",
+                "activations": "true",
+                "ref_data": "forget",
+                "function": {
+                  "class": "erasure.evaluations.distances.jsdistance",
+                  "parameters": {}
+                }
+            }}
+
           ]
         }
       },
