@@ -4,6 +4,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 import copy
+from torch_geometric.loader import DataLoader as GeometricDataLoader
+from torch_geometric.data import Data
 from tqdm import tqdm
 from erasure.core.factory_base import get_instance_kvargs
 
@@ -24,7 +26,11 @@ class FisherForgetting(TorchUnlearner):
         Now generalized for any type of data without class-specific computation.
         """
         self.predictor.model.eval()
-        dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
+        
+        if isinstance(dataset[0][0],Data):
+            dataloader = GeometricDataLoader(dataset, batch_size=1, shuffle=False)
+        else:
+            dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
 
         # Initialize gradient accumulators
         for p in self.predictor.model.parameters():

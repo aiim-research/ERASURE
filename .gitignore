@@ -11,3 +11,4 @@ output/runs
 saliency_maps/*
 *.pdf
 launchers/*
+data/*

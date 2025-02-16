@@ -66,23 +66,15 @@ class TorchModel(Trainable):
                 # print(X)
                 # print(labels)
 
-                if isinstance(X,list):
-                    for i in X:
-                        i = i.to(self.device)
-
-                    _,pred = self.model(X, batch)
-                else:
-                    X = X.to(self.device)
-                    _,pred = self.model(X)
-                    
-                labels =  labels.to(self.device)
-
                 self.optimizer.zero_grad()
 
-                _,pred = self.model(X, batch)
+                X, labels = X.to(self.device), labels.to(self.device)
+                
+
+                _,pred = self.model(X)
+
                 loss = self.loss_fn(pred, labels)
                 
-                self.optimizer.zero_grad()
                 # print(loss)
                 losses.append(loss.to('cpu').detach().numpy())
                 loss.backward()
@@ -106,17 +98,10 @@ class TorchModel(Trainable):
                     for batch, (X, labels) in enumerate(train_loader):
 
                         self.optimizer.zero_grad()
-                        if isinstance(X,list):
-                            for i in X:
-                                i = i.to(self.device)
 
-                            _,pred = self.model(X, batch)
-                        else:
-                            X = X.to(self.device)
-                            _,pred = self.model(X)
-                            
-                        labels =  labels.to(self.device)
+                        X, labels = X.to(self.device), labels.to(self.device)
 
+                        _,pred = self.model(X)
 
                         loss = self.loss_fn(pred, labels)
                     

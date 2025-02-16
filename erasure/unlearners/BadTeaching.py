@@ -8,7 +8,8 @@ import copy
 
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset
-
+from torch_geometric.loader import DataLoader as GeometricDataLoader
+from torch_geometric.data import Data
 from erasure.utils.config.local_ctx import Local
 from erasure.core.factory_base import get_instance_kvargs
 
@@ -83,7 +84,10 @@ class BadTeaching(TorchUnlearner):
         self.forget_set = forget_loader.dataset
         
         unlearning_data = UnLearningData(forget_data=self.retain_set, retain_data=self.forget_set, transform=self.transform)
-        unlearning_loader = DataLoader(unlearning_data, batch_size = self.batch_size, shuffle=True)
+        if isinstance(self.retain_set[0][0],Data):
+            unlearning_loader = GeometricDataLoader(unlearning_data, batch_size=self.batch_size, shuffle=True)
+        else:
+            unlearning_loader = DataLoader(unlearning_data, batch_size = self.batch_size, shuffle=True)
 
         self.info(f'Number of steps per epoch: { len(unlearning_loader)}')
 

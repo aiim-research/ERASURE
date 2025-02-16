@@ -2,37 +2,44 @@ import torch.nn as nn
 from torch_geometric.nn.aggr import MeanAggregation
 import torch.nn as nn
 from torch_geometric.nn.conv import GCNConv
-
+import torch
 from erasure.core.factory_base import build_w_params_string
 
 class GCN(nn.Module):
    
-    def __init__(self, node_features, num_conv_layers=2, conv_booster=1, pooling=MeanAggregation):
+    def __init__(self, batch_size, node_features, num_conv_layers=2, conv_booster=1, pooling=MeanAggregation):
         super(GCN, self).__init__()
         
         self.in_channels = node_features
         self.out_channels = int(self.in_channels * conv_booster)
-          
+        self.batch_size = batch_size
         self.pooling =  build_w_params_string(pooling)
  
         
         if num_conv_layers>1:
-            self.num_conv_layers = [(self.in_channels, self.out_channels)] + [(self.out_channels, self.out_channels) * (num_conv_layers - 1)]
+            self.num_conv_layers = [(self.in_channels, self.out_channels)] + [(self.out_channels, self.out_channels)] * (num_conv_layers - 1)
         else:
             self.num_conv_layers = [(self.in_channels, self.out_channels)]
         self.graph_convs = self.__init__conv_layers()
         
-    def forward(self, X, batch):
-        node_features, edge_index, edge_weight = X
-        # convolution operations
+    def forward(self, X):
+        node_features = X.x.double()
+
+        edge_index = X.edge_index.long()
+        edge_weight = X.edge_attr[:, 0].double() if X.edge_attr is not None else None  # Use only one weight per edge
+
         for conv_layer in self.graph_convs[:-1]:
             node_features = conv_layer(node_features, edge_index, edge_weight)
             node_features = nn.functional.relu(node_features)
 
-        # global pooling
-        if isinstance(self.graph_convs[-1],nn.Identity):
-            return self.graph_convs[-1](node_features)
-        return self.graph_convs[-1](node_features, batch)
+        intermediate_results = node_features
+
+        # Handle last layer correctly
+        if isinstance(self.graph_convs[-1], MeanAggregation):
+            return intermediate_results, self.graph_convs[-1](node_features, X.batch)
+        else:
+            return intermediate_results, self.graph_convs[-1](node_features)
+
     
     def __init__conv_layers(self):
         ############################################
@@ -47,7 +54,7 @@ class GCN(nn.Module):
 
 class DownstreamGCN(GCN):
    
-    def __init__(self, node_features,
+    def __init__(self, batch_size, node_features,
                  n_classes=2,
                  num_conv_layers=2,
                  num_dense_layers=2,
@@ -55,7 +62,7 @@ class DownstreamGCN(GCN):
                  linear_decay=2,
                  pooling=MeanAggregation()):
         
-        super().__init__(node_features, num_conv_layers, conv_booster, pooling)
+        super().__init__(batch_size, node_features, num_conv_layers, conv_booster, pooling)
         
         self.num_dense_layers = num_dense_layers
         self.linear_decay = linear_decay
@@ -81,10 +88,9 @@ class DownstreamGCN(GCN):
                 if m.bias is not None:
                     nn.init.constant_(m.bias, 0)
         
-    def forward(self, X, batch):
-        node_features, edge_index, edge_weight = X
-        node_features = super().forward(node_features, edge_index, edge_weight, batch)
-        return self.downstream_layers(node_features)
+    def forward(self, X):
+        intermediate_results, node_features = super().forward(X)
+        return intermediate_results, self.downstream_layers(node_features)
     
     def __init__downstream_layers(self):
         ############################################

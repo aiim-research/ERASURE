@@ -6,6 +6,7 @@ from erasure.utils.config.local_ctx import Local
 from erasure.data.datasets.Dataset import DatasetWrapper 
 import numpy as np
 from torch_geometric.transforms import Pad
+from torch_geometric.data import Data
 
 class MoleculeWrapper(DatasetWrapper):
     def __init__(self, data, preprocess):
@@ -14,12 +15,13 @@ class MoleculeWrapper(DatasetWrapper):
     def __realgetitem__(self, index: int):
         sample = self.data[index]
 
-        sample = Pad(200)(sample)
-
         #Data(x=[20, 9], edge_index=[2, 40], edge_attr=[40, 3], smiles='[Cl].CC(C)NCC(O)COc1cccc2ccccc12', y=[1, 1])
 
-        X = [sample.x, sample.edge_index, sample.edge_attr]
+        #X = [sample.x, sample.edge_index, sample.edge_attr]
+        X = Data(sample.x, sample.edge_index, sample.edge_attr)
         y = sample.y
+
+        y = y.squeeze().long()
 
         #X= torch.tensor(X)
      
@@ -49,8 +51,14 @@ class MoleculeNetDataSource(DataSource):
         
         self.dataset = MoleculeNet(root='data/MoleculeNet', name=self.name)
 
+        #Remove empty graphs
+        filtered_data_list = [data for data in self.dataset if data.x is not None and data.x.shape[0] > 0]
 
-        return MoleculeWrapper(self.dataset, self.preprocess)
+        filtered_dataset = self.dataset.__class__(root=self.dataset.root, name=self.name)  
+        filtered_dataset.data, filtered_dataset.slices = self.dataset.collate(filtered_data_list)  
+
+
+        return MoleculeWrapper(filtered_dataset, self.preprocess)
 
     def get_simple_wrapper(self, data):
         return MoleculeWrapper(data, self.preprocess)

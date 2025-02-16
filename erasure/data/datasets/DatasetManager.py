@@ -8,6 +8,8 @@ from .Dataset import DatasetWrapper
 import torch
 from torch.utils.data import DataLoader, Subset
 from torch.utils.data.dataloader import default_collate
+from torch_geometric.loader import DataLoader as GeometricDataLoader
+from torch_geometric.data import Data
 
 class DatasetManager(Configurable):
 
@@ -23,7 +25,7 @@ class DatasetManager(Configurable):
         self.ref_data_dict = {'all':'all'}
         
         self.parts_cfgs = self.params['partitions']
-        self.info(self.partitions['all'].data)
+        #self.info(self.partitions['all'].data)
         self.batch_size=self.params['batch_size']
         self.name = self.datasource.get_name()
 
@@ -56,11 +58,14 @@ class DatasetManager(Configurable):
 
         dataset = self.partitions['all']
 
-        # main_loader = DataLoader(Subset(dataset.data, list_ids), batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed())
-        main_loader = DataLoader(
-            self.datasource.get_wrapper(Subset(dataset.data, list_ids)),
-            batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed()
-        )
+
+        if isinstance(dataset[0][0],Data):
+            main_loader = GeometricDataLoader(self.datasource.get_wrapper(Subset(dataset.data, list_ids)), batch_size=self.batch_size, drop_last=True)
+        else:
+            main_loader = DataLoader(
+                self.datasource.get_wrapper(Subset(dataset.data, list_ids)),
+                batch_size=self.batch_size, collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed()
+            )        
 
         return main_loader
            
@@ -82,7 +87,10 @@ class DatasetManager(Configurable):
             pass
 
         else:
-            main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed(),drop_last=drop_last)
+            if isinstance(dataset[0][0],Data):
+                main_loader = GeometricDataLoader(dataset, batch_size=self.batch_size, drop_last=True)
+            else:
+                main_loader = DataLoader(dataset, batch_size=self.batch_size,  collate_fn = skip_nones_collate, shuffle=False, worker_init_fn = torch.initial_seed(),drop_last=drop_last)
             fold_loader = None
 
         return main_loader, fold_loader

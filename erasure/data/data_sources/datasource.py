@@ -10,6 +10,8 @@ import numpy as np
 from torch.utils.data import TensorDataset, ConcatDataset
 from erasure.core.factory_base import get_instance_kvargs
 import inspect
+from torch_geometric.loader import DataLoader as GeometricDataLoader
+from torch_geometric.data import Data
 
 class DataSource(Configurable):
     def __init__(self, global_ctx: Global, local_ctx: Local):
@@ -39,9 +41,10 @@ class DataSource(Configurable):
         Checks that the dataset's data can be iterated over using a DataLoader.
         Returns True if successful, otherwise raises a ValueError.
         """
-        try:
-            dataloader = DataLoader(dataset, batch_size=1)
 
+
+        try:
+            dataloader = DataLoader(dataset, batch_size=1) if not isinstance(dataset[0][0], Data) else GeometricDataLoader(dataset, batch_size=1)
             for _, _ in zip(dataloader, range(5)): 
                 pass
 

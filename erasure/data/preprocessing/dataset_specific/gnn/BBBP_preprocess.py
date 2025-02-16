@@ -7,6 +7,5 @@ class BBBP_preprocess(Preprocess):
         super().__init__(global_ctx, local_ctx)
 
     def process(self, X, y, z):
-        print("X", X)
-        print("y", y)
+
         return X,y,z
