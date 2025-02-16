@@ -122,8 +122,8 @@ def hausdorff(list1, list2):
 
     # compute the hausdorff distance for each pair
     for mat1, mat2 in zip(list1, list2):
-        mat1 = mat1.detach().reshape(len(mat1), -1)
-        mat2 = mat2.detach().reshape(len(mat2), -1)
+        mat1 = mat1.detach().reshape(len(mat1), -1).cpu()
+        mat2 = mat2.detach().reshape(len(mat2), -1).cpu()
 
         distances.append(
             scipy.spatial.distance.directed_hausdorff(mat1, mat2)[0]
@@ -137,10 +137,10 @@ def kldivergence(list1, list2):
 
     # compute KL-divergence for each layer
     for mat1, mat2 in zip(list1, list2):
-        mat1 = mat1.detach().flatten()
+        mat1 = mat1.detach().flatten().cpu()
         mat1 = torch.nn.functional.softmax(mat1, dim=0)
         mat1 = torch.clamp(mat1, 1e-6)
-        mat2 = mat2.detach().flatten()
+        mat2 = mat2.detach().flatten().cpu()
         mat2 = torch.nn.functional.softmax(mat2, dim=0)
         mat2 = torch.clamp(mat2, 1e-6)
 
@@ -154,12 +154,12 @@ def kldivergence(list1, list2):
 def jsdistance(list1, list2):
     distances = []
 
-    # compute KL-divergence for each layer
+    # compute JS-divergence for each layer
     for mat1, mat2 in zip(list1, list2):
-        mat1 = mat1.detach().flatten()
+        mat1 = mat1.detach().flatten().cpu()
         mat1 = torch.nn.functional.softmax(mat1, dim=0)
         mat1 = torch.clamp(mat1, 1e-6)
-        mat2 = mat2.detach().flatten()
+        mat2 = mat2.detach().flatten().cpu()
         mat2 = torch.nn.functional.softmax(mat2, dim=0)
         mat2 = torch.clamp(mat2, 1e-6)
 
