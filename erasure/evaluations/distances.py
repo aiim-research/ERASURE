@@ -139,10 +139,10 @@ def kldivergence(list1, list2):
     for mat1, mat2 in zip(list1, list2):
         mat1 = mat1.detach().flatten().cpu()
         mat1 = torch.nn.functional.softmax(mat1, dim=0)
-        mat1 = torch.clamp(mat1, 1e-6)
+        mat1 = torch.clamp(mat1, 1e-5)
         mat2 = mat2.detach().flatten().cpu()
         mat2 = torch.nn.functional.softmax(mat2, dim=0)
-        mat2 = torch.clamp(mat2, 1e-6)
+        mat2 = torch.clamp(mat2, 1e-5)
 
         distances.append(
             scipy.special.kl_div(mat1, mat2).sum()
@@ -158,10 +158,10 @@ def jsdistance(list1, list2):
     for mat1, mat2 in zip(list1, list2):
         mat1 = mat1.detach().flatten().cpu()
         mat1 = torch.nn.functional.softmax(mat1, dim=0)
-        mat1 = torch.clamp(mat1, 1e-6)
+        mat1 = torch.clamp(mat1, 1e-5)
         mat2 = mat2.detach().flatten().cpu()
         mat2 = torch.nn.functional.softmax(mat2, dim=0)
-        mat2 = torch.clamp(mat2, 1e-6)
+        mat2 = torch.clamp(mat2, 1e-5)
 
         distances.append(
             scipy.spatial.distance.jensenshannon(mat1, mat2)
