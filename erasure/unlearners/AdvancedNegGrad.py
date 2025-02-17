@@ -36,8 +36,6 @@ class AdvancedNegGrad(TorchUnlearner):
 
         dataloader_iterator = iter(forget_loader)
 
-        print(self.predictor.optimizer)
-
         for epoch in range(self.epochs):
             losses = []
             self.predictor.model.train()

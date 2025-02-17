@@ -1,17 +1,17 @@
 {
     "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
     "parameters": {
-              "DataSource": { "class":"erasure.data.data_sources.TorchGeometricDataSource.TorchGeometricDataSource", 
-              "parameters": {"datasource": {"class": "torch_geometric.datasets.MoleculeNet", "parameters":{"root":"resources/data","name":"BBBP"},
-              "preprocess":[
-                ]}
-          }}, 
+      "DataSource": { "class":"erasure.data.data_sources.TorchGeometricDataSource.TorchGeometricDataSource", 
+      "parameters": {"datasource": {"class": "torch_geometric.datasets.MoleculeNet", "parameters":{"root":"resources/data","name":"ESOL"},
+                      "preprocess":[
+                        ]}
+                  }}, 
         "partitions":  [  
           {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":1, "shuffle":true}},
           {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
           {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train", "shuffle":false}}
                     ],
-        "batch_size":64,
+        "batch_size":4,
         "split_seed":16}
     },
     "predictor": {
@@ -210,9 +210,9 @@
               // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/BBBP_seed2.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/ESOL.json"}}
             ]
           }
         },
-    "globals":{"cached": "false","seed": 2}
+    "globals":{"cached": "false","seed": 0}
   }

@@ -5,6 +5,7 @@ from erasure.utils.logger import GLogger
 import torch
 import numpy as np
 import random
+import tracemalloc
 #from erasure.utils.config.global_ctx import set_seed 
 
 #set_seed(1)
@@ -14,7 +15,7 @@ from erasure.utils.config.local_ctx import Local
 from erasure.utils.config.global_ctx import Global, bcolors 
 from erasure.core.factory_base import ConfigurableFactory
 from erasure.data.datasets.DatasetManager import DatasetManager
-
+tracemalloc.start()
 arg_parser = argparse.ArgumentParser(description="Erasure Framework.")
 
 arg_parser.add_argument("config_file", type=str, help="This is the path of the configuration file.")

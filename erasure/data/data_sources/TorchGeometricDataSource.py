@@ -1,14 +1,15 @@
 import torch
 from .datasource import DataSource
-from torch_geometric.datasets import MoleculeNet
+from torch_geometric.datasets import TUDataset
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 from erasure.data.datasets.Dataset import DatasetWrapper 
 import numpy as np
+from erasure.core.factory_base import get_instance_kvargs
 from torch_geometric.transforms import Pad
 from torch_geometric.data import Data
 
-class MoleculeWrapper(DatasetWrapper):
+class GeometricWrapper(DatasetWrapper):
     def __init__(self, data, preprocess):
         super().__init__(data,preprocess)
 
@@ -35,36 +36,43 @@ class MoleculeWrapper(DatasetWrapper):
 
 
 
-class MoleculeNetDataSource(DataSource):
+class TorchGeometricDataSource(DataSource):
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
         self.dataset = None
-        self.max_size = 0
-        self.name = self.local_config['parameters']['name']
-
+        #self.name = self.local_config['parameters']['name']
+        #self.root = self.local_config['parameters']['root'] 
     
+        self.dataset = get_instance_kvargs(self.local_config['parameters']['datasource']['class'],
+                        self.local_config['parameters']['datasource']['parameters'])
+        
+        self.name = self.local_config['parameters']['datasource']['parameters']['name']
+
+        
+
     def get_name(self):
         return self.name
 
 
     def create_data(self):
         
-        self.dataset = MoleculeNet(root='data/MoleculeNet', name=self.name)
+        #self.dataset = MoleculeNet(root=self.root, name=self.name)
+
+        print(self.dataset)
+        print(self.dataset[0])
 
         #Remove empty graphs
         filtered_data_list = [data for data in self.dataset if data.x is not None and data.x.shape[0] > 0]
-
         filtered_dataset = self.dataset.__class__(root=self.dataset.root, name=self.name)  
         filtered_dataset.data, filtered_dataset.slices = self.dataset.collate(filtered_data_list)  
 
 
-        return MoleculeWrapper(filtered_dataset, self.preprocess)
+        return GeometricWrapper(filtered_dataset, self.preprocess)
 
     def get_simple_wrapper(self, data):
-        return MoleculeWrapper(data, self.preprocess)
+        return GeometricWrapper(data, self.preprocess)
     
 
 
     def check_configuration(self):
         super().check_configuration()
-        self.local_config['parameters']['name'] = self.local_config['parameters']['name']
