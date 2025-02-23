@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 from erasure.core.base import Configurable
 from erasure.core.factory_base import get_instance_kvargs
@@ -14,11 +15,17 @@ class Evaluator(Configurable):
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
         self.__init_measures__()
-        
+
     def evaluate(self, unlearner: Unlearner, predictor):
         e = Evaluation(unlearner,predictor)
         for measure in self.measures:
-            e = measure.process(e)
+            try:
+                e = measure.process(e)
+            except Exception as err:
+                self.global_ctx.logger.warning(f"Error occurred during execution of evaluation {measure}")
+                self.global_ctx.logger.warning(repr(err))
+                if isinstance(measure, UnlearnRunner):
+                    traceback.print_exc()
 
         return e
 

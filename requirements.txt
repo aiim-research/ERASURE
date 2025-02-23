@@ -11,3 +11,6 @@ pandas
 PyYAML
 gdown
 python_papi; sys_platform != 'darwin'
+datasets
+transformers
+ucimlrepo
