@@ -1,6 +1,6 @@
 import torch
 from .datasource import DataSource
-from torch_geometric.datasets import TUDataset
+import torch_geometric
 from erasure.utils.config.global_ctx import Global
 from erasure.utils.config.local_ctx import Local
 from erasure.data.datasets.Dataset import DatasetWrapper 
@@ -16,15 +16,10 @@ class GeometricWrapper(DatasetWrapper):
     def __realgetitem__(self, index: int):
         sample = self.data[index]
 
-        #Data(x=[20, 9], edge_index=[2, 40], edge_attr=[40, 3], smiles='[Cl].CC(C)NCC(O)COc1cccc2ccccc12', y=[1, 1])
-
-        #X = [sample.x, sample.edge_index, sample.edge_attr]
         X = Data(sample.x, sample.edge_index, sample.edge_attr)
         y = sample.y
 
         y = y.squeeze().long()
-
-        #X= torch.tensor(X)
      
         return X,y
     
@@ -40,8 +35,8 @@ class TorchGeometricDataSource(DataSource):
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
         self.dataset = None
-        #self.name = self.local_config['parameters']['name']
-        #self.root = self.local_config['parameters']['root'] 
+
+        diocane = torch_geometric.datasets.MoleculeNet(root="resources/data", name="ESOL")
     
         self.dataset = get_instance_kvargs(self.local_config['parameters']['datasource']['class'],
                         self.local_config['parameters']['datasource']['parameters'])
@@ -56,11 +51,6 @@ class TorchGeometricDataSource(DataSource):
 
     def create_data(self):
         
-        #self.dataset = MoleculeNet(root=self.root, name=self.name)
-
-        print(self.dataset)
-        print(self.dataset[0])
-
         #Remove empty graphs
         filtered_data_list = [data for data in self.dataset if data.x is not None and data.x.shape[0] > 0]
         filtered_dataset = self.dataset.__class__(root=self.dataset.root, name=self.name)  
