@@ -8,7 +8,8 @@
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_reduced"}},
                                   {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.1, "ref_data":"train"}},
 //                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterClass", "parameters": {"parts_names":["forget","retain"], "label":1, "ref_data": "train"}},
-                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"parts_names":["example","-"], "n_samples":100, "ref_data":"forget"}}
+                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"parts_names":["example","-"], "n_samples":100, "ref_data":"forget"}},
+                                  {"class": "erasure.data.datasets.DataSplitter.DataSplitterNSamples", "parameters":{"parts_names":["dist_part","-"], "n_samples":3, "ref_data":"forget"}}
                                 ],
                     "batch_size":128,
                     "split_seed":16}
@@ -119,12 +120,12 @@
             { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "activations": "true",
-                "ref_data": "forget"
+                "ref_data": "dist_part"
             }},
             { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "activations": "true",
-                "ref_data": "forget",
+                "ref_data": "dist_part",
                 "function": {
                   "class": "erasure.evaluations.distances.hausdorff",
                   "parameters": {}
@@ -133,7 +134,7 @@
             { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "activations": "true",
-                "ref_data": "forget",
+                "ref_data": "dist_part",
                 "function": {
                   "class": "erasure.evaluations.distances.kldivergence",
                   "parameters": {}
@@ -142,7 +143,7 @@
             { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "activations": "true",
-                "ref_data": "forget",
+                "ref_data": "dist_part",
                 "function": {
                   "class": "erasure.evaluations.distances.jsdistance",
                   "parameters": {}
@@ -153,13 +154,13 @@
               "parameters":{
                 "block_diag": "true",
                 "activations": "true",
-                "ref_data": "forget"
+                "ref_data": "dist_part"
             }},
             { "class": "erasure.evaluations.distances.ModelDistance",
               "parameters":{
                 "block_diag": "true",
                 "activations": "true",
-                "ref_data": "forget",
+                "ref_data": "dist_part",
                 "function": {
                   "class": "erasure.evaluations.distances.hausdorff",
                   "parameters": {}
@@ -169,7 +170,7 @@
               "parameters":{
                 "block_diag": "true",
                 "activations": "true",
-                "ref_data": "forget",
+                "ref_data": "dist_part",
                 "function": {
                   "class": "erasure.evaluations.distances.kldivergence",
                   "parameters": {}
@@ -179,12 +180,14 @@
               "parameters":{
                 "block_diag": "true",
                 "activations": "true",
-                "ref_data": "forget",
+                "ref_data": "dist_part",
                 "function": {
                   "class": "erasure.evaluations.distances.jsdistance",
                   "parameters": {}
                 }
-            }}
+            }},
+
+            {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/test_dist.json"}}
 
           ]
         }

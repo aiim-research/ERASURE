@@ -28,6 +28,11 @@ class ModelDistance(Measure):
         self.activations = strtobool(self.params['activations'])
         self.ref_data = self.params["ref_data"]
 
+        if self.activations:
+            self.distance_name += ".act"
+        if self.block_diag:
+            self.distance_name += ".block"
+
 
     def check_configuration(self):
         super().check_configuration()

@@ -1,4 +1,5 @@
 import sys
+import traceback
 
 from erasure.core.base import Configurable
 from erasure.core.factory_base import get_instance_kvargs
@@ -23,6 +24,8 @@ class Evaluator(Configurable):
             except Exception as err:
                 self.global_ctx.logger.warning(f"Error occurred during execution of evaluation {measure}")
                 self.global_ctx.logger.warning(repr(err))
+                if isinstance(measure, UnlearnRunner):
+                    traceback.print_exc()
 
         return e
 
