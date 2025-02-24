@@ -1,6 +1,7 @@
 # ERASURE - Redefining Privacy Through Selective Machine Unlearning
 
-![ERASURE Logo](https://raw.githubusercontent.com/aiim-research/ERASURE/refs/heads/main/ERASURE%20LOGO.png?token=GHSAT0AAAAAACXNOTNZVSMFO36TR7DLVFVIZ54TINA)
+<img src="https://raw.githubusercontent.com/aiim-research/ERASURE/refs/heads/main/ERASURE_LOGO_WHITE.png?token=GHSAT0AAAAAACXNOTNYDELIGIF7T55QBE6QZ54TJUA" width="100">
+
 
 
 ## Table of Contents
