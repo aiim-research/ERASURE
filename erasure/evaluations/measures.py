@@ -224,6 +224,59 @@ class RelearnTime(Measure):
         e.add_value('RelearnTime', relearn_time)
 
         return e
+    
+class NoMUS(Measure):
+    """ Time (epochs) needed to acquire the original accuracy"""
+
+    def init(self):
+        super().init()
+        self.l = self.params["l"]
+        self.acc_metric = f"sklearn.metrics.accuracy_score.{self.params["acc_split"]}.unlearned"
+
+    def check_configuration(self):
+        self.params["l"] = self.params.get("l", 0.5)
+        self.params["acc_split"] = self.params.get("acc_split", "test")
+
+    def process(self, e: Evaluation):
+        # evaluate the NoMUS score by havng already both the accuracy of the unlearned model on test set and the UMIA score
+
+        if self.acc_metric not in e.data_info.keys():
+            self.info(f"Accuracy metric {self.acc_metric} not found in data_info. Calculating it now.")
+            measure = {'class': 'erasure.evaluations.measures.TorchSKLearn', 'parameters': {'partition': self.params["acc_split"], 'target': 'unlearned'}}
+            current = self.global_ctx.factory.get_object(Local(measure))
+
+            try: 
+                e = current.process(e)
+            except Exception as err:
+                self.global_ctx.logger.warning(f"Error occurred during execution of evaluation {measure}")
+                self.global_ctx.logger.warning(repr(err))
+                return e
+
+        acc = e.data_info[self.acc_metric]
+
+        if "UMIA" not in e.data_info.keys():
+            self.info(f"UMIA metric not found in data_info. Calculating it now.")
+            measure = {'class': 'erasure.evaluations.MIA.umia.Attack', 'parameters': {'attack_in_data': {'class': 'erasure.data.datasets.DatasetManager.DatasetManager', 'parameters': {'DataSource': {'class': 'erasure.data.data_sources.TorchFileDataSource.TorchFileDataSource', 'parameters': {'path': 'resources/data/umia/umia.pt'}}, 'partitions': [{'class': 'erasure.data.datasets.DataSplitter.DataSplitterPercentage', 'parameters': {'parts_names': ['train', 'test'], 'percentage': 0.5, 'ref_data': 'all'}}], 'batch_size': 128}}}}
+
+            current = self.global_ctx.factory.get_object(Local(measure))
+
+            try: 
+                e = current.process(e)
+            except Exception as err:
+                self.global_ctx.logger.warning(f"Error occurred during execution of evaluation {measure}")
+                self.global_ctx.logger.warning(repr(err))
+                return e
+            
+        umia = e.data_info["UMIA"]
+
+        forget_score = abs(umia - 0.5)
+            
+        nomus = self.l * acc + (1 - self.l) * (1-forget_score*2)
+
+        self.info(f'NoMUS Score: {nomus}')
+        e.add_value('NoMUS', nomus)
+
+        return e
 
 
 class AIN(Measure):
