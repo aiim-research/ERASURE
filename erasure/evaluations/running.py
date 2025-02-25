@@ -63,11 +63,19 @@ class PAPI(UnlearnRunner):
     """ PAPI Events to execute the unlearn """
     def init(self):
         super().init()
+
+        self.events = self.params["events"]
+
         papi.library_init()
         self.evs = papi.create_eventset()
-        papi.add_event(self.evs, papi_events.PAPI_TOT_INS)
-        papi.add_event(self.evs, papi_events.PAPI_TOT_CYC)
-        papi.add_event(self.evs, papi_events.PAPI_LST_INS)
+
+        for event_name in self.events:
+            event = getattr(papi_events, event_name)
+            print(event, papi_events.PAPI_LST_INS)
+            papi.add_event(self.evs, event)
+    
+    def check_configuration(self):
+        self.params["events"] = self.params.get("events", ['PAPI_TOT_INS', 'PAPI_TOT_CYC', 'PAPI_LST_INS'])
 
     def process(self, e: Evaluation):
         if not e.unlearned_model:
@@ -76,13 +84,9 @@ class PAPI(UnlearnRunner):
             super().process(e)
 
             result = papi.stop(self.evs)
-            #e.add_value('PAPI', result)
-            e.add_value('PAPI_TOT_INS', result[0])
-            e.add_value('PAPI_TOT_CYC', result[1])
-            e.add_value('PAPI_LST_INS', result[2])
 
-            #papi.cleanup_eventset(self.evs)
-            #papi.destroy_eventset(evs)
+            for i, event_name in enumerate(self.events):
+                e.add_value(event_name, result[i])
         
         return e
 
