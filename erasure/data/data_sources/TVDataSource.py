@@ -57,7 +57,10 @@ class TVDataSource(DataSource):
         concat =  ConcatDataset([train, test])
 
         if self.classes is None:
-            labels = torch.tensor(getattr(train, self.label_column))
+            try:
+                labels = torch.tensor(getattr(train, self.label_column))
+            except:
+                labels = torch.tensor([label for _, label in train])
             concat.classes = torch.unique(labels)  
             #TODO: manage if classes is a one-hot encoded vector multilabeled
         else:
@@ -198,14 +201,18 @@ class TVDataSourceCifar100(DataSource):
         self.local_config['parameters']['classes'] = self.local_config['parameters'].get('classes', None)
         
     
+import re
+import ast
+
 def parse_transform(lib, transform_string):
     """
-    Dynamically parses a transform string and instantiates it.
+    Parses a transform string and instantiates it dynamically.
 
     Example:
+        "Resize((128, 128))"
+        "ToTensor"
         "Normalize(mean=[0.485, 0.456, 0.406], std=[0.229, 0.224, 0.225])"
         "RandomHorizontalFlip(p=0.5)"
-        "ToTensor"
     """
     try:
         match = re.match(r"(\w+)\((.*)\)", transform_string)
@@ -214,15 +221,24 @@ def parse_transform(lib, transform_string):
             transform_class = getattr(lib, class_name, None)
             if not transform_class:
                 raise ValueError(f"Transform '{class_name}' not found in the provided library")
-            parsed_args = eval(f"dict({args})") if args else {}
-            return transform_class(**parsed_args)
+
+            if args:
+                # Special case: Tuples like Resize((128, 128))
+                if args.startswith("(") and args.endswith(")"):
+                    parsed_args = (ast.literal_eval(args),)  # Ensure it's treated as a tuple
+                else:
+                    parsed_args = ast.literal_eval(f"({args},)") if "," not in args else ast.literal_eval(f"({args})")
+
+                return transform_class(*parsed_args) if isinstance(parsed_args, tuple) else transform_class(parsed_args)
+            else:
+                return transform_class()  # No arguments case
+
         else:
-            # Handle transforms without arguments (e.g., "ToTensor")
+            # Handle transforms without parentheses (e.g., "ToTensor")
             transform_class = getattr(lib, transform_string, None)
             if not transform_class:
                 raise ValueError(f"Transform '{transform_string}' not found in the provided library")
             return transform_class()  # Instantiate without arguments
+
     except Exception as e:
         raise ValueError(f"Failed to parse transform: {transform_string}. Error: {e}")
-
-    
