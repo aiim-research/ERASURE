@@ -6,7 +6,7 @@ from erasure.utils.config.local_ctx import Local
 from datasets import load_dataset, Dataset, DatasetDict, concatenate_datasets
 from collections import Counter
 import torch
-
+from torchvision import transforms
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
@@ -178,8 +178,6 @@ class SpotifyHFDataSource(HFDataSource):
         # remove the same rows from the dataset
         ds['train'] = Dataset.from_pandas(df)
 
-
-
         ds['train'] = ds['train'].remove_columns("artists")  
         ds['train'] = ds['train'].add_column("artists", df['artists'].tolist())
 
@@ -229,9 +227,6 @@ class SpotifyHFDataSource(HFDataSource):
         self.local_config['parameters']['to_normalize'] = self.local_config['parameters'].get("to_normalize",[])
         self.local_config['parameters']['keep_top_k'] = self.local_config['parameters'].get("keep_top_k",10)
         self.local_config['parameters']['keep_top_k_artist'] = self.local_config['parameters'].get("keep_top_k_artist",10000000000000)
-
-from torchvision import transforms
-
 
 class HFImageDatasetWrapper(DatasetWrapper):
     def __init__(self, data, preprocess, label):

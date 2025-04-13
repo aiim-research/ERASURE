@@ -49,7 +49,7 @@ class TorchGeometricDataSource(DataSource):
 
     def create_data(self):
         
-        #Remove empty graphs
+        #Remove empty graphs (for compatibility)
         filtered_data_list = [data for data in self.dataset if data.x is not None and data.x.shape[0] > 0]
         filtered_dataset = self.dataset.__class__(root=self.dataset.root, name=self.name)  
         filtered_dataset.data, filtered_dataset.slices = self.dataset.collate(filtered_data_list)  
