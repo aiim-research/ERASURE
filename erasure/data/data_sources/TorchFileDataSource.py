@@ -9,9 +9,6 @@ from erasure.data.data_sources.datasource import DataSource
 from erasure.data.datasets.Dataset import DatasetWrapper
 
 
-# torch.serialization.add_safe_globals([TensorDataset, ConcatDataset, Subset])
-
-
 class TorchFileDataSource(DataSource):
     """ Load Dataset from a Torch file """
 

@@ -58,29 +58,6 @@ class Global:
         torch.backends.cudnn.benchmark = False
         
 
-    '''def __setitem__(self, key, value):
-        self._data[key] = value
-
-    def __getitem__(self, key):
-        return self._data[key]
-    
-    def __copy__(self):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        result.__dict__.update(self.__dict__)
-        return result
-
-    def __deepcopy__(self, memo):
-        cls = self.__class__
-        result = cls.__new__(cls)
-        memo[id(self)] = result
-        for k, v in self.__dict__.items():
-            if k != 'logger':
-                setattr(result, k, deepcopy(v, memo))
-            else:
-                setattr(result, k, self.logger)
-        return result'''
-    
   
 def clean_cfg(cfg):
     if isinstance(cfg,dict):

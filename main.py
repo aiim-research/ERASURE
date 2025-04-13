@@ -6,8 +6,6 @@ import torch
 import numpy as np
 import random
 import tracemalloc
-
-
 from erasure.utils.config.local_ctx import Local
 from erasure.utils.config.global_ctx import Global, bcolors 
 from erasure.core.factory_base import ConfigurableFactory

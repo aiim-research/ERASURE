@@ -155,12 +155,7 @@ class TVDataSourceCifar100(DataSource):
             # convert the image to a tensor
             transforms.ToTensor(),
         ]
-
-        # self.transform = [
-        #     parse_transform(lib.transforms,t) if isinstance(t, str) else t
-        #     for t in self.transform
-        # ]
-
+        
         self.transform = Compose(self.transform)
 
         params = inspect.signature(dataset_class.__init__).parameters
