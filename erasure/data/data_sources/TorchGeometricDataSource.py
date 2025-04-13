@@ -35,8 +35,6 @@ class TorchGeometricDataSource(DataSource):
     def __init__(self, global_ctx: Global, local_ctx: Local):
         super().__init__(global_ctx, local_ctx)
         self.dataset = None
-
-        diocane = torch_geometric.datasets.MoleculeNet(root="resources/data", name="ESOL")
     
         self.dataset = get_instance_kvargs(self.local_config['parameters']['datasource']['class'],
                         self.local_config['parameters']['datasource']['parameters'])
