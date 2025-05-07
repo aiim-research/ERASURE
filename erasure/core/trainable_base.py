@@ -9,6 +9,7 @@ class Trainable(Saveable, metaclass=ABCMeta):
 
     def __init__(self, global_ctx: Global, local_ctx):
         self.dataset = local_ctx.dataset
+        self.skip_training = getattr(local_ctx, "skip_training", False)
         super().__init__(global_ctx, local_ctx)
 
     def load_or_create(self, condition=False):

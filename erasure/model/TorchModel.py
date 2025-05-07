@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import torch
-
+from copy import deepcopy
 from erasure.core.trainable_base import Trainable
 from erasure.utils.cfg_utils import init_dflts_to_of
 from erasure.core.factory_base import get_instance_kvargs, get_instance
@@ -17,6 +17,10 @@ from fractions import Fraction
 class TorchModel(Trainable):
        
     def init(self):
+        
+        if not (hasattr(self, "skip_training")):
+            self.skip_training = False
+
         self.epochs = self.local_config['parameters']['epochs']
 
         self.model = get_instance_kvargs(self.local_config['parameters']['model']['class'],
@@ -35,9 +39,7 @@ class TorchModel(Trainable):
         self.lr_scheduler =  lr_scheduler.LinearLR(self.optimizer, start_factor=1.0, end_factor=0.5, total_iters=self.epochs)
 
         self.training_set = self.local.config['parameters'].get('training_set','train')
-
-
-
+        
         self.device = (
             "cuda"
             if torch.cuda.is_available()
@@ -49,8 +51,26 @@ class TorchModel(Trainable):
         self.model.device = self.device
         
         self.patience = 0     
+        
+        if self.skip_training:
+            return 
+        
         self.fit() 
 
+    '''
+    #FOR KAN networks
+    def clone(self):
+        new_config = deepcopy(self.local_config)
+        new_config["_skip_fit"] = True
+
+        ctx = type("MockLocalContext", (object,), {})()
+        ctx.config = new_config
+        ctx.dataset = self.dataset
+        clone = TorchModel(self.global_ctx, ctx)
+        clone.model.load_state_dict(self.model.state_dict())
+
+        return clone
+    '''
     
     def real_fit(self):
 
@@ -138,7 +158,8 @@ class TorchModel(Trainable):
         init_dflts_to_of(local_config, 'optimizer', 'torch.optim.Adam',lr=0.001)
         init_dflts_to_of(local_config, 'loss_fn', 'torch.nn.BCELoss')
 
-        local_config['parameters']['model']['parameters']['n_classes'] = self.dataset.n_classes
+        if 'KANWrapper' not in local_config['parameters']['model']['class']: 
+            local_config['parameters']['model']['parameters']['n_classes'] = self.dataset.n_classes
 
         local_config['parameters']['alias'] = local_config['parameters']['model']['class']
         local_config['parameters']['training_set'] = local_config['parameters'].get("training_set", "train")

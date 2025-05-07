@@ -75,3 +75,4 @@ def default_cfg(func):
     def default_cfg(*args, **kwargs):        
         return func(*args, **kwargs)
     return default_cfg
+

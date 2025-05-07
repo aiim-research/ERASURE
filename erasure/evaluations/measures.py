@@ -231,7 +231,7 @@ class NoMUS(Measure):
     def init(self):
         super().init()
         self.l = self.params["l"]
-        self.acc_metric = f"sklearn.metrics.accuracy_score.{self.params["acc_split"]}.unlearned"
+        self.acc_metric = f"sklearn.metrics.accuracy_score.{self.params['acc_split']}.unlearned"
 
     def check_configuration(self):
         self.params["l"] = self.params.get("l", 0.5)
@@ -318,7 +318,7 @@ class AIN(Measure):
         rt_unlearned = compute_relearn_time(e.unlearned_model, forget_loader, max_accuracy=max_accuracy)
 
         # relearn time of Gold model on forget
-        rt_gold = compute_relearn_time(deepcopy(self.gold_model), forget_loader, max_accuracy=max_accuracy)
+        rt_gold = compute_relearn_time(deepcopy_manual(self.gold_model), forget_loader, max_accuracy=max_accuracy)
 
         epsilon = 0.01
         ain = (rt_unlearned + epsilon) / (rt_gold + epsilon)
@@ -326,4 +326,13 @@ class AIN(Measure):
         e.add_value('AIN', ain)
 
         return e
+
+def deepcopy_manual(predictor):
+    new_current = Local(predictor.global_ctx.config.predictor)
+    new_current.dataset = predictor.dataset
+    new_current.skip_training = True
+    new_pred = predictor.global_ctx.factory.get_object(new_current)
+    new_pred.model.load_state_dict(predictor.model.state_dict())
+
+    return new_pred
 

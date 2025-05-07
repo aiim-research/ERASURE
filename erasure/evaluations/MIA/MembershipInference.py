@@ -94,3 +94,13 @@ class MembershipInference(Measure):
 
     def create_attack_datasets(self, shadow_models):
         return {}
+    
+def deepcopy_manual(predictor):
+    new_current = Local(predictor.global_ctx.config.predictor)
+    new_current.dataset = predictor.dataset
+    new_current.skip_training = True
+    new_pred = predictor.global_ctx.factory.get_object(new_current)
+    new_pred.model.load_state_dict(predictor.model.state_dict())
+
+    return new_pred
+

@@ -70,9 +70,11 @@ class UCIRepositoryDataSource(DataSource):
         self.local_config['parameters']['data_columns'] = self.local_config['parameters'].get('data_columns',[])
         self.local_config['parameters']['to_encode'] = self.local_config['parameters'].get('to_encode',[])
 
+
+
+
 ##Adult has a lot of errors in its data, so it's best to handle them in a different loader.
-class UCI_Adult_DataSource(UCIRepositoryDataSource):
-    
+class UCI_Adult_DataSource(UCIRepositoryDataSource):    
     # column transformer 
     
     def create_data(self):

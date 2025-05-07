@@ -5,6 +5,7 @@ from erasure.utils.logger import GLogger
 import torch
 import numpy as np
 import random
+
 import tracemalloc
 #from erasure.utils.config.global_ctx import set_seed 
 
@@ -15,6 +16,7 @@ from erasure.utils.config.local_ctx import Local
 from erasure.utils.config.global_ctx import Global, bcolors 
 from erasure.core.factory_base import ConfigurableFactory
 from erasure.data.datasets.DatasetManager import DatasetManager
+
 tracemalloc.start()
 arg_parser = argparse.ArgumentParser(description="Erasure Framework.")
 
@@ -45,7 +47,14 @@ if __name__ == "__main__":
     for un in unlearners_cfg:
         current = Local(un)
         current.dataset = data_manager
-        current.predictor = copy.deepcopy(predictor)
+        #current.predictor = copy.deepcopy(predictor)
+
+        new_current = Local(global_ctx.config.predictor)
+        new_current.dataset = data_manager
+        new_current.skip_training = True
+        current.predictor = global_ctx.factory.get_object(new_current)
+        current.predictor.model.load_state_dict(predictor.model.state_dict())
+
         unlearners.append( global_ctx.factory.get_object(current) )
 
     #Evaluator
