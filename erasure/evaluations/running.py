@@ -2,9 +2,9 @@ import time
 import torch.profiler
 import platform
 
-if platform.system() != 'Darwin':
-    from pypapi import papi_low as papi
-    from pypapi import events as papi_events
+#if platform.system() != 'Darwin':
+#    from pypapi import papi_low as papi
+#    from pypapi import events as papi_events
 
 from erasure.core.measure import Measure
 from erasure.evaluations.manager import Evaluation

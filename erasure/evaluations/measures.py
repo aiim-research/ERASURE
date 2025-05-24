@@ -231,7 +231,7 @@ class NoMUS(Measure):
     def init(self):
         super().init()
         self.l = self.params["l"]
-        self.acc_metric = f"sklearn.metrics.accuracy_score.{self.params["acc_split"]}.unlearned"
+        self.acc_metric = f"sklearn.metrics.accuracy_score.{self.params['acc_split']}.unlearned"
 
     def check_configuration(self):
         self.params["l"] = self.params.get("l", 0.5)
