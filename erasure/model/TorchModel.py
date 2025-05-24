@@ -172,11 +172,6 @@ class TorchModel(Trainable):
         acc = accuracy_score(testy, np.argmax(probs, axis=1))
         return acc
     
-    @property
-    def model(self):
-        if not hasattr(self, '_model'):
-            raise RuntimeError("TorchModel was used before calling init()")
-        return self._model
 
 '''
     def read(self):
