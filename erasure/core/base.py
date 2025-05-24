@@ -77,8 +77,8 @@ class Saveable(Configurable):
         if not self.local.config['parameters']['cached']:
             return False
         
-        if self.local_ctx.config.get("_skip_fit", False):
-                return False
+        if self.local.config.get("_skip_fit", False):
+            return False
 
         file_name = Saveable.CACHE_DIR + '/'+self.__cfg_hashing(self.local_config['parameters']['alias']) if 'alias' in self.local_config['parameters'] else self.__cfg_hashing()
         self.info(f'''{bcolors.FAIL}Dumped Instance to: {bcolors.UNDERLINE}{file_name}{bcolors.ENDC}''')

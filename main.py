@@ -53,6 +53,7 @@ if __name__ == "__main__":
         new_current.dataset = data_manager
         new_current.skip_training = True
         current.predictor = global_ctx.factory.get_object(new_current)
+        
         current.predictor.model.load_state_dict(predictor.model.state_dict())
 
         unlearners.append( global_ctx.factory.get_object(current) )

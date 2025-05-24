@@ -26,7 +26,10 @@ class TorchModel(Trainable):
         self.model = get_instance_kvargs(self.local_config['parameters']['model']['class'],
                                    self.local_config['parameters']['model']['parameters'])
         
-        self.model.apply(init_weights)
+        try:
+            self.model.apply(init_weights)
+        except Exception as e:
+            print(f"Skipping init_weights due to: {e}")
         
         self.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
                                       {'params':self.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
@@ -168,6 +171,13 @@ class TorchModel(Trainable):
     def accuracy(self, testy, probs):
         acc = accuracy_score(testy, np.argmax(probs, axis=1))
         return acc
+    
+    @property
+    def model(self):
+        if not hasattr(self, '_model'):
+            raise RuntimeError("TorchModel was used before calling init()")
+        return self._model
+
 '''
     def read(self):
         super().read()
@@ -184,9 +194,11 @@ class TorchModel(Trainable):
             for model in self.model:
                 if isinstance(model, torch.nn.Module):
                     model.to(self.device)
+
                     '''
 
 def init_weights(m):
     if isinstance(m, nn.Linear):
         torch.nn.init.xavier_uniform_(m.weight)
         m.bias.data.fill_(0.01)
+

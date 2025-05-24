@@ -26,7 +26,7 @@ class GCN(nn.Module):
         node_features = X.x.double()
 
         edge_index = X.edge_index.long()
-        edge_weight = X.edge_attr[:, 0].double() if X.edge_attr is not None else None  # Use only one weight per edge
+        edge_weight = X.edge_attr[:, 0].double() if X.edge_attr is not None else None  
 
         for conv_layer in self.graph_convs[:-1]:
             node_features = conv_layer(node_features, edge_index, edge_weight)
@@ -34,7 +34,6 @@ class GCN(nn.Module):
 
         intermediate_results = node_features
 
-        # Handle last layer correctly
         if isinstance(self.graph_convs[-1], MeanAggregation):
             return intermediate_results, self.graph_convs[-1](node_features, X.batch)
         else:
@@ -42,8 +41,6 @@ class GCN(nn.Module):
 
     
     def __init__conv_layers(self):
-        ############################################
-        # initialize the convolutional layers interleaved with pooling layers
         graph_convs = []
         for i in range(len(self.num_conv_layers)):#add len
             graph_convs.append(GCNConv(in_channels=self.num_conv_layers[i][0],
@@ -93,17 +90,13 @@ class DownstreamGCN(GCN):
         return intermediate_results, self.downstream_layers(node_features)
     
     def __init__downstream_layers(self):
-        ############################################
-        # initialize the linear layers interleaved with activation functions
         downstream_layers = []
         in_linear = self.out_channels
         for _ in range(self.num_dense_layers-1):
             downstream_layers.append(nn.Linear(in_linear, int(in_linear // self.linear_decay)))
             downstream_layers.append(nn.ReLU())
             in_linear = int(in_linear // self.linear_decay)
-        # add the output layer
+
         downstream_layers.append(nn.Linear(in_linear, self.n_classes))
-        #downstream_layers.append(nn.Sigmoid())
-        #downstream_layers.append(nn.Softmax())
-        # put the linear layers in sequential
+
         return nn.Sequential(*downstream_layers).double()
