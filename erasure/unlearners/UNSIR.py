@@ -33,7 +33,7 @@ class UNSIR(TorchUnlearner):
         self.predictor.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
                                       {'params':self.predictor.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
         
-        self.sample_type = self.local.config['parameters']['sample_type']
+        self.vocab_size = self.local.config['parameters']['vocab_size']
 
     
     def __unlearn__(self):
@@ -58,30 +58,43 @@ class UNSIR(TorchUnlearner):
             for batch_idx, ((x_retain, y_retain), (x_forget, y_forget)) in enumerate(zip(retain_loader, forget_loader)):
                 y_retain = y_retain.to(self.device)
                 batch_size_forget = y_forget.size(0)
+                if self.vocab_size is None:
+                    if x_retain.size(0) != retain_loader.batch_size or x_forget.size(0) != forget_loader.batch_size:
+                        continue
 
-                if x_retain.size(0) != retain_loader.batch_size or x_forget.size(0) != forget_loader.batch_size:
-                    continue
+                    noise_dim = x_forget.size()
+                    noise = Noise(*noise_dim).to(self.device)
+                    noise_optimizer = torch.optim.Adam(noise.parameters(), lr=self.noise_lr)
+                    noise_tensor = noise()[:batch_size_forget]
 
-                noise_dim = x_forget.size()
-                noise = Noise(*noise_dim).to(self.device)
-                noise_optimizer = torch.optim.Adam(noise.parameters(), lr=self.noise_lr)
-                noise_tensor = noise()[:batch_size_forget]
-                if self.sample_type == 'text':
-                    noise_tensor[:, 1, :] = 1
-                    noise_tensor = noise_tensor.int()
+                    # Update the noise for increasing the loss value.
+                    for _ in range(5):
+                        _, outputs = self.predictor.model(noise_tensor)
+                        with torch.no_grad():
+                            _, target_logits = self.predictor.model(x_forget.to(self.device))
+                        # Maximize the similarity between noise data and forget features.
+                        loss_noise = -F.mse_loss(outputs, target_logits)
 
-                # Update the noise for increasing the loss value.
-                for _ in range(5):
-                    _, outputs = self.predictor.model(noise_tensor)
-                    with torch.no_grad():
-                        _, target_logits = self.predictor.model(x_forget.to(self.device))
-                    # Maximize the similarity between noise data and forget features.
-                    loss_noise = -F.mse_loss(outputs, target_logits)
+                        # Backpropagate to update the noise.
+                        noise_optimizer.zero_grad()
+                        loss_noise.backward(retain_graph=True)
+                        noise_optimizer.step()
+                else:
+                    # For text data, we need to create a noise tensor with the same shape as the input, it can't be optimized
+                    # since the tokens are discrete, so we create a random tensor of the same shape.
+                    seq_len = x_forget.size(2)
 
-                    # Backpropagate to update the noise.
-                    noise_optimizer.zero_grad()
-                    loss_noise.backward(retain_graph=True)
-                    noise_optimizer.step()
+                    token_ids = torch.randint(
+                            low=0,
+                            high=self.vocab_size,
+                            size=(batch_size_forget, seq_len),
+                            device=self.device,
+                            dtype=torch.long
+                        )
+
+                    attention_mask = torch.ones_like(token_ids, dtype=torch.long)
+                    noise_tensor = torch.stack([token_ids, attention_mask], dim=1)
+                    noise_tensor = noise_tensor.to(self.device)
 
                 # Train the model with noise and retain image
                 noise_tensor = torch.clamp(noise_tensor, 0, 1).detach().to(self.device)
@@ -112,4 +125,4 @@ class UNSIR(TorchUnlearner):
         self.local.config['parameters']['ref_data_forget'] = self.local.config['parameters'].get("ref_data_forget", 'forget')  # Default reference data is forget
         self.local.config['parameters']['noise_lr'] = self.local.config['parameters'].get("noise_lr", 0.01)  # Default noise learning rate is 0.01
         self.local.config['parameters']['optimizer'] = self.local.config['parameters'].get("optimizer", {'class':'torch.optim.Adam', 'parameters':{}})  # Default optimizer is Adam
-        self.local.config['parameters']['sample_type'] = self.local.config['parameters'].get("sample_type", 'default')
+        self.local.config['parameters']['vocab_size'] = getattr(self.global_ctx, 'vocab_size', None)

@@ -35,12 +35,11 @@ class SaliencyMapGeneration(TorchUnlearner):
         
         forget_loader, _ = self.dataset.get_loader_for(self.ref_data, Fraction('0'))
 
-        gradients = {}
-
         self.predictor.model.eval()
 
-        for name, param in self.predictor.model.named_parameters():
-            gradients[name] = 0
+        gradients = {
+                name: torch.zeros_like(param.data) for name, param in self.predictor.model.named_parameters()
+            }
 
         for i, (image, target) in enumerate(forget_loader):
             image = image.to(self.device)
