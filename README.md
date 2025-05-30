@@ -2,6 +2,8 @@
 
 ![ERASURE Logo](ERASURE_LOGO.png)
 
+[![Star us on GitHub](https://img.shields.io/badge/⭐_Star_Us_If_You_Like_It-181717?style=for-the-badge&logo=github)](https://github.com/aiim-research/ERASURE)
+
 
 ## Table of Contents
 * [General Information](#general-information)
