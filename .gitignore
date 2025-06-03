@@ -13,3 +13,4 @@ saliency_maps/*
 launchers/*
 data/*
 .vscode/*
+*.jsonc

@@ -16,6 +16,7 @@ class TokenizeX(Preprocess):
     def __init__(self, global_ctx, local_ctx):
         super().__init__(global_ctx, local_ctx)
         self.tokenizer = get_instance_config(self.local_config["parameters"]["tokenizer"])
+        global_ctx.vocab_size = self.tokenizer.tokenizer.vocab_size
 
     def process(self, X, y, z):    
         if isinstance(X, str): 
