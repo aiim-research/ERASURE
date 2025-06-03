@@ -2,7 +2,7 @@
     "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
     "parameters": {
               "DataSource": { "class":"erasure.data.data_sources.TorchGeometricDataSource.TorchGeometricDataSource", 
-              "parameters": {"datasource": {"class": "torch_geometric.datasets.MoleculeNet", "parameters":{"root":"resources/data","name":"BBBP"},
+              "parameters": {"datasource": {"class": "torch_geometric.datasets.MoleculeNet", "parameters":{"root":"resources/data","name":"BACE"},
               "preprocess":[
                 ]}
           }}, 
@@ -11,13 +11,13 @@
           {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
           {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train", "shuffle":false}}
                     ],
-        "batch_size":64,
+        "batch_size":4,
         "split_seed":16}
     },
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 100,
+          "epochs": 30,
           "optimizer": {
             "class": "torch.optim.RMSprop",
             "parameters": {
@@ -36,39 +36,158 @@
           }
         }
       },
-
     "unlearners":[
-      {
+        // Original Model 
+              {"compose_idt" : "configs/snippets/u_id.json"},
+        // Gold Model
+              {
         "class": "erasure.unlearners.GoldModel.GoldModel",
         "parameters": {
           "training_set": "retain"
         }
         },
+        // Fine-Tuning
         {
-          "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
-          "parameters": {
-              "epochs": 1, 
-              "ref_data_retain": "retain", 
-              "ref_data_forget": "forget",
-              "optimizer": {"class": "torch.optim.SGD","parameters": {"lr": 0.0001}}
-          }
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+        }
       },
       {
-        "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+        }
+      },
+      // Successive Random Labelling 
+      {
+        "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
         "parameters": {
             "epochs": 1, 
             "ref_data_retain": "retain", 
             "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.SGD","parameters": {"lr": 0.00001}}
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
         }
-    },
-    {
+      },
+      {
+        "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+        }
+      },
+      // cfk 
+      {
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "last_trainable_layers": 2,
+            "epochs": 1, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "last_trainable_layers": 2,
+            "epochs": 1, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "parameters": {
+            "last_trainable_layers": 2,
+            "epochs": 1, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+        }
+      },
+      // euk 
+      {
+        "class": "erasure.unlearners.eu_k.eu_k",
+        "parameters": {
+            "last_trainable_layers": 2,
+            "epochs": 10, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.eu_k.eu_k",
+        "parameters": {
+            "last_trainable_layers": 2,
+            "epochs": 10, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.eu_k.eu_k",
+        "parameters": {
+            "last_trainable_layers": 2,
+            "epochs": 10, 
+            "ref_data":"retain",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+        }
+      },
+      // neggrad 
+      {
+        "class": "erasure.unlearners.NegGrad.NegGrad",
+        "parameters": {
+            "epochs": 1,
+            "ref_data": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.NegGrad.NegGrad",
+        "parameters": {
+            "epochs": 1,
+            "ref_data": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+        }
+      },
+      {
+        "class": "erasure.unlearners.NegGrad.NegGrad",
+        "parameters": {
+            "epochs": 1,
+            "ref_data": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+        }
+      },
+      // advanced neggrad 
+      {
       "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
       "parameters": {
           "epochs": 1, 
           "ref_data_retain": "retain", 
           "ref_data_forget": "forget",
-          "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+          "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
       }
   },
   {
@@ -77,9 +196,95 @@
         "epochs": 1, 
         "ref_data_retain": "retain", 
         "ref_data_forget": "forget",
-        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
     }
 },
+{
+  "class": "erasure.unlearners.AdvancedNegGrad.AdvancedNegGrad",
+  "parameters": {
+      "epochs": 1, 
+      "ref_data_retain": "retain", 
+      "ref_data_forget": "forget",
+      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+  }
+},
+// UNSIR 
+    {
+        "class": "erasure.unlearners.composite.Cascade",
+        "parameters": {
+            "sub_unlearner": [
+                {
+                    "class": "erasure.unlearners.UNSIR.UNSIR",
+                    "parameters": {
+                        "epochs": 1,
+                        "ref_data_retain": "retain", 
+                        "ref_data_forget": "forget", 
+                        "noise_lr": 0.1,
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+                    }
+                }, 
+                {
+                  "class": "erasure.unlearners.Finetuning.Finetuning",
+                  "parameters": {
+                      "epochs": 1, 
+                      "ref_data":"retain",
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+                  }
+              }
+            ]
+        }
+      },
+      {
+        "class": "erasure.unlearners.composite.Cascade",
+        "parameters": {
+            "sub_unlearner": [
+                {
+                    "class": "erasure.unlearners.UNSIR.UNSIR",
+                    "parameters": {
+                        "epochs": 1,
+                        "ref_data_retain": "retain", 
+                        "ref_data_forget": "forget", 
+                        "noise_lr": 0.1,
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+                    }
+                }, 
+                {
+                  "class": "erasure.unlearners.Finetuning.Finetuning",
+                  "parameters": {
+                      "epochs": 1, 
+                      "ref_data":"retain",
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+                  }
+              }
+            ]
+        }
+      },
+      {
+        "class": "erasure.unlearners.composite.Cascade",
+        "parameters": {
+            "sub_unlearner": [
+                {
+                    "class": "erasure.unlearners.UNSIR.UNSIR",
+                    "parameters": {
+                        "epochs": 1,
+                        "ref_data_retain": "retain", 
+                        "ref_data_forget": "forget", 
+                        "noise_lr": 0.1,
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+                    }
+                }, 
+                {
+                  "class": "erasure.unlearners.Finetuning.Finetuning",
+                  "parameters": {
+                      "epochs": 1, 
+                      "ref_data":"retain",
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
+                  }
+              }
+            ]
+        }
+      },
+      // Bad Teaching 
       {
         "class": "erasure.unlearners.BadTeaching.BadTeaching",
         "parameters": {
@@ -110,57 +315,45 @@
             "KL_temperature": 1.0
         }
       },
-      {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
+      // SCRUB 
+    {
+        "class": "erasure.unlearners.Scrub.Scrub",
         "parameters": {
             "epochs": 1, 
-            "ref_data":"retain",
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "T": 2.0,
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
         }
       },
       {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "class": "erasure.unlearners.Scrub.Scrub",
         "parameters": {
             "epochs": 1, 
-            "ref_data":"retain",
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "T": 2.0,
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
         }
       },
       {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
+        "class": "erasure.unlearners.Scrub.Scrub",
         "parameters": {
             "epochs": 1, 
-            "ref_data":"retain",
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "T": 2.0,
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
         }
       },
+      // Fisher Forgetting 
       {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
-        "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 1, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
-        "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 1, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.Finetuning.Finetuning",
-        "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 1, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
-        }
-      },
+            "class": "erasure.unlearners.FisherForgetting.FisherForgetting",
+            "parameters": {
+                "ref_data":"retain",
+                "alpha": 1e-6
+                }
+            },  
       {
         "class": "erasure.unlearners.FisherForgetting.FisherForgetting",
         "parameters": {
@@ -175,219 +368,38 @@
               "alpha": 1e-8
               }
           },
+        // Selective Synaptic Dampening 
           {
-            "class": "erasure.unlearners.FisherForgetting.FisherForgetting",
-            "parameters": {
-                "ref_data":"retain",
-                "alpha": 1e-6
-                }
-            },
-      {
-        "class": "erasure.unlearners.eu_k.eu_k",
+        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
         "parameters": {
-            "last_trainable_layers": 3,
-            "epochs": 5, 
-            "ref_data":"retain",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-        }
+            "ref_data_train": "train", 
+            "ref_data_forget": "forget",
+            "dampening_constant": 0.1,
+            "selection_weighting": 50,
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
+          }
       },
-      {"compose_idt" : "configs/snippets/u_id.json"},
       {
-        "class": "erasure.unlearners.NegGrad.NegGrad",
+        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
         "parameters": {
-            "epochs": 1,
-            "ref_data": "forget",
+            "ref_data_train": "train", 
+            "ref_data_forget": "forget",
+            "dampening_constant": 0.1,
+            "selection_weighting": 50,
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
+          }
+      },
+      {
+        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
+        "parameters": {
+            "ref_data_train": "train", 
+            "ref_data_forget": "forget",
+            "dampening_constant": 0.1,
+            "selection_weighting": 50,
             "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.00001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.NegGrad.NegGrad",
-        "parameters": {
-            "epochs": 1,
-            "ref_data": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.NegGrad.NegGrad",
-        "parameters": {
-            "epochs": 1,
-            "ref_data": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.Scrub.Scrub",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "T": 4.0,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.Scrub.Scrub",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "T": 4.0,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.Scrub.Scrub",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "T": 4.0,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
-        "parameters": {
-            "ref_data_train": "train", 
-            "ref_data_forget": "forget",
-            "dampening_constant": 0.1,
-            "selection_weighting": 20,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
           }
       },
-      {
-        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
-        "parameters": {
-            "ref_data_train": "train", 
-            "ref_data_forget": "forget",
-            "dampening_constant": 0.01,
-            "selection_weighting": 20,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-          }
-      },
-      {
-        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
-        "parameters": {
-            "ref_data_train": "train", 
-            "ref_data_forget": "forget",
-            "dampening_constant": 0.1,
-            "selection_weighting": 40,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-          }
-      },
-      {
-        "class": "erasure.unlearners.SelectiveSynapticDampening.SelectiveSynapticDampening",
-        "parameters": {
-            "ref_data_train": "train", 
-            "ref_data_forget": "forget",
-            "dampening_constant": 0.01,
-            "selection_weighting": 40,
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-          }
-      },
-      {
-        "class": "erasure.unlearners.composite.Cascade",
-        "parameters": {
-            "sub_unlearner": [
-                {
-                    "class": "erasure.unlearners.UNSIR.UNSIR",
-                    "parameters": {
-                        "epochs": 1,
-                        "ref_data_retain": "retain", 
-                        "ref_data_forget": "forget", 
-                        "noise_lr": 0.01,
-                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-                    }
-                }, 
-                {
-                  "class": "erasure.unlearners.Finetuning.Finetuning",
-                  "parameters": {
-                      "epochs": 1, 
-                      "ref_data":"retain",
-                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-                  }
-              }
-            ]
-        }
-      },
-      {
-        "class": "erasure.unlearners.composite.Cascade",
-        "parameters": {
-            "sub_unlearner": [
-                {
-                    "class": "erasure.unlearners.UNSIR.UNSIR",
-                    "parameters": {
-                        "epochs": 1,
-                        "ref_data_retain": "retain", 
-                        "ref_data_forget": "forget", 
-                        "noise_lr": 0.001,
-                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-                    }
-                }, 
-                {
-                  "class": "erasure.unlearners.Finetuning.Finetuning",
-                  "parameters": {
-                      "epochs": 1, 
-                      "ref_data":"retain",
-                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-                  }
-              }
-            ]
-        }
-      },
-      {
-        "class": "erasure.unlearners.composite.Cascade",
-        "parameters": {
-            "sub_unlearner": [
-                {
-                    "class": "erasure.unlearners.UNSIR.UNSIR",
-                    "parameters": {
-                        "epochs": 1,
-                        "ref_data_retain": "retain", 
-                        "ref_data_forget": "forget", 
-                        "noise_lr": 0.0001,
-                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-                    }
-                }, 
-                {
-                  "class": "erasure.unlearners.Finetuning.Finetuning",
-                  "parameters": {
-                      "epochs": 1, 
-                      "ref_data":"retain",
-                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-                  }
-              }
-            ]
-        }
-      },
-      {
-        "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.01}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.001}}
-        }
-      },
-      {
-        "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
-        "parameters": {
-            "epochs": 1, 
-            "ref_data_retain": "retain", 
-            "ref_data_forget": "forget",
-            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 0.0001}}
-        }
-      },
+      // SalUn 
       {
         "class": "erasure.unlearners.composite.Cascade",
         "parameters": {
@@ -442,7 +454,7 @@
                       "optimizer": {
                           "class": "torch.optim.Adam",
                           "parameters": {
-                              "lr": 0.01
+                              "lr": 0.0001
                           }
                       }
                   }
@@ -473,7 +485,7 @@
                       "optimizer": {
                           "class": "torch.optim.Adam",
                           "parameters": {
-                              "lr": 0.0001
+                              "lr": 0.00001
                           }
                       }
                   }
@@ -500,9 +512,9 @@
               // {"compose_mia" : "configs/snippets/e_mia.json"},
               {"compose_umia" : "configs/snippets/e_umia.json"},
               //{"compose_lira" : "configs/snippets/e_lira.json"},
-              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/survey/new_BBBP_seed2.json"}}
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/resource/BACE_seed3.json"}}
             ]
           }
         },
-    "globals":{"cached": "false","seed": 2}
+    "globals":{"cached": "false","seed": 3}
   }

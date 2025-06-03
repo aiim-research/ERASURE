@@ -129,7 +129,7 @@ class AUS(Measure):
 
 
 class SaveValues(Measure):
-    # TODO: add configuration nodes
+
     def init(self):
         super().init()
         self.path = self.params['path']

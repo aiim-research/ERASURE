@@ -1,6 +1,7 @@
 import sys
 import traceback
-
+import torch
+import gc
 from erasure.core.base import Configurable
 from erasure.core.factory_base import get_instance_kvargs
 from erasure.evaluations.evaluation import Evaluation
@@ -27,7 +28,15 @@ class Evaluator(Configurable):
                 if isinstance(measure, UnlearnRunner):
                     traceback.print_exc()
 
-        return e
+        self.global_ctx.logger.warning(f"Cleaning evaluator cache...")
+
+        del e
+        del unlearner
+        del predictor
+        gc.collect()
+        torch.cuda.empty_cache()
+        
+        return None
 
     def __init_measures__(self):
         self.measures = []
