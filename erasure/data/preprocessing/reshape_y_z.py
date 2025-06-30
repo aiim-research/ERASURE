@@ -10,30 +10,35 @@ import re
 from erasure.data.preprocessing.preprocess import Preprocess
 
 class reshape_y_z(Preprocess):
-    def __init__(self, global_ctx: Global, local_ctx: Local):
+    def __init__(self, global_ctx, local_ctx):
         super().__init__(global_ctx, local_ctx)
-        self.keep_as_y = self.local_config['parameters']['keep_as_y']
-        self.move_to_z = self.local_config['parameters']['move_to_z']
+        self.keep_as_y = self.local_config['parameters'].get('keep_as_y', [])
+        self.move_to_z = self.local_config['parameters'].get('move_to_z', [])
 
 
     def process(self, X, y, z):
-        
-        ##  input tensor is of shape
-        ##  ( [img], [downloaded_attributes], None)
-        ##  if keep_as_y is (0,0), we keep the first column of the first downloaded_attribute
+        if not isinstance(self.keep_as_y, list):
+            self.keep_as_y = [self.keep_as_y]
+        if not isinstance(self.move_to_z, list):
+            self.move_to_z = [self.move_to_z]
 
-        true_y = y
+        # Ensure y is indexable
+        if not isinstance(y, (list, tuple, np.ndarray)):
+            y = [y]
 
-        for idx in self.keep_as_y:
-            true_y = true_y[idx]
-         
-        z = y
-        for idx in self.move_to_z:
-            z = z[idx]
+        true_y = [y[idx] for idx in self.keep_as_y]
 
-        return X, true_y , z
-    
+        if len(true_y) == 1:
+            true_y = true_y[0]
+
+        z = [y[idx] for idx in self.move_to_z]
+
+        if len(z) == 1:
+            z = z[0]
+
+        return X, true_y, z
+            
     def check_configuration(self):
         super().check_configuration()
-        self.local_config['parameters']['keep_as_y'] = self.local_config['parameters'].get('keep_as_y',0)
-        self.local_config['parameters']['move_to_z'] = self.local_config['parameters'].get('move_to_z',1)
+        self.local_config['parameters']['keep_as_y'] = self.local_config['parameters'].get('keep_as_y', [])
+        self.local_config['parameters']['move_to_z'] = self.local_config['parameters'].get('move_to_z', [])

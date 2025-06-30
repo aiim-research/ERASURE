@@ -14,3 +14,4 @@ launchers/*
 data/*
 .vscode/*
 *.jsonc
+configs/ESSAI/*

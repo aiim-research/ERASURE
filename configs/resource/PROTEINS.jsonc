@@ -11,7 +11,7 @@
           {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["train","test"], "percentage":0.8, "ref_data":"all_shuffled", "shuffle":false}},
           {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["forget","retain"], "percentage":0.2, "ref_data":"train", "shuffle":false}}
                     ],
-        "batch_size":4,
+        "batch_size":2,
         "split_seed":16}
     },
     "predictor": {

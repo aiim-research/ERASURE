@@ -30,7 +30,7 @@ class HFDataSource(DataSource):
         super().__init__(global_ctx, local_ctx)
         self.dataset = None
         self.path = self.local_config['parameters']['path']
-        self.configuration = self.local_config.get("configuration","")
+        self.configuration = self.local_config['parameters'].get("configuration","")
         self.label = self.local_config['parameters']['label']
         self.data_columns = self.local_config['parameters']['data_columns']
         self.to_encode = self.local_config['parameters']['to_encode']
@@ -40,7 +40,8 @@ class HFDataSource(DataSource):
         return self.path.split("/")[-1] 
 
     def create_data(self):
-        ds = load_dataset(self.path)            
+
+        ds = load_dataset(self.path,self.configuration)            
 
         self.label_mappings = {}
         for column_to_encode in self.to_encode:
@@ -80,7 +81,7 @@ class HFDataSource(DataSource):
     def check_configuration(self):
         super().check_configuration()
         self.local_config['parameters']['path'] = self.local_config['parameters']['path']
-        self.local_config['parameters']['configuration'] = self.local_config.get("configuration","")
+        self.local_config['parameters']['configuration'] = self.local_config['parameters'].get("configuration","")
         self.local_config['parameters']['label'] = self.local_config['parameters'].get('label',"")
         self.local_config['parameters']['data_columns'] = self.local_config['parameters']['data_columns']
         self.local_config['parameters']['to_encode'] = self.local_config['parameters'].get("to_encode",[])
@@ -226,7 +227,7 @@ class SpotifyHFDataSource(HFDataSource):
         super().check_configuration()
         self.local_config['parameters']['to_normalize'] = self.local_config['parameters'].get("to_normalize",[])
         self.local_config['parameters']['keep_top_k'] = self.local_config['parameters'].get("keep_top_k",10)
-        self.local_config['parameters']['keep_top_k_artist'] = self.local_config['parameters'].get("keep_top_k_artist",10000000000000)
+        self.local_config['parameters']['keep_top_k_artist'] = self.local_config['parameters'].get("keep_top_k_artist",10000000000)
 
 class HFImageDatasetWrapper(DatasetWrapper):
     def __init__(self, data, preprocess, label):

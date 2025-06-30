@@ -15,7 +15,9 @@ class DatasetWrapper:
 
     def __getitem__(self, index: int):
         X,y = self.__realgetitem__(index)
+
         X,y,Z = self.apply_preprocessing(X, y, None)
+
         return X,y
 
     def __realgetitem__(self, index: int):

@@ -6,11 +6,8 @@ class BERTClassifier(nn.Module):
     def __init__(self, n_classes=2):
         super(BERTClassifier, self).__init__()
         
-        self.bert = BertModel.from_pretrained("bert-base-uncased") # automodel 
-
-        # for param in self.bert.parameters():
-        #     param.requires_grad = False  
-        
+        self.bert = BertModel.from_pretrained("bert-base-uncased") 
+    
         self.fc1 = nn.Linear(self.bert.config.hidden_size, 512)
         self.fc2 = nn.Linear(512, n_classes)
 
