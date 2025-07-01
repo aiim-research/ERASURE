@@ -3,7 +3,7 @@
                 "parameters": {
                     "DataSource": { "class":"erasure.data.data_sources.TVDataSource.TVDataSourceCelebA", 
                                     "parameters": {"path": "torchvision.datasets.CelebA", "transform":["ToTensor"], "label_column":"attr", "target_type":["attr","identity"],
-                                    "preprocess": [{"class":"erasure.data.preprocessing.reshape_y_z.reshape_y_z", "parameters":{"keep_as_y":[0,31], "move_to_z":[1]}}]
+                                    "preprocess": [{"class":"erasure.data.preprocessing.reshape_y_z.reshape_y_z_legacy", "parameters":{"keep_as_y":[0,31], "move_to_z":[1]}}]
                                   }
                                 }, 
                     "partitions":  [  
