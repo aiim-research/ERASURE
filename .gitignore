@@ -13,6 +13,5 @@ saliency_maps/*
 launchers/*
 data/*
 .vscode/*
-*.jsonc
 configs/ESSAI/*
 result_analysis_short_bench.ipynb

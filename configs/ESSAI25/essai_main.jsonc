@@ -1,0 +1,7 @@
+{
+  "globals":{"cached": "true","seed": 0},  
+  "compose_data" : "configs/essai/solutions/1_fair_face_remove_race.json",
+  "compose_pred" : "configs/essai/pred.json",
+  "compose_unlearners" : "configs/essai/unlearners.json",
+  "compose_eval" : "configs/essai/eval.json"    
+}
