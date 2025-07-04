@@ -1,7 +1,7 @@
 {
   "globals":{"cached": "true","seed": 0},  
-  "compose_data" : "configs/essai25/solutions/2_fair_face_remove_gender+race.json",
-  "compose_pred" : "configs/essai25/pred.json",
-  "compose_unlearners" : "configs/essai25/unlearners.json",
-  "compose_eval" : "configs/essai25/eval.json"    
+  "compose_data" : "configs/ESSAI25/data_forget_race.json",
+  "compose_pred" : "configs/ESSAI25/pred.json",
+  "compose_unlearners" : "configs/ESSAI25/unlearners.json",
+  "compose_eval" : "configs/ESSAI25/eval.json"    
 }
