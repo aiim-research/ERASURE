@@ -98,27 +98,28 @@ class DataSplitterConcat(DataSplitter):
 
 
 class DataSplitterClass(DataSplitter):
-    def __init__(self, label, parts_names, ref_data = 'all'):
-        super().__init__(ref_data,parts_names) 
-        self.label = label
+    def __init__(self, labels, parts_names, ref_data='all'):
+        super().__init__(ref_data, parts_names)
+        self.labels = labels  
 
+    def split_data(self, partitions):
+        ref_data = (
+            partitions[self.ref_data]
+            if self.ref_data == 'all'
+            else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+        )
 
-    def split_data(self,partitions):
-
-        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
-        
         filtered_indices = [
-            ref_data.data.indices[idx] for idx in range(len(ref_data))  
-            if ref_data[idx][1] == self.label  
+            ref_data.data.indices[idx] for idx in range(len(ref_data))
+            if ref_data[idx][1] in self.labels
         ]
 
         other_indices = [
-            ref_data.data.indices[idx] for idx in range(len(ref_data)) 
-            if idx not in filtered_indices
+            ref_data.data.indices[idx] for idx in range(len(ref_data))
+            if ref_data[idx][1] not in self.labels
         ]
 
-
-        partitions[self.parts_names[0]] = filtered_indices 
+        partitions[self.parts_names[0]] = filtered_indices
         partitions[self.parts_names[1]] = other_indices
 
         return partitions

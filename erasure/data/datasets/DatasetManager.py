@@ -53,6 +53,8 @@ class DatasetManager(Configurable):
         self.partitions = splitted_data.split_data(self.partitions)
 
         self.info(list(self.partitions.keys()))
+        for key, value in self.partitions.items():
+            self.info(f"Partition {key} has {len(value)} samples")
 
     def get_loader_for_ids(self, list_ids):
 
