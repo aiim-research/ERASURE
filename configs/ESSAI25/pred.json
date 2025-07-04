@@ -1,0 +1,23 @@
+{
+    "predictor": {
+        "class": "erasure.model.TorchModel.TorchModel",
+        "parameters": {
+          "epochs": 5,
+          "optimizer": {
+            "class": "torch.optim.Adam",
+            "parameters": {
+              "lr": 0.001
+            }
+          },
+          "loss_fn": {
+            "class": "torch.nn.CrossEntropyLoss",
+            "parameters": {
+              "reduction": "mean"
+            }
+          },
+          "model": {
+            "class": "erasure.model.classifiers.resnet18_for_fairface.FairFaceResNet18","parameters": {}
+          }
+        }
+      }
+}

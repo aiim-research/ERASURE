@@ -1,0 +1,16 @@
+{"evaluator":{
+          "class": "erasure.evaluations.manager.Evaluator",
+          "parameters": {
+            "measures":[
+              {"class":"erasure.evaluations.running.RunTime"},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"unlearned"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"test","target":"original"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"unlearned"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
+              {"class": "erasure.evaluations.measures.SaveValues", "parameters":{"path":"output/runs/fairface.json"}}
+            ]
+          }
+        }
+    }

@@ -1,0 +1,25 @@
+{
+  "data": {"class":"erasure.data.datasets.DatasetManager.DatasetManager",
+    "parameters": {
+        "DataSource": { "class":"erasure.data.data_sources.HFDataSource.HFDataSource", 
+                        "parameters": {"path": "HuggingFaceM4/FairFace", "configuration":"0.25", "data_columns":["image","race","gender"], "label":"age", "to_encode":["age","race"],                       
+                      "preprocess":[
+    
+
+                        {"class":"erasure.data.preprocessing.reshape_x_z.reshape_x_z", "parameters":{"keep_as_x":[0], "move_to_z":[2]}},
+                        {"class": "erasure.data.preprocessing.image_to_tensor.ImageToTensorPreprocess", "parameters": {}}
+
+                    ]
+                    }
+                    }, 
+        "partitions":  [  
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["all_shuffled","-"], "percentage":0.1, "ref_data":"all"}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterByZ", "parameters":{"parts_names":["forget","other_ids_full"], "z_labels":[0], "ref_data":"all_shuffled"}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["other_ids","-"], "percentage":0.5, "ref_data":"other_ids_full"}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterPercentage", "parameters":{"parts_names":["retain","test"], "percentage":0.8, "ref_data":"other_ids", "shuffle":false}},
+                      {"class":"erasure.data.datasets.DataSplitter.DataSplitterConcat", "parameters":{"parts_names":["train","-"], "concat_splits":["retain","forget"]}}
+                    ],
+        "batch_size":8,
+        "split_seed":16}
+    }
+}

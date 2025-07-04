@@ -1,0 +1,91 @@
+{
+    "unlearners":[
+        {
+        "class": "erasure.unlearners.SuccessiveRandomLabels.SuccessiveRandomLabels",
+        "parameters": {
+            "epochs": 1, 
+            "ref_data_retain": "retain", 
+            "ref_data_forget": "forget",
+            "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
+        }
+      },
+
+      {
+        "class": "erasure.unlearners.composite.Cascade",
+        "parameters": {
+            "sub_unlearner": [
+                {
+                    "class": "erasure.unlearners.UNSIR.UNSIR",
+                    "parameters": {
+                        "epochs": 1,
+                        "ref_data_retain": "retain", 
+                        "ref_data_forget": "forget", 
+                        "noise_lr": 0.1,
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-4}}
+                    }
+                }, 
+                {
+                  "class": "erasure.unlearners.Finetuning.Finetuning",
+                  "parameters": {
+                      "epochs": 1, 
+                      "ref_data":"retain",
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-4}}
+                  }
+              }
+            ]
+        }
+      },
+
+      {
+        "class": "erasure.unlearners.composite.Cascade",
+        "parameters": {
+            "sub_unlearner": [
+                {
+                    "class": "erasure.unlearners.UNSIR.UNSIR",
+                    "parameters": {
+                        "epochs": 1,
+                        "ref_data_retain": "retain", 
+                        "ref_data_forget": "forget", 
+                        "noise_lr": 0.1,
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
+                    }
+                }, 
+                {
+                  "class": "erasure.unlearners.Finetuning.Finetuning",
+                  "parameters": {
+                      "epochs": 1, 
+                      "ref_data":"retain",
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-5}}
+                  }
+              }
+            ]
+        }
+      },
+
+      {
+        "class": "erasure.unlearners.composite.Cascade",
+        "parameters": {
+            "sub_unlearner": [
+                {
+                    "class": "erasure.unlearners.UNSIR.UNSIR",
+                    "parameters": {
+                        "epochs": 1,
+                        "ref_data_retain": "retain", 
+                        "ref_data_forget": "forget", 
+                        "noise_lr": 0.1,
+                        "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
+                    }
+                }, 
+                {
+                  "class": "erasure.unlearners.Finetuning.Finetuning",
+                  "parameters": {
+                      "epochs": 1, 
+                      "ref_data":"retain",
+                      "optimizer": {"class": "torch.optim.Adam","parameters": {"lr": 1e-6}}
+                  }
+              }
+            ]
+        }
+      }
+    ]
+}
