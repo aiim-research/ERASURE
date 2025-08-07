@@ -44,6 +44,17 @@ class reshape_y_z(Preprocess):
         self.local_config['parameters']['move_to_z'] = self.local_config['parameters'].get('move_to_z', [])
 
 
+class copy_y_z(Preprocess):
+    def __init__(self, global_ctx, local_ctx):
+        super().__init__(global_ctx, local_ctx)
+
+    def process(self, X, y, z):
+        return X, y, y
+            
+    def check_configuration(self):
+        super().check_configuration()
+
+
 
 
 class reshape_y_z_legacy(Preprocess):
@@ -73,3 +84,4 @@ class reshape_y_z_legacy(Preprocess):
     def check_configuration(self):
         super().check_configuration()
         self.local_config['parameters']['keep_as_y'] = self.local_config['parameters'].get('keep_as_y',0)
+

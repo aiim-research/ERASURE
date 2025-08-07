@@ -7,6 +7,7 @@ from tqdm import tqdm
 from torch.utils.data import DataLoader
 import torch
 import hashlib
+from sklearn.model_selection import train_test_split
 import numpy as np
 
 class DataSplitter(ABC):
@@ -358,3 +359,52 @@ class DataSplitterAnyZisInRange(DataSplitter):
             all_possible_z = torch.sort(all_possible_z).values
 
             return partitions
+
+class DataSplitterPercentageStratified(DataSplitter):
+    def __init__(self, percentage, parts_names, ref_data = 'all'):
+        super().__init__(ref_data,parts_names) 
+        self.percentage = percentage
+    
+    def split_data(self,partitions):
+
+        ref_data = partitions[self.ref_data] if self.ref_data == 'all' else self.source.get_extended_wrapper(Subset(partitions['all'].data, partitions[self.ref_data]))
+
+
+        dataloader = DataLoader(ref_data, batch_size=10000)
+
+        all_labels = []
+        all_indices = []
+
+        current_index = 0
+
+        for i in range(len(ref_data)):
+            sample = ref_data[i]
+            if sample is None:
+                print(f"None sample found at index {i}")
+
+        for batch in tqdm(dataloader, desc="Extracting labels for stratified split"):
+            _, Y, _ = batch  
+            all_labels.extend(Y)
+            batch_indices = list(range(current_index, current_index + len(Y)))
+            all_indices.extend(batch_indices)
+            current_index += len(Y)
+
+        all_labels = np.array(all_labels)
+        all_indices = np.array(all_indices)
+
+        stratified_indices_first, stratified_indices_second = train_test_split(
+            all_indices,
+            train_size=self.percentage,
+            stratify=all_labels,
+            shuffle=True,
+            random_state=42
+        )
+
+        if self.ref_data != 'all':
+            stratified_indices_first = [partitions[self.ref_data][i] for i in stratified_indices_first]
+            stratified_indices_second = [partitions[self.ref_data][i] for i in stratified_indices_second]
+
+        partitions[self.parts_names[0]] = stratified_indices_first
+        partitions[self.parts_names[1]] = stratified_indices_second
+
+        return partitions

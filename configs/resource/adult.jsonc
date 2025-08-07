@@ -17,7 +17,7 @@
     "predictor": {
         "class": "erasure.model.TorchModel.TorchModel",
         "parameters": {
-          "epochs": 20,
+          "epochs": 2,
           "optimizer": {
             "class": "torch.optim.Adam",
             "parameters": {
