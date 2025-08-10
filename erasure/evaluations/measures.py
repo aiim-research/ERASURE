@@ -39,8 +39,8 @@ class TorchSKLearn(Measure):
         if self.target == 'unlearned':
             erasure_model = e.unlearned_model
 
-        erasure_model.eval()
-
+        erasure_model.model.eval()
+    
         loader, _ = e.unlearner.dataset.get_loader_for(self.partition_name, drop_last=False)
 
         var_labels, var_preds = [], []
@@ -115,8 +115,8 @@ class AUS(Measure):
         or_model = e.predictor
         ul_model = e.unlearned_model
 
-        or_model.eval()
-        ul_model.eval()
+        or_model.model.eval()
+        ul_model.model.eval()
 
         test_loader, _ = e.unlearner.dataset.get_loader_for(self.test_part, drop_last=False)
         forget_loader, _ = e.unlearner.dataset.get_loader_for(self.forget_part, drop_last=False)
