@@ -1,3 +1,6 @@
 [submodule "erasure/reform"]
 	path = erasure/reform
 	url = https://github.com/aiim-research/REFORM.git
+[submodule "dev"]
+	path = dev
+	url = https://github.com/aiim-research/erasure-dev.git
