@@ -205,6 +205,16 @@
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"forget","target":"original"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"unlearned"}},
               {"class": "erasure.evaluations.measures.TorchSKLearn", "parameters":{"partition":"retain","target":"original"}},
+              //F1 score
+              {"class": "erasure.evaluations.measures.TorchSKLearn",
+              "parameters": {"partition": "test", "target": "unlearned", "name": "f1_macro", "function": { "class": "sklearn.metrics.f1_score", "parameters": { "average": "macro" } }}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn",
+              "parameters": {"partition": "test", "target": "original", "name": "f1_macro", "function": { "class": "sklearn.metrics.f1_score", "parameters": { "average": "macro" } }}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn",
+              "parameters": {"partition": "forget", "target": "unlearned", "name": "f1_macro", "function": { "class": "sklearn.metrics.f1_score", "parameters": { "average": "macro" } }}},
+              {"class": "erasure.evaluations.measures.TorchSKLearn",
+              "parameters": {"partition": "forget", "target": "original", "name": "f1_macro", "function": { "class": "sklearn.metrics.f1_score", "parameters": { "average": "macro" } }}},
+
               {"class": "erasure.evaluations.measures.AUS", "parameters":{"forget_part": "forget","test_part": "test"}},
               {"class": "erasure.evaluations.measures.RelearnTime", "parameters":{"forget_part": "forget"}},
               {"class": "erasure.evaluations.measures.AIN", "parameters":{"forget_part": "forget","alpha": 0.001,

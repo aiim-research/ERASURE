@@ -55,7 +55,13 @@ class TorchSKLearn(Measure):
                             else [list(pred.squeeze().to('cpu').numpy())]
 
             # preprocessing predictions TODO: made a preprocessing class?
-            var_preds = np.argmax(var_preds, axis=1)
+            #var_preds = np.argmax(var_preds, axis=1)
+
+            var_preds = np.array(var_preds)
+            if var_preds.ndim == 1:             
+                var_preds = (var_preds >= 0.5).astype(int)
+            else:
+                var_preds = var_preds.argmax(axis=1)
 
             value = self.metric_func(var_labels, var_preds,**self.metric_params)
             self.info(f"{self.metric_name} of \"{self.partition_name}\" on {self.target}: {value} of {erasure_model}")
