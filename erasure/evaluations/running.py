@@ -1,6 +1,8 @@
 import time
 import torch.profiler
 import platform
+import sys
+from contextlib import contextmanager,nullcontext
 
 #if platform.system() != 'Darwin':
 #    from pypapi import papi_low as papi
@@ -46,6 +48,97 @@ class ChainOfRunners(UnlearnRunner):
 
         return e
 
+
+def get_peak_rss_mb():
+    try:
+        import resource
+        r = resource.getrusage(resource.RUSAGE_SELF)
+        peak = r.ru_maxrss
+        if sys.platform == "darwin":
+            return peak / (1024 * 1024)  
+        else:
+            return peak / 1024           
+    except Exception:
+        # Fallback/cross-platform
+        try:
+            import psutil, os
+            p = psutil.Process(os.getpid())
+            mi = p.memory_info()
+            peak = getattr(mi, "peak_wset", None) or getattr(mi, "peak_rss", None) or mi.rss
+            return peak / (1024 * 1024)
+        except Exception:
+            return None
+
+@contextmanager
+def python_alloc_tracker():
+    import tracemalloc
+    tracemalloc.start()
+    try:
+        yield
+    finally:
+        current, peak = tracemalloc.get_traced_memory()
+        python_alloc_tracker.current_mb = current / (1024 * 1024)
+        python_alloc_tracker.peak_mb = peak / (1024 * 1024)
+        tracemalloc.stop()
+
+@contextmanager
+def torch_gpu_peak_tracker():
+    try:
+        import torch
+        if torch.cuda.is_available():
+            torch.cuda.reset_peak_memory_stats()
+        yield
+    finally:
+        try:
+            import torch
+            if torch.cuda.is_available():
+                torch_gpu_peak_tracker.peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
+            else:
+                torch_gpu_peak_tracker.peak_mb = None
+        except Exception:
+            torch_gpu_peak_tracker.peak_mb = None
+
+
+class RunTime(UnlearnRunner):
+    """ Wallclock running time + memory usage """
+    def process(self, e: Evaluation):
+        if not e.unlearned_model:
+
+            device = e.predictor.device
+
+            dict_memory = {'cuda': torch_gpu_peak_tracker, 'cpu': python_alloc_tracker}
+
+            factory = dict_memory.get(device)
+            tracker = factory() if callable(factory) else nullcontext()
+
+            start_time = time.time()
+
+            with tracker:    
+                super().process(e)
+
+            runtime = time.time() - start_time
+            e.add_value('RunTime', runtime)
+
+
+            peak_rss_mb = get_peak_rss_mb()
+            if peak_rss_mb is not None:
+                e.add_value('PeakRSS_MB', peak_rss_mb)
+
+            peak_mb = getattr(tracker, 'peak_mb', None)
+            current_mb = getattr(tracker, 'current_mb', None)
+
+            if peak_mb is not None:
+                if self.memory_metric == 'CUDA':
+                    e.add_value('CudaPeak_MB', peak_mb)
+                elif self.memory_metric == 'python':
+                    e.add_value('PyHeapPeak_MB', peak_mb)
+
+            if current_mb is not None and self.memory_metric == 'python':
+                e.add_value('PyHeapCurrent_MB', current_mb)
+
+            return e
+    
+'''
 class RunTime(UnlearnRunner):
     """ Wallclock running time to execute the unlearn """
     def process(self, e: Evaluation):
@@ -58,6 +151,7 @@ class RunTime(UnlearnRunner):
             e.add_value('RunTime', metric_value)
 
         return e
+'''
 
 class PAPI(UnlearnRunner):
     """ PAPI Events to execute the unlearn """
