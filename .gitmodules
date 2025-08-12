@@ -4,6 +4,7 @@
 [submodule "dev"]
 	path = dev
 	url = https://github.com/aiim-research/erasure-dev.git
+	branch = main
 [submodule "configs/ICLR_benchmark"]
 	path = configs/ICLR_benchmark
 	url = https://github.com/dangeloandrea14/ERASURE_dev
