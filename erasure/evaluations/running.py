@@ -3,6 +3,8 @@ import torch.profiler
 import platform
 import sys
 from contextlib import contextmanager,nullcontext
+import psutil, os
+import tracemalloc
 
 #if platform.system() != 'Darwin':
 #    from pypapi import papi_low as papi
@@ -59,7 +61,6 @@ def get_peak_rss_mb():
         else:
             return peak / 1024           
     except Exception:
-        # Fallback/cross-platform
         try:
             import psutil, os
             p = psutil.Process(os.getpid())
@@ -90,7 +91,6 @@ def torch_gpu_peak_tracker():
         yield
     finally:
         try:
-            import torch
             if torch.cuda.is_available():
                 torch_gpu_peak_tracker.peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
             else:
@@ -106,32 +106,35 @@ class RunTime(UnlearnRunner):
 
             device = e.predictor.device
 
-            dict_memory = {'cuda': torch_gpu_peak_tracker, 'cpu': python_alloc_tracker}
-
-            factory = dict_memory.get(device)
-            tracker = factory() if callable(factory) else nullcontext()
 
             start_time = time.time()
 
-            with tracker:    
-                super().process(e)
+            tracemalloc.start()
+
+            super().process(e)
 
             runtime = time.time() - start_time
             e.add_value('RunTime', runtime)
+
+            current, peak = tracemalloc.get_traced_memory()
+            current_mb = current / (1024 * 1024)
+            peak_mb = peak / (1024 * 1024)
+            tracemalloc.stop()
 
 
             peak_rss_mb = get_peak_rss_mb()
             if peak_rss_mb is not None:
                 e.add_value('PeakRSS_MB', peak_rss_mb)
 
-            peak_mb = getattr(tracker, 'peak_mb', None)
-            current_mb = getattr(tracker, 'current_mb', None)
 
-            if peak_mb is not None:
-                if self.memory_metric == 'CUDA':
-                    e.add_value('CudaPeak_MB', peak_mb)
-                elif self.memory_metric == 'python':
-                    e.add_value('PyHeapPeak_MB', peak_mb)
+            if 'cuda' in device:
+                cuda_peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
+                e.add_value('CudaPeak_MB', cuda_peak_mb)
+                torch.cuda.reset_peak_memory_stats(device)
+            elif self.memory_metric == 'python':
+                e.add_value('PyHeapPeak_MB', peak_mb)
+
+
 
             if current_mb is not None and self.memory_metric == 'python':
                 e.add_value('PyHeapCurrent_MB', current_mb)
