@@ -131,13 +131,6 @@ class RunTime(UnlearnRunner):
                 cuda_peak_mb = torch.cuda.max_memory_allocated() / (1024 * 1024)
                 e.add_value('CudaPeak_MB', cuda_peak_mb)
                 torch.cuda.reset_peak_memory_stats(device)
-            elif self.memory_metric == 'python':
-                e.add_value('PyHeapPeak_MB', peak_mb)
-
-
-
-            if current_mb is not None and self.memory_metric == 'python':
-                e.add_value('PyHeapCurrent_MB', current_mb)
 
             return e
     
