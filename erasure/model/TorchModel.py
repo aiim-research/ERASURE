@@ -34,7 +34,7 @@ class TorchModel(Trainable):
         
         self.lr_scheduler =  lr_scheduler.LinearLR(self.optimizer, start_factor=1.0, end_factor=0.5, total_iters=self.epochs)
 
-        self.training_set = self.local.config['parameters'].get('training_set','train')
+        self.training_set = self.local_config['parameters'].get('training_set','train')
 
 
 
@@ -63,8 +63,8 @@ class TorchModel(Trainable):
             self.model.train()
 
             for batch, (X, labels) in enumerate(train_loader):
-                # print(X)
-                # print(labels)
+                print("x is ", X)
+                print("y is" , labels)
 
                 self.optimizer.zero_grad()
 
@@ -95,7 +95,7 @@ class TorchModel(Trainable):
                 self.model.eval()
                 var_losses, var_labels, var_preds = [], [], []
                 with torch.no_grad():
-                    for batch, (X, labels) in enumerate(train_loader):
+                    for batch, (X, labels) in enumerate(val_loader):
 
                         self.optimizer.zero_grad()
 
@@ -138,7 +138,8 @@ class TorchModel(Trainable):
         init_dflts_to_of(local_config, 'optimizer', 'torch.optim.Adam',lr=0.001)
         init_dflts_to_of(local_config, 'loss_fn', 'torch.nn.BCELoss')
 
-        local_config['parameters']['model']['parameters']['n_classes'] = self.dataset.n_classes
+
+        local_config['parameters']['model']['parameters']['n_classes'] = local_config['parameters']['model']['parameters'].get('n_classes',self.dataset.n_classes)
 
         local_config['parameters']['alias'] = local_config['parameters']['model']['class']
         local_config['parameters']['training_set'] = local_config['parameters'].get("training_set", "train")

@@ -5,7 +5,9 @@ from torchvision.models import resnet18, resnet50
 class CelebAResNet18(nn.Module):
     def __init__(self, n_classes=2):
         super(CelebAResNet18, self).__init__()
-        
+
+        print("OK, n_classes =", n_classes)
+
         resnet = resnet18()
         
         self.feature_extractor = nn.Sequential(*list(resnet.children())[:-1])  
@@ -17,7 +19,7 @@ class CelebAResNet18(nn.Module):
         self.flatten = nn.Flatten()  
         self.last_layer = self.fc2
 
-    def forward(self, x):
+    def forward(self, x):        
         x = self.feature_extractor(x)
         x = self.flatten(x)  
         
