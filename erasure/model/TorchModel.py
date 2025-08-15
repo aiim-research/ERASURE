@@ -63,8 +63,6 @@ class TorchModel(Trainable):
             self.model.train()
 
             for batch, (X, labels) in enumerate(train_loader):
-                print("x is ", X)
-                print("y is" , labels)
 
                 self.optimizer.zero_grad()
 

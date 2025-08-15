@@ -35,4 +35,18 @@ class Celeba_labels(Preprocess):
         y_mc = [y_mc, identity]
 
         return X, y_mc, Z
+    
+class Celeba_multilabel(Preprocess):
+    def __init__(self, global_ctx: Global, local_ctx: Local):
+        super().__init__(global_ctx, local_ctx)
+        self.label_columns =  self.local_config['parameters']['label_columns']
+
+    def process(self, X, y, Z):
+
+        attr, identity = y
+ 
+        attr = attr[self.label_columns]
+
+        return X, attr, identity
+
 

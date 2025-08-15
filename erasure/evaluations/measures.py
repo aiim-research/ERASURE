@@ -49,19 +49,32 @@ class TorchSKLearn(Measure):
             for batch, (X, labels) in enumerate(loader):
                 _, pred = erasure_model.model(X.to(erasure_model.model.device))
 
-                var_labels += list(labels.squeeze().to('cpu').numpy()) if len(labels) > 1 \
-                            else [labels.squeeze().to('cpu').numpy()]
-                var_preds += list(pred.squeeze().to('cpu').numpy()) if len(pred) > 1 \
-                            else [list(pred.squeeze().to('cpu').numpy())]
+                y_true = labels.detach().to('cpu').numpy()
+                if y_true.ndim == 0:                     
+                    var_labels.append(int(y_true))
+                else:                                    
+                    var_labels += np.ravel(y_true).astype(int).tolist()
+
+                p = pred.detach().to('cpu').numpy()
+                if p.ndim == 0:
+                    var_preds.append(float(p))
+                else:                                    
+                    var_preds += p.tolist()
 
             # preprocessing predictions TODO: made a preprocessing class?
             #var_preds = np.argmax(var_preds, axis=1)
 
-            var_preds = np.array(var_preds)
-            if var_preds.ndim == 1:             
-                var_preds = (var_preds >= 0.5).astype(int)
+            var_preds = np.array(var_preds, dtype=np.float32)
+            if var_preds.ndim == 1:
+                if var_preds.size > 0 and var_preds.min() >= 0.0 and var_preds.max() <= 1.0:
+                    thr = 0.5
+                else:
+                    thr = 0.0
+                var_preds = (var_preds >= thr).astype(int)
             else:
-                var_preds = var_preds.argmax(axis=1)
+                var_preds = var_preds.argmax(axis=1).astype(int)
+
+            var_labels = np.asarray(var_labels).astype(int).reshape(-1)
 
             value = self.metric_func(var_labels, var_preds,**self.metric_params)
             self.info(f"{self.metric_name} of \"{self.partition_name}\" on {self.target}: {value} of {erasure_model}")
