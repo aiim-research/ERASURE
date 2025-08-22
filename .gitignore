@@ -16,7 +16,7 @@ data/*
 configs/ESSAI/*
 result_analysis_short_bench.ipynb
 configs/ICLR_benchmark/*
-configs/resource/
-
-*.jsonc
+configs/resource/*
+configs_iclr/*
+jsonc_school_cikm/*
 *.sh

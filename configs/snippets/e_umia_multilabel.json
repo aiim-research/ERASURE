@@ -1,0 +1,30 @@
+{
+    "class": "erasure.evaluations.MIA.umia.Attack",
+
+    "parameters": {
+      "attack_in_data": {
+        "class": "erasure.data.datasets.DatasetManager.DatasetManager",
+        "parameters": {
+          "DataSource": {
+            "class": "erasure.data.data_sources.TorchFileDataSource.TorchFileDataSource",
+            "parameters": {
+              "path": "resources/data/umia/umia.pt"
+            }
+          },
+          "partitions": [
+            { "class": "erasure.data.datasets.DataSplitter.DataSplitterPercentage",
+              "parameters": {"parts_names": ["train", "test"], "percentage": 0.5, "ref_data": "all"}
+            }
+          ],
+          "batch_size": 128, 
+          "loss_fn": {
+            "class": "torch.nn.BCEWithLogitsLoss",
+            "parameters": {
+              "reduction": "none"
+            }
+          }, 
+          "task": "multilabel"
+        }
+      }
+    }
+  }

@@ -47,6 +47,8 @@ class Celeba_multilabel(Preprocess):
  
         attr = attr[self.label_columns]
 
+        attr = attr.to(torch.float32)
+
         return X, attr, identity
 
 

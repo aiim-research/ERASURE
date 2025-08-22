@@ -32,7 +32,9 @@ class TorchSKLearn(Measure):
         self.local.config['parameters']['partition'] = self.local.config['parameters'].get('partition', 'test')  # Default partition: test
         self.local.config['parameters']['name'] = self.local.config['parameters'].get('name', self.local.config['parameters']['function']['class'])  # Default name as metric name
         self.local.config['parameters']['target'] = self.local.config['parameters'].get('target', 'unlearned')  # Default partition: test
-
+        #handle multiclass task 
+        self.local.config['parameters']['task'] = self.local.config['parameters'].get('task', 'auto')
+        
     def process(self, e: Evaluation):
         erasure_model = e.predictor
 
@@ -48,6 +50,10 @@ class TorchSKLearn(Measure):
         with torch.no_grad():
             for batch, (X, labels) in enumerate(loader):
                 _, pred = erasure_model.model(X.to(erasure_model.model.device))
+                
+                if self.local.config['parameters']['task'] == 'multilabel':
+                    pred = torch.sigmoid(pred)
+                    pred = (pred >= 0.5).int() 
 
                 var_labels += list(labels.squeeze().to('cpu').numpy()) if len(labels) > 1 \
                             else [labels.squeeze().to('cpu').numpy()]
@@ -58,10 +64,15 @@ class TorchSKLearn(Measure):
             #var_preds = np.argmax(var_preds, axis=1)
 
             var_preds = np.array(var_preds)
-            if var_preds.ndim == 1:             
-                var_preds = (var_preds >= 0.5).astype(int)
+            if self.local.config['parameters']['task'] == 'auto':
+                if var_preds.ndim == 1:             
+                    var_preds = (var_preds >= 0.5).astype(int)
+                else:
+                    var_preds = var_preds.argmax(axis=1)
+            elif self.local.config['parameters']['task'] == 'multilabel':
+                pass  
             else:
-                var_preds = var_preds.argmax(axis=1)
+                raise ValueError(f"Unsupported task type: {self.local.config['parameters']['task']}. Supported types are 'auto' and 'multiclass'.")
 
             value = self.metric_func(var_labels, var_preds,**self.metric_params)
             self.info(f"{self.metric_name} of \"{self.partition_name}\" on {self.target}: {value} of {erasure_model}")
@@ -268,7 +279,7 @@ class NoMUS(Measure):
         if "UMIA" not in e.data_info.keys():
             self.info(f"UMIA metric not found in data_info. Calculating it now.")
             measure = {'class': 'erasure.evaluations.MIA.umia.Attack', 'parameters': {'attack_in_data': {'class': 'erasure.data.datasets.DatasetManager.DatasetManager', 'parameters': {'DataSource': {'class': 'erasure.data.data_sources.TorchFileDataSource.TorchFileDataSource', 'parameters': {'path': 'resources/data/umia/umia.pt'}}, 'partitions': [{'class': 'erasure.data.datasets.DataSplitter.DataSplitterPercentage', 'parameters': {'parts_names': ['train', 'test'], 'percentage': 0.5, 'ref_data': 'all'}}], 'batch_size': 128}}}}
-
+            
             current = self.global_ctx.factory.get_object(Local(measure))
 
             try: 

@@ -66,6 +66,8 @@ class Attack(Measure):
             # sklearn Logistic Regression
             attack_loader, _ = attack_dataset.get_loader_for("all")
             X, y = attack_loader.dataset[:]
+            if len(X.shape) == 3:
+                X = X.squeeze(1)
             attack_model = sklearn.linear_model.LogisticRegression()
             cv = sklearn.model_selection.StratifiedShuffleSplit(n_splits=5, test_size=0.8)
             try:
