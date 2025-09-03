@@ -22,7 +22,7 @@ class TorchModel(Trainable):
         self.model = get_instance_kvargs(self.local_config['parameters']['model']['class'],
                                    self.local_config['parameters']['model']['parameters'])
         
-        self.model.apply(init_weights)
+        #self.model.apply(init_weights)
         
         self.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
                                       {'params':self.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
