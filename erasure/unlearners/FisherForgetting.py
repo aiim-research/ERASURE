@@ -18,7 +18,10 @@ class FisherForgetting(TorchUnlearner):
 
         self.ref_data_retain = self.local.config['parameters']['ref_data']
         self.alpha = self.local.config['parameters'].get('alpha', 1e-6)
+        self.ff_epochs = self.local.config['parameters'].get('ff_epochs', 1000)
         self.num_classes = self.dataset.n_classes
+
+        self.task = self.local.config['parameters']['task']
 
     def compute_fisher_information(self, dataset):
         """
@@ -36,8 +39,10 @@ class FisherForgetting(TorchUnlearner):
         for p in self.predictor.model.parameters():
             p.grad_acc = 0
             p.grad2_acc = 0
+
+        processed_batches = 0
         
-        for data, orig_target in tqdm(dataloader):
+        for data, orig_target in tqdm(dataloader, total=self.ff_epochs):
             data, orig_target = data.to(self.device), orig_target.to(self.device)
             _, output = self.predictor.model(data)
             prob = F.softmax(output, dim=-1).data
@@ -48,23 +53,63 @@ class FisherForgetting(TorchUnlearner):
                 self.predictor.model.zero_grad()
                 loss.backward(retain_graph=True)
                 for p in self.predictor.model.parameters():
-                    if p.requires_grad:
-                        if p.grad is None:
-                            continue
-                        p.grad_acc += (orig_target == target).float() * p.grad.data
-                        p.grad2_acc += prob[:, y] * p.grad.data.pow(2)
+                    if not p.requires_grad or p.grad is None:
+                        continue
+                    p.grad_acc += (orig_target == target).float() * p.grad.data
+                    p.grad2_acc += prob[:, y] * p.grad.data.pow(2)
             
-            break
+            processed_batches += 1
+            if processed_batches >= self.ff_epochs:
+                break
+
         for p in self.predictor.model.parameters():
-            p.grad_acc /= len(dataloader)
-            p.grad2_acc /= len(dataloader)
-        
-        # Normalize accumulators
-        n_samples = len(dataloader.dataset)
+            p.grad_acc /= processed_batches
+            p.grad2_acc /= processed_batches
+
+    def compute_fisher_information_multilabel(self, dataset):
+        self.predictor.model.eval()
+
+        if isinstance(dataset[0][0], Data):
+            dataloader = GeometricDataLoader(dataset, batch_size=1, shuffle=False)
+        else:
+            dataloader = torch.utils.data.DataLoader(dataset, batch_size=1, shuffle=False)
+
         for p in self.predictor.model.parameters():
-            p.grad_acc /= n_samples
-            p.grad2_acc /= n_samples
-        
+            if p.requires_grad:
+                p.grad_acc = torch.zeros_like(p, device=p.device)
+                p.grad2_acc = torch.zeros_like(p, device=p.device)
+
+        processed_batches = 0
+
+        for data, orig_target in tqdm(dataloader, total=self.ff_epochs):
+            data, orig_target = data.to(self.device), orig_target.to(self.device)
+            
+            _, outputs = self.predictor.model(data)
+            probs = torch.sigmoid(outputs)
+
+            # Loop over classes
+            for y in range(outputs.shape[1]):
+                self.predictor.model.zero_grad(set_to_none=True)
+                outputs[:, y].sum().backward(retain_graph=True)
+
+                pos_frac = orig_target[:, y].mean() 
+                fisher_w = (probs[:, y] * (1.0 - probs[:, y])).mean().detach() 
+
+                for p in self.predictor.model.parameters():
+                    if not p.requires_grad or p.grad is None:
+                        continue
+                    g = p.grad.detach()
+                    p.grad_acc += pos_frac * g
+                    p.grad2_acc += fisher_w * g.pow(2)
+            
+            processed_batches += 1
+            if processed_batches >= self.ff_epochs:
+                break
+
+        for p in self.predictor.model.parameters():
+            p.grad_acc /= processed_batches
+            p.grad2_acc /= processed_batches
+
 
     def get_mean_var(self, p, is_base_dist=False, alpha=3e-6):
         var = copy.deepcopy(1./(p.grad2_acc+1e-8))
@@ -122,7 +167,10 @@ class FisherForgetting(TorchUnlearner):
 
         # Compute Fisher Information using retain set
         self.info('Computing Fisher Information Matrix')
-        self.compute_fisher_information(retain_loader.dataset)
+        if self.task == 'auto':
+            self.compute_fisher_information(retain_loader.dataset)
+        elif self.task == 'multilabel':
+            self.compute_fisher_information_multilabel(retain_loader.dataset)
 
         # Apply Fisher noise for selective forgetting
         self.info('Applying Fisher noise for selective forgetting')
@@ -138,3 +186,5 @@ class FisherForgetting(TorchUnlearner):
 
         self.local.config['parameters']['ref_data'] = self.local.config['parameters'].get("ref_data", 'retain')
         self.local.config['parameters']['alpha'] = self.local.config['parameters'].get("alpha", 1e-6)
+        self.local.config['parameters']['task'] = self.local.config['parameters'].get("task", 'auto')  # Default task is auto (single-label classification)
+        self.local.config['parameters']['ff_epochs'] = self.local.config['parameters'].get("ff_epochs", 1000)
