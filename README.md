@@ -9,7 +9,7 @@
 
 ERASURE was accepted as IJCAI demo and CIKM resource! 
 
-If you use this framework, please cite us:
+If you use this Machine Unlearning framework, please cite us:
 
 > @inproceedings{ijcai2025p1255,
   title     = {How to Make Reproducible Research in Machine Unlearning with ERASURE},
@@ -26,8 +26,6 @@ If you use this framework, please cite us:
   url       = {https://doi.org/10.24963/ijcai.2025/1255},
 }
 
-You can find the Demo paper here: https://www.ijcai.org/proceedings/2025/1255
-
 
 ## Table of Contents
 * [General Information](#general-information)
@@ -41,6 +39,14 @@ You can find the Demo paper here: https://www.ijcai.org/proceedings/2025/1255
 
 ERASURE offers fully extensible built-in components, allowing users to define custom unlearning techniques, integrate custom and synthetic datasets, implement tailored evaluation metrics, and meld seamlessly with state-of-the-art machine learning models.
 Additionally, it provides a flexible environment for defining and running unlearning experiments, enabling researchers to evaluate the effectiveness and efficiency of various unlearning methods systematically.
+
+The framework is inside the ```erasure``` folder. A JSON configuration file is everything ERASURE needs to run.
+
+You can find examples of configurations in the ```config``` folder. Specifically, ```example.jsonc``` and ```proof_of_concept.jsonc``` are simple configurations designed as a starting point.
+
+You can find a step-by-step guide on how to use ERASURE in our IJCAI demo paper: https://www.ijcai.org/proceedings/2025/1255
+
+You may also find the presentation in the ```guide``` folder useful to implement your methods in the ERASURE framework. 
 
 
 ## Team Information:
