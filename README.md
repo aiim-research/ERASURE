@@ -18,10 +18,7 @@
 
 ## 📝 Citation
 
-<p align="center">
-  <img src="https://i.imgur.com/cCOB6T2.png" alt="IJCAI Logo" width="150" style="display:inline-block; margin-right:10px;"/>
-  <img src="https://i.imgur.com/5NpDTOH.jpeg" alt="CIKM Logo" width="100" style="display:inline-block;"/>
-</p>
+<p align="center"><img src="https://i.imgur.com/cCOB6T2.png" width="150"/> <img src="https://i.imgur.com/5NpDTOH.jpeg" width="100"/></p>
 
 ERASURE was accepted as IJCAI demo and CIKM resource! 
 
