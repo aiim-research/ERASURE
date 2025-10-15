@@ -3,13 +3,24 @@
 # ERASURE  
 ### Redefining Privacy Through Selective Machine Unlearning
 
-<img src="ERASURE_LOGO.png" alt="ERASURE Logo" width="200"/>
+<img src="ERASURE_LOGO.png" alt="ERASURE Logo" width="150"/>
 
 [![Star us on GitHub](https://img.shields.io/badge/⭐_Star_Us_If_You_Like_It-181717?style=for-the-badge&logo=github)](https://github.com/aiim-research/ERASURE)
 
+### ERASURE: Open-source framework for selective machine unlearning and privacy-preserving AI
+
+[![License](https://img.shields.io/github/license/aiim-research/ERASURE?style=flat-square)](LICENSE)
+[![Last Commit](https://img.shields.io/github/last-commit/aiim-research/ERASURE?style=flat-square)](https://github.com/aiim-research/ERASURE/commits/main)
+
 </div>
 
+
+
 ## 📝 Citation
+
+<img src="https://i.imgur.com/cCOB6T2.png" alt="ERASURE Logo" width="150"/>
+<img src="https://i.imgur.com/5NpDTOH.jpeg" alt="ERASURE Logo" width="100"/>
+
 
 ERASURE was accepted as IJCAI demo and CIKM resource! 
 
@@ -32,11 +43,13 @@ If you use this Machine Unlearning framework, please cite us:
 
 
 ## 📜 Table of Contents
-* [📘 General Information](#general-information)
-* [🧭 Guide](#guide)
-* [🧪 Example Workflow](#example-workflow)
-* [📊 Resources Provided with the Framework](#resources-provided-with-the-framework)
-* [Team Information](#team-information)
+* [📘 General Information](#-general-information)
+* [🧭 Guide](#-guide)
+* [⚙️ Installation](#️-installation)
+* [🧪 Example Workflow](#-example-workflow)
+* [📊 Resources Provided with the Framework](#-resources-provided-with-the-framework)
+* [👥 Team Information](#-team-information)
+
 
 ## 📘 General Information
 
@@ -52,6 +65,14 @@ You can find examples of configurations in the ```config``` folder. Specifically
 You can find a step-by-step guide on how to use ERASURE in our IJCAI demo paper: https://www.ijcai.org/proceedings/2025/1255
 
 You may also find the presentation in the ```guide``` folder useful to implement your methods in the ERASURE framework. 
+
+## ⚙️ Installation
+
+```bash
+git clone https://github.com/aiim-research/ERASURE.git
+cd ERASURE
+pip install -r requirements.txt
+```
 
 
 
@@ -109,3 +130,6 @@ However, benchmarking your Unlearner in an unified environment is just as import
 * Andrea D'Angelo [investigator]
 * Claudio Savelli [investigator]
 * Gabriele Tagliente [pivotal contributor]
+
+---
+<sub>Keywords: ERASURE, Machine Unlearning, Privacy, Unlearning, IJCAI, CIKM</sub>
