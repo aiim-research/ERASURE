@@ -32,10 +32,10 @@ If you use this Machine Unlearning framework, please cite us:
 
 
 ## 📜 Table of Contents
-* [General Information](#general-information)
-* [Guide](#guide)
-* [First steps with ERASURE](#first-steps-with-erasure)
-* [Resources Provided with the Framework](#resources-provided-with-the-framework)
+* [📘 General Information](#general-information)
+* [🧭 Guide](#guide)
+* [🧪 Example Workflow](#example-workflow)
+* [📊 Resources Provided with the Framework](#resources-provided-with-the-framework)
 * [Team Information](#team-information)
 
 ## 📘 General Information
