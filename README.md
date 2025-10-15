@@ -7,7 +7,7 @@
 
 [![Star us on GitHub](https://img.shields.io/badge/⭐_Star_Us_If_You_Like_It-181717?style=for-the-badge&logo=github)](https://github.com/aiim-research/ERASURE)
 
-### ERASURE: Open-source framework for selective machine unlearning and privacy-preserving AI
+### ERASURE: Open-source framework for selective machine unlearning
 
 [![License](https://img.shields.io/github/license/aiim-research/ERASURE?style=flat-square)](LICENSE)
 [![Last Commit](https://img.shields.io/github/last-commit/aiim-research/ERASURE?style=flat-square)](https://github.com/aiim-research/ERASURE/commits/main)
