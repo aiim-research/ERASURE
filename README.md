@@ -1,11 +1,15 @@
-# ERASURE - Redefining Privacy Through Selective Machine Unlearning
+<div align="center">
 
-![ERASURE Logo](ERASURE_LOGO.png)
+# ERASURE  
+### Redefining Privacy Through Selective Machine Unlearning
+
+<img src="ERASURE_LOGO.png" alt="ERASURE Logo" width="200"/>
 
 [![Star us on GitHub](https://img.shields.io/badge/⭐_Star_Us_If_You_Like_It-181717?style=for-the-badge&logo=github)](https://github.com/aiim-research/ERASURE)
 
+</div>
 
-## Citation
+## 📝 Citation
 
 ERASURE was accepted as IJCAI demo and CIKM resource! 
 
@@ -27,15 +31,14 @@ If you use this Machine Unlearning framework, please cite us:
 }
 
 
-## Table of Contents
+## 📜 Table of Contents
 * [General Information](#general-information)
-* [Team Information](#team-information)
+* [Guide](#guide)
 * [First steps with ERASURE](#first-steps-with-erasure)
 * [Resources Provided with the Framework](#resources-provided-with-the-framework)
-* [References](#references)
+* [Team Information](#team-information)
 
-## General Information
-
+## 📘 General Information
 
 ERASURE offers fully extensible built-in components, allowing users to define custom unlearning techniques, integrate custom and synthetic datasets, implement tailored evaluation metrics, and meld seamlessly with state-of-the-art machine learning models.
 Additionally, it provides a flexible environment for defining and running unlearning experiments, enabling researchers to evaluate the effectiveness and efficiency of various unlearning methods systematically.
@@ -44,28 +47,33 @@ The framework is inside the ```erasure``` folder. A JSON configuration file is e
 
 You can find examples of configurations in the ```config``` folder. Specifically, ```example.jsonc``` and ```proof_of_concept.jsonc``` are simple configurations designed as a starting point.
 
+## 🧭 Guide
+
 You can find a step-by-step guide on how to use ERASURE in our IJCAI demo paper: https://www.ijcai.org/proceedings/2025/1255
 
 You may also find the presentation in the ```guide``` folder useful to implement your methods in the ERASURE framework. 
 
 
-## Team Information:
-* Prof. Giovanni Stilo, PhD. [project leader/research advisor]
-* Flavio Giobergia, PhD. [research advisor]
-* Andrea D'Angelo [investigator]
-* Claudio Savelli [investigator]
-* Gabriele Tagliente [pivotal contributor]
 
-## First steps with ERASURE
+## 🧪 Example Workflow
+
+<div align="center">
+ <img src="https://i.imgur.com/gcar8Zz.png" alt="worfklow" width="500"/>
+</div>
+
+To run an experiment, you just have to run:
+
 ```console
 foo@bar:~$ python main.py configs/example.jsonc
 ```
 
+in your terminal, given that you have dependencies installed.
 
-## Resources Provided with the Framework
+
+## 📊 Resources Provided with the Framework
 
 
-### Datasets:
+### 🗂️ Datasets
 
 You can quickly implement any Dataset you like in ERASURE. At the moment, ERASURE has built-in DataSource classes for the following sources:
 
@@ -78,59 +86,26 @@ You can quickly implement any Dataset you like in ERASURE. At the moment, ERASUR
 ![Static Badge](https://img.shields.io/badge/Datasource-PyTorch%20Geometric-blue)
 
 
-
-
-
-
-### Unlearners: 
+### 🧩 Built-in Unlearners 
 
 Developing your own custom Unlearner in ERASURE is easy. 
 
 However, benchmarking your Unlearner in an unified environment is just as important. Right now, ERASURE comes built-in with the following Unlearners:
 
-![Static Badge](https://img.shields.io/badge/Unlearner-Gold%20Model-red)
 
-![Static Badge](https://img.shields.io/badge/Unlearner-Finetuning-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-Successive%20Random%20Labels-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-cfk-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-euk-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-NegGrad-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-Advanced%20NegGrad-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-UNSIR-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-Bad%20Teaching-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-SCRUB-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-Fisher%20Forgetting-red) 
-
-![Static Badge](https://img.shields.io/badge/Unlearner-Selective%20Synaptic%20Dampening-red)
-
-![Static Badge](https://img.shields.io/badge/Unlearner-SalUn-red) 
+| | | |
+|:--:|:--:|:--:|
+| ![Static Badge](https://img.shields.io/badge/Unlearner-cfk-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-euk-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-SalUn-red) |
+| ![Static Badge](https://img.shields.io/badge/Unlearner-UNSIR-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-SCRUB-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-NegGrad-red) |
+| ![Static Badge](https://img.shields.io/badge/Unlearner-Finetuning-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-Bad%20Teaching-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-Gold%20Model-red) |
+| ![Static Badge](https://img.shields.io/badge/Unlearner-Fisher%20Forgetting-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-Successive%20Random%20Labels-red) | ![Static Badge](https://img.shields.io/badge/Unlearner-Selective%20Synaptic%20Dampening-red) |
+| ![Static Badge](https://img.shields.io/badge/Unlearner-Advanced%20NegGrad-red) |  |  |
 
 
-## References
 
-<!--  taken with Harvard reference style -->
-
-1. **cfk, euk**: Shashwat Goel, Ameya Prabhu, Amartya Sanyal, Ser-Nam Lim, Philip Torr, and Ponnurangam Kumaraguru. 2022. Towards adversarial evaluations for inexact machine unlearning. arXiv preprint arXiv:2201.06640 (2022).
-
-2. **NegGrad, Fisher Forgetting**: Golatkar, A., Achille, A. and Soatto, S., 2019. Eternal sunshine of the spotless net: Selective forgetting in deep networks. In 2020 IEEE. In CVF Conference on Computer Vision and Pattern Recognition (CVPR) (pp. 9301-9309).
-
-3. **Advanced NegGrad**: Choi, D. and Na, D., 2023. Towards machine unlearning benchmarks: Forgetting the personal identities in facial recognition systems. arXiv preprint arXiv:2311.02240.
-
-4. **UNSIR**: Tarun, A.K., Chundawat, V.S., Mandal, M. and Kankanhalli, M., 2023. Fast yet effective machine unlearning. IEEE Transactions on Neural Networks and Learning Systems.
-
-5. **Bad Teaching**: Chundawat, V.S., Tarun, A.K., Mandal, M. and Kankanhalli, M., 2023, June. Can bad teaching induce forgetting? unlearning in deep networks using an incompetent teacher. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 37, No. 6, pp. 7210-7217).
-
-6. **SCRUB**: Kurmanji, M., Triantafillou, P., Hayes, J. and Triantafillou, E., 2024. Towards unbounded machine unlearning. Advances in neural information processing systems, 36.
-
-7. **Selective Synaptic Dampening**: Foster, J., Schoepf, S. and Brintrup, A., 2024, March. Fast machine unlearning without retraining through selective synaptic dampening. In Proceedings of the AAAI Conference on Artificial Intelligence (Vol. 38, No. 11, pp. 12043-12051).
-
-8. **SalUn**: Fan, C., Liu, J., Zhang, Y., Wong, E., Wei, D. and Liu, S. (2024) ‘SalUn: Empowering machine unlearning via gradient-based weight saliency in both image classification and generation’, arXiv preprint, arXiv:2310.12508. Available at: https://arxiv.org/abs/2310.12508.
+## Team Information:
+* Prof. Giovanni Stilo, PhD. [project leader/research advisor]
+* Flavio Giobergia, PhD. [research advisor]
+* Andrea D'Angelo [investigator]
+* Claudio Savelli [investigator]
+* Gabriele Tagliente [pivotal contributor]
