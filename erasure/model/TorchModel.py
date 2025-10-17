@@ -1,7 +1,7 @@
 import numpy as np
 import random
 import torch
-
+import copy
 from erasure.core.trainable_base import Trainable
 from erasure.utils.cfg_utils import init_dflts_to_of
 from erasure.core.factory_base import get_instance_kvargs, get_instance
@@ -22,8 +22,20 @@ class TorchModel(Trainable):
         self.model = get_instance_kvargs(self.local_config['parameters']['model']['class'],
                                    self.local_config['parameters']['model']['parameters'])
         
-        #self.model.apply(init_weights)
+
+        if hasattr(self.global_ctx, 'save_weights'):
+            if self.global_ctx.save_weights:
+                self.train_init_weights = self.model.state_dict()
+                self.global_ctx.save_weights = False
+
         
+        if hasattr(self.local, 'train_init_weights'):
+            if self.local.train_init_weights:
+                self.model.load_state_dict(self.local.train_init_weights)
+
+        print(self.model.feature_extractor[0].weight[-2:])
+
+
         self.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
                                       {'params':self.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
         
