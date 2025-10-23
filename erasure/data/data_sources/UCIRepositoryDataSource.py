@@ -46,6 +46,8 @@ class UCIRepositoryDataSource(DataSource):
 
         if not self.data_columns:
             self.data_columns = [col for col in pddataset if col != self.label]
+        else:
+            self.data_columns = [col for col in pddataset if col in self.data_columns and col != self.label]
             
         
         self.name = self.dataset.metadata.name if 'name' in self.dataset.metadata else 'Name not found'
