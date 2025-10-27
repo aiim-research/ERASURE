@@ -33,8 +33,6 @@ class TorchModel(Trainable):
             if self.local.train_init_weights:
                 self.model.load_state_dict(self.local.train_init_weights)
 
-        print(self.model.feature_extractor[0].weight[-2:])
-
 
         self.optimizer = get_instance_kvargs(self.local_config['parameters']['optimizer']['class'],
                                       {'params':self.model.parameters(), **self.local_config['parameters']['optimizer']['parameters']})
