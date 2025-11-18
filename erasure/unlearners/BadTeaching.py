@@ -83,7 +83,7 @@ class BadTeaching(TorchUnlearner):
         self.retain_set = retain_loader.dataset
         self.forget_set = forget_loader.dataset
         
-        unlearning_data = UnLearningData(forget_data=self.retain_set, retain_data=self.forget_set, transform=self.transform)
+        unlearning_data = UnLearningData(forget_data=self.forget_set, retain_data=self.retain_set, transform=self.transform)
         if isinstance(self.retain_set[0][0],Data):
             unlearning_loader = GeometricDataLoader(unlearning_data, batch_size=self.batch_size, shuffle=True)
         else:
