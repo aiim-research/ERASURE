@@ -34,6 +34,8 @@ class DatasetManager(Configurable):
 
         self.add_partitions(self.parts_cfgs)
 
+        self.print_partition_lengths()
+
     def add_partitions(self, splits, postfix=""):
         for split in splits:
             self.add_partition(split,postfix)
@@ -124,6 +126,11 @@ class DatasetManager(Configurable):
         else:
             raise ValueError(f"Partition ID '{split_id}' not found in partitions.")
    
+    def print_partition_lengths(self):
+        self.info("Dataset partitions summary:")
+        for name, part in self.partitions.items():
+            self.info(f"  {name}: {len(part)} samples")
+
 
 def skip_nones_collate(batch):
     batch = [item for item in batch if item is not None]
