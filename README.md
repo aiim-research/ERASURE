@@ -39,6 +39,23 @@ If you use this Machine Unlearning framework, please cite us:
   url       = {https://doi.org/10.24963/ijcai.2025/1255},
 }
 
+>@inproceedings{10.1145/3746252.3761627,
+author = {D'Angelo, Andrea and Savelli, Claudio and Tagliente, Gabriele and Giobergia, Flavio and Baralis, Elena and Stilo, Giovanni},
+title = {ERASURE: A Modular and Extensible Framework for Machine Unlearning},
+year = {2025},
+isbn = {9798400720406},
+publisher = {Association for Computing Machinery},
+address = {New York, NY, USA},
+url = {https://doi.org/10.1145/3746252.3761627},
+doi = {10.1145/3746252.3761627},
+booktitle = {Proceedings of the 34th ACM International Conference on Information and Knowledge Management},
+pages = {6346–6350},
+numpages = {5},
+keywords = {benchmark, evaluation framework, machine unlearning},
+location = {Seoul, Republic of Korea},
+series = {CIKM '25}
+}
+
 
 ## 📜 Table of Contents
 * [📘 General Information](#-general-information)
